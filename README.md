@@ -4,8 +4,6 @@ A complete C++ framework for training and finetuning Transformer language models
 
 **Version:** 1.0.0  
 **Language:** C++17  
-**License:** MIT
-
 ---
 
 ## Vision
