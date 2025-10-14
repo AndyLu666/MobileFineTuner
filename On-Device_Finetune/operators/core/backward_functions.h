@@ -1,0 +1,305 @@
+#pragma once
+
+#include "tensor.h"
+#include <memory>
+#include <vector>
+
+namespace ops {
+
+class Tensor;
+using TensorPtr = std::shared_ptr<Tensor>;
+
+class BackwardFunction {
+public:
+    virtual ~BackwardFunction() = default;
+    virtual std::vector<TensorPtr> apply(const TensorPtr& grad_output) = 0;
+};
+
+using BackwardFunctionPtr = std::shared_ptr<BackwardFunction>;
+
+class AddBackward : public BackwardFunction {
+private:
+    std::vector<int64_t> shape_a_, shape_b_;
+
+public:
+    AddBackward(const std::vector<int64_t>& shape_a, const std::vector<int64_t>& shape_b)
+        : shape_a_(shape_a), shape_b_(shape_b) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class MulBackward : public BackwardFunction {
+private:
+    TensorPtr a_, b_;
+
+public:
+    MulBackward(const TensorPtr& a, const TensorPtr& b) : a_(a), b_(b) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class MatmulBackward : public BackwardFunction {
+private:
+    TensorPtr a_, b_;
+
+public:
+    MatmulBackward(const TensorPtr& a, const TensorPtr& b) : a_(a), b_(b) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class ReluBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+
+public:
+    ReluBackward(const TensorPtr& input) : input_(input) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class GeluBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+
+public:
+    GeluBackward(const TensorPtr& input) : input_(input) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class SigmoidBackward : public BackwardFunction {
+private:
+    TensorPtr output_;
+
+public:
+    SigmoidBackward(const TensorPtr& output) : output_(output) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class SoftmaxBackward : public BackwardFunction {
+private:
+    TensorPtr output_;
+    int dim_;
+
+public:
+    SoftmaxBackward(const TensorPtr& output, int dim) : output_(output), dim_(dim) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class LayerNormBackward : public BackwardFunction {
+private:
+    TensorPtr input_, weight_, bias_;
+    TensorPtr mean_, var_;
+    float eps_;
+
+public:
+    LayerNormBackward(const TensorPtr& input, const TensorPtr& weight,
+                     const TensorPtr& bias, const TensorPtr& mean,
+                     const TensorPtr& var, float eps)
+        : input_(input), weight_(weight), bias_(bias), mean_(mean), var_(var), eps_(eps) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// Backward for RMSNorm: y = (x / sqrt(mean(x^2)+eps)) * weight
+class RMSNormBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+    TensorPtr weight_;
+    float eps_;
+public:
+    RMSNormBackward(const TensorPtr& input, const TensorPtr& weight, float eps)
+        : input_(input), weight_(weight), eps_(eps) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class LinearBackward : public BackwardFunction {
+private:
+    TensorPtr input_, weight_, bias_;
+
+public:
+    LinearBackward(const TensorPtr& input, const TensorPtr& weight, const TensorPtr& bias)
+        : input_(input), weight_(weight), bias_(bias) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class MSELossBackward : public BackwardFunction {
+private:
+    TensorPtr input_, target_;
+    std::string reduction_;
+
+public:
+    MSELossBackward(const TensorPtr& input, const TensorPtr& target, const std::string& reduction)
+        : input_(input), target_(target), reduction_(reduction) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class TransposeBackward : public BackwardFunction {
+private:
+    int dim0_, dim1_;
+
+public:
+    TransposeBackward(int dim0, int dim1) : dim0_(dim0), dim1_(dim1) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class ReshapeBackward : public BackwardFunction {
+private:
+    std::vector<int64_t> original_shape_;
+
+public:
+    ReshapeBackward(const std::vector<int64_t>& original_shape) : original_shape_(original_shape) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class CrossEntropyLossBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+    TensorPtr target_;
+    std::string reduction_;
+
+public:
+    CrossEntropyLossBackward(const TensorPtr& input, const TensorPtr& target, const std::string& reduction)
+        : input_(input), target_(target), reduction_(reduction) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class LogSoftmaxBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+    TensorPtr output_;
+    int dim_;
+
+public:
+    LogSoftmaxBackward(const TensorPtr& input, const TensorPtr& output, int dim)
+        : input_(input), output_(output), dim_(dim) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class SumBackward : public BackwardFunction {
+private:
+    std::vector<int64_t> input_shape_;
+    int dim_;
+    bool keepdim_;
+
+public:
+    SumBackward(const std::vector<int64_t>& input_shape, int dim, bool keepdim)
+        : input_shape_(input_shape), dim_(dim), keepdim_(keepdim) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// New: scale backward for unary ops like mul(tensor, scalar) and div
+class ScaleBackward : public BackwardFunction {
+private:
+    float scale_;
+public:
+    explicit ScaleBackward(float scale) : scale_(scale) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// New: pass-through backward for unary ops like add/sub with scalar
+class PassThroughBackward : public BackwardFunction {
+public:
+    PassThroughBackward() = default;
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// Backward for apply_mask: y = input + mask (mask is constant w.r.t. gradients)
+class ApplyMaskBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+public:
+    explicit ApplyMaskBackward(const TensorPtr& input) : input_(input) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// New: matmul_rhs_T backward for y = a @ b^T (b is [N,K])
+class MatmulRhsTBackward : public BackwardFunction {
+private:
+    TensorPtr a_;
+    TensorPtr b_;
+public:
+    MatmulRhsTBackward(const TensorPtr& a, const TensorPtr& b) : a_(a), b_(b) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class LoRALinearBackward : public BackwardFunction {
+private:
+    TensorPtr input_;
+    TensorPtr weight_;
+    TensorPtr lora_A_;
+    TensorPtr lora_B_;
+    TensorPtr bias_;
+    float alpha_;
+
+public:
+    LoRALinearBackward(const TensorPtr& input, const TensorPtr& weight,
+                      const TensorPtr& lora_A, const TensorPtr& lora_B,
+                      float alpha, const TensorPtr& bias)
+        : input_(input), weight_(weight), lora_A_(lora_A), lora_B_(lora_B),
+          alpha_(alpha), bias_(bias) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// Backward for repeat_kv_heads: expands KV heads by repeating; grad should sum back
+class RepeatKVHeadsBackward : public BackwardFunction {
+private:
+    int repeat_factor_;
+public:
+    explicit RepeatKVHeadsBackward(int repeat_factor) : repeat_factor_(repeat_factor) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+// Backward for RoPE: y = R(theta) * x, grad_x = R(theta)^T * grad_y
+class ApplyRoPEBackward : public BackwardFunction {
+private:
+    int seq_len_;
+    int head_dim_;
+    float rope_theta_;
+public:
+    ApplyRoPEBackward(int seq_len, int head_dim, float rope_theta)
+        : seq_len_(seq_len), head_dim_(head_dim), rope_theta_(rope_theta) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class GraphNode {
+public:
+    std::vector<std::shared_ptr<GraphNode>> inputs;
+    BackwardFunctionPtr backward_fn;
+    TensorPtr tensor;
+
+    GraphNode(const TensorPtr& t) : tensor(t) {}
+
+    void add_input(const std::shared_ptr<GraphNode>& input) {
+        inputs.push_back(input);
+    }
+
+    void set_backward_fn(BackwardFunctionPtr fn) {
+        backward_fn = fn;
+    }
+};
+
+using GraphNodePtr = std::shared_ptr<GraphNode>;
+
+GraphNodePtr create_graph_node(const TensorPtr& tensor);
+
+void set_tensor_graph_info(const TensorPtr& result,
+                          const std::vector<TensorPtr>& inputs,
+                          BackwardFunctionPtr backward_fn);
+
+void accumulate_gradient(const TensorPtr& tensor, const TensorPtr& grad);
+
+TensorPtr sum_to_shape(const TensorPtr& tensor, const std::vector<int64_t>& target_shape);
+
+}

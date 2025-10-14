@@ -1,0 +1,19 @@
+# build outputs
+build/
+bin/
+*.exe
+gpt2_lora_finetune
+
+# logs and metrics
+*.log
+logs/
+gpt2_finetune/logs/
+
+# backups
+*.bak
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+

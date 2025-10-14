@@ -1,0 +1,9 @@
+torch>=1.10.0
+transformers>=4.30.0
+datasets>=2.12.0
+accelerate>=0.20.0
+evaluate>=0.4.0
+scikit-learn>=1.0.2
+tqdm>=4.65.0
+wandb>=0.15.0  # 可选，用于实验追踪
+numpy>=1.24.0

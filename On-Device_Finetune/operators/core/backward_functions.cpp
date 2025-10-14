@@ -1,0 +1,512 @@
+#include "backward_functions.h"
+#include "ops.h"
+#include <cmath>
+
+namespace ops {
+
+void accumulate_gradient(const TensorPtr& tensor, const TensorPtr& grad) {
+    if (!tensor->requires_grad()) {
+        return;
+    }
+
+    #ifdef USE_NEW_AUTOGRAD_ENGINE
+    // New engine handles accumulation in Engine::accumulate_grad
+    // This function is only called in legacy mode
+    return;
+    #else
+    // Legacy accumulation with recursive backward
+    if (!tensor->grad()) {
+        tensor->set_grad(grad->clone());
+    } else {
+        auto accumulated = add(tensor->grad(), grad);
+        tensor->set_grad(accumulated);
+    }
+
+    if (tensor->is_leaf()) {
+        return;
+    } else {
+        tensor->backward(grad);
+    }
+    #endif
+}
+
+TensorPtr sum_to_shape(const TensorPtr& tensor, const std::vector<int64_t>& target_shape) {
+
+    if (tensor->shape() == target_shape) {
+        return tensor;
+    }
+
+    auto result = tensor;
+    while (result->shape() != target_shape) {
+        if (result->shape().size() > target_shape.size()) {
+
+            result = sum(result, 0, false);
+        } else if (result->shape().size() == target_shape.size()) {
+
+            for (size_t i = 0; i < target_shape.size(); ++i) {
+                if (target_shape[i] == 1 && result->shape()[i] > 1) {
+                    result = sum(result, static_cast<int>(i), true);
+                }
+            }
+            break;
+        } else {
+
+            std::vector<int64_t> new_shape = {1};
+            new_shape.insert(new_shape.end(), result->shape().begin(), result->shape().end());
+            result = reshape(result, new_shape);
+        }
+    }
+
+    return result;
+}
+
+std::vector<TensorPtr> AddBackward::apply(const TensorPtr& grad_output) {
+
+    auto grad_a = sum_to_shape(grad_output, shape_a_);
+    auto grad_b = sum_to_shape(grad_output, shape_b_);
+
+    return {grad_a, grad_b};
+}
+
+std::vector<TensorPtr> MulBackward::apply(const TensorPtr& grad_output) {
+
+    auto grad_a = mul(grad_output, b_);
+    auto grad_b = mul(grad_output, a_);
+
+    grad_a = sum_to_shape(grad_a, a_->shape());
+    grad_b = sum_to_shape(grad_b, b_->shape());
+
+    return {grad_a, grad_b};
+}
+
+std::vector<TensorPtr> MatmulBackward::apply(const TensorPtr& grad_output) {
+
+    auto grad_a = matmul(grad_output, transpose(b_, -2, -1));
+    auto grad_b = matmul(transpose(a_, -2, -1), grad_output);
+
+    return {grad_a, grad_b};
+}
+
+std::vector<TensorPtr> ReluBackward::apply(const TensorPtr& grad_output) {
+
+    auto result = zeros(input_->shape(), input_->dtype(), input_->device());
+
+    const float* input_data = input_->data<float>();
+    const float* grad_data = grad_output->data<float>();
+    float* result_data = result->data<float>();
+
+    for (int64_t i = 0; i < input_->numel(); ++i) {
+        result_data[i] = (input_data[i] > 0.0f) ? grad_data[i] : 0.0f;
+    }
+
+    return {result};
+}
+
+std::vector<TensorPtr> GeluBackward::apply(const TensorPtr& grad_output) {
+
+    auto result = zeros(input_->shape(), input_->dtype(), input_->device());
+
+    const float* input_data = input_->data<float>();
+    const float* grad_data = grad_output->data<float>();
+    float* result_data = result->data<float>();
+
+    for (int64_t i = 0; i < input_->numel(); ++i) {
+        float x = input_data[i];
+
+        float tanh_input = 0.7978845608f * (x + 0.044715f * x * x * x);
+        float tanh_val = std::tanh(tanh_input);
+
+        float grad_gelu = 0.5f * (1.0f + tanh_val) +
+                         0.5f * x * (1.0f - tanh_val * tanh_val) *
+                         0.7978845608f * (1.0f + 3.0f * 0.044715f * x * x);
+
+        result_data[i] = grad_data[i] * grad_gelu;
+    }
+
+    return {result};
+}
+
+std::vector<TensorPtr> SigmoidBackward::apply(const TensorPtr& grad_output) {
+
+    auto one = ones(output_->shape(), output_->dtype(), output_->device());
+    auto one_minus_sigmoid = sub(one, output_);
+    auto sigmoid_grad = mul(output_, one_minus_sigmoid);
+    auto result = mul(grad_output, sigmoid_grad);
+
+    return {result};
+}
+
+std::vector<TensorPtr> SoftmaxBackward::apply(const TensorPtr& grad_output) {
+
+    auto softmax_grad_prod = mul(grad_output, output_);
+    auto sum_grad = sum(softmax_grad_prod, dim_, true);
+    auto grad_diff = sub(grad_output, sum_grad);
+    auto result = mul(output_, grad_diff);
+
+    return {result};
+}
+
+std::vector<TensorPtr> LinearBackward::apply(const TensorPtr& grad_output) {
+
+    std::vector<TensorPtr> grads;
+
+    auto grad_input = matmul(grad_output, weight_);
+    grads.push_back(grad_input);
+
+    auto grad_weight = matmul(transpose(input_, -2, -1), grad_output);
+    grads.push_back(grad_weight);
+
+    if (bias_) {
+        auto grad_bias = sum(grad_output, 0, false);
+        grads.push_back(grad_bias);
+    }
+
+    return grads;
+}
+
+std::vector<TensorPtr> MSELossBackward::apply(const TensorPtr& grad_output) {
+
+    auto diff = sub(input_, target_);
+    auto two = ops::full(diff->shape(), 2.0f, diff->dtype(), diff->device());
+    auto grad = mul(two, diff);
+
+    if (reduction_ == "mean") {
+        float scale = 1.0f / static_cast<float>(input_->numel());
+        auto scale_tensor = ops::full(grad->shape(), scale, grad->dtype(), grad->device());
+        grad = mul(grad, scale_tensor);
+    }
+
+    grad = mul(grad, grad_output);
+
+    return {grad};
+}
+
+std::vector<TensorPtr> TransposeBackward::apply(const TensorPtr& grad_output) {
+
+    auto result = transpose(grad_output, dim0_, dim1_);
+    return {result};
+}
+
+std::vector<TensorPtr> ReshapeBackward::apply(const TensorPtr& grad_output) {
+
+    auto result = reshape(grad_output, original_shape_);
+    return {result};
+}
+
+std::vector<TensorPtr> LayerNormBackward::apply(const TensorPtr& grad_output) {
+
+    std::vector<TensorPtr> grads;
+
+    auto normalized = div(sub(input_, mean_), add(var_, eps_));
+    
+    auto grad_input = mul(grad_output, weight_);
+    grads.push_back(grad_input);
+
+    auto grad_weight = sum(mul(grad_output, normalized), 0, false);
+    grads.push_back(grad_weight);
+
+    auto grad_bias = sum(grad_output, 0, false);
+    grads.push_back(grad_bias);
+
+    return grads;
+}
+
+std::vector<TensorPtr> RMSNormBackward::apply(const TensorPtr& grad_output) {
+    // Implement numerically stable RMSNorm backward
+    const auto& shape = input_->shape();
+    int64_t D = shape.back();
+    int64_t batch = input_->numel() / D;
+    auto grad_input = zeros(shape, input_->dtype(), input_->device());
+
+    const float* x = input_->data<float>();
+    const float* w = weight_->data<float>();
+    const float* gy = grad_output->data<float>();
+    float* gx = grad_input->data<float>();
+
+    for (int64_t b=0;b<batch;++b){
+        const float* xb = x + b*D;
+        const float* gyb = gy + b*D;
+        float* gxb = gx + b*D;
+        // compute rms and x_hat
+        float sqsum = 0.f;
+        for (int64_t i=0;i<D;++i) sqsum += xb[i]*xb[i];
+        float inv_rms = 1.0f / std::sqrt(sqsum / (float)D + eps_);
+        // y = x_hat * w, x_hat = x * inv_rms
+        // dL/dx = (gy*w)*(inv_rms) - x * inv_rms^3 * (1/D) * sum_i( (gy*w)*x )
+        float dot = 0.f;
+        for (int64_t i=0;i<D;++i) dot += (gyb[i]*w[i]) * xb[i];
+        float coeff = inv_rms*inv_rms*inv_rms / (float)D;
+        for (int64_t i=0;i<D;++i){
+            float term1 = (gyb[i]*w[i]) * inv_rms;
+            float term2 = xb[i] * coeff * dot;
+            gxb[i] = term1 - term2;
+        }
+    }
+
+    return {grad_input};
+}
+
+std::vector<TensorPtr> CrossEntropyLossBackward::apply(const TensorPtr& grad_output) {
+    
+    const auto& input_shape = input_->shape();
+    const auto& target_shape = target_->shape();
+    
+    int64_t batch_size = input_shape[0];
+    int64_t num_classes = input_shape[1];
+    
+    auto softmax_probs = softmax(input_, -1);
+    const float* softmax_data = softmax_probs->data<float>();
+    const float* target_data = target_->data<float>();
+    
+    auto grad_input = zeros(input_shape, input_->dtype(), input_->device());
+    float* grad_data = grad_input->data<float>();
+    
+    float scale = 1.0f;
+    if (reduction_ == "mean") {
+        scale = 1.0f / static_cast<float>(batch_size);
+    }
+    
+    for (int64_t b = 0; b < batch_size; ++b) {
+        int target_class = static_cast<int>(target_data[b]);
+        if (target_class >= 0 && target_class < num_classes) {
+            for (int64_t c = 0; c < num_classes; ++c) {
+                int64_t idx = b * num_classes + c;
+                if (c == target_class) {
+                    grad_data[idx] = (softmax_data[idx] - 1.0f) * scale;
+                } else {
+                    grad_data[idx] = softmax_data[idx] * scale;
+                }
+            }
+        }
+    }
+    
+    // grad_output is usually a scalar [1], directly use the first element
+    float grad_scale = 1.0f;
+    if (grad_output->numel() == 1) {
+        grad_scale = grad_output->data<float>()[0];
+    }
+    
+    if (grad_scale != 1.0f) {
+        grad_input = mul(grad_input, grad_scale);
+    }
+    
+    return {grad_input};
+}
+
+std::vector<TensorPtr> LogSoftmaxBackward::apply(const TensorPtr& grad_output) {
+    
+    auto softmax_probs = softmax(input_, dim_);
+    auto sum_grad = sum(grad_output, dim_, true);
+    auto grad_input = sub(grad_output, mul(softmax_probs, sum_grad));
+    
+    return {grad_input};
+}
+
+std::vector<TensorPtr> RepeatKVHeadsBackward::apply(const TensorPtr& grad_output) {
+    // grad_output shape: [batch, kv_heads*repeat, seq, dim]
+    // reduce by summing contiguous groups along head dimension
+    const auto& gshape = grad_output->shape();
+    if (gshape.size() != 4) {
+        throw TensorError("RepeatKVHeadsBackward expects 4D gradient");
+    }
+    int64_t batch = gshape[0];
+    int64_t heads_rep = gshape[1];
+    int64_t seq = gshape[2];
+    int64_t dim = gshape[3];
+    if (heads_rep % repeat_factor_ != 0) {
+        throw TensorError("repeat_factor does not divide head dimension");
+    }
+    int64_t kv_heads = heads_rep / repeat_factor_;
+    auto grad_kv = zeros({batch, kv_heads, seq, dim}, grad_output->dtype(), grad_output->device());
+    const float* src = grad_output->data<float>();
+    float* dst = grad_kv->data<float>();
+    for (int64_t b=0;b<batch;++b){
+        for(int64_t kv=0;kv<kv_heads;++kv){
+            for(int64_t rep=0;rep<repeat_factor_;++rep){
+                int64_t out_head = kv*repeat_factor_+rep;
+                for(int64_t s=0;s<seq;++s){
+                    for(int64_t d=0;d<dim;++d){
+                        int64_t src_idx = (((b*heads_rep + out_head)*seq + s)*dim + d);
+                        int64_t dst_idx = (((b*kv_heads + kv)*seq + s)*dim + d);
+                        dst[dst_idx] += src[src_idx];
+                    }
+                }
+            }
+        }
+    }
+    return {grad_kv};
+}
+
+std::vector<TensorPtr> ApplyRoPEBackward::apply(const TensorPtr& grad_output) {
+    const auto& gshape = grad_output->shape();
+    if (gshape.size() != 4) {
+        throw TensorError("ApplyRoPEBackward expects 4D tensor [batch, heads, seq, head_dim]");
+    }
+    int64_t batch = gshape[0];
+    int64_t heads = gshape[1];
+    int64_t seq_len = gshape[2];
+    int64_t head_dim = gshape[3];
+    if (head_dim != head_dim_) {
+        // Allow silent continue but check consistency
+    }
+    if ((head_dim % 2) != 0) {
+        throw TensorError("ApplyRoPEBackward requires even head_dim");
+    }
+
+    auto grad_input = zeros(gshape, grad_output->dtype(), grad_output->device());
+    const float* gy = grad_output->data<float>();
+    float* gx = grad_input->data<float>();
+
+    const int64_t stride_head = seq_len * head_dim;
+    const int64_t stride_batch = heads * stride_head;
+
+    for (int64_t b = 0; b < batch; ++b) {
+        for (int64_t h = 0; h < heads; ++h) {
+            for (int64_t pos = 0; pos < seq_len; ++pos) {
+                int64_t base = b * stride_batch + h * stride_head + pos * head_dim;
+                for (int64_t d = 0; d < head_dim / 2; ++d) {
+                    float freq = 1.0f / std::pow(rope_theta_, 2.0f * static_cast<float>(d) / static_cast<float>(head_dim));
+                    float angle = static_cast<float>(pos) * freq;
+                    float c = std::cos(angle);
+                    float s = std::sin(angle);
+                    int64_t idx1 = base + 2 * d;
+                    int64_t idx2 = base + 2 * d + 1;
+                    float g1p = gy[idx1];
+                    float g2p = gy[idx2];
+                    // grad_input = R^T * grad_output
+                    gx[idx1] = g1p * c + g2p * s;
+                    gx[idx2] = -g1p * s + g2p * c;
+                }
+            }
+        }
+    }
+
+    return {grad_input};
+}
+
+std::vector<TensorPtr> SumBackward::apply(const TensorPtr& grad_output) {
+    // Sum's gradient: broadcast grad_output to input shape
+    auto grad_input = zeros(input_shape_, grad_output->dtype(), grad_output->device());
+    const float* grad_data = grad_output->data<float>();
+    float* input_grad_data = grad_input->data<float>();
+    
+    if (dim_ == -1) {
+        // Summed all dimensions
+        float grad_val = grad_data[0];
+        for (int64_t i = 0; i < grad_input->numel(); ++i) {
+            input_grad_data[i] = grad_val;
+        }
+    } else {
+        // Summed along specific dimension - need to broadcast back
+        // Simplified: copy grad to all positions
+        int64_t total = grad_input->numel();
+        int64_t grad_size = grad_output->numel();
+        
+        for (int64_t i = 0; i < total; ++i) {
+            int64_t grad_idx = i % grad_size;
+            input_grad_data[i] = grad_data[grad_idx];
+        }
+    }
+    
+    return {grad_input};
+}
+
+std::vector<TensorPtr> ScaleBackward::apply(const TensorPtr& grad_output) {
+    // dy/dx = scale -> grad_input = grad_output * scale
+    auto grad_input = mul(grad_output, scale_);
+    return {grad_input};
+}
+
+std::vector<TensorPtr> PassThroughBackward::apply(const TensorPtr& grad_output) {
+    // dy/dx = 1 -> grad_input = grad_output
+    return {grad_output};
+}
+
+std::vector<TensorPtr> ApplyMaskBackward::apply(const TensorPtr& grad_output) {
+    // y = input + mask (mask is constant), so grad wrt input is grad_output, mask has no grad
+    return {grad_output};
+}
+
+std::vector<TensorPtr> MatmulRhsTBackward::apply(const TensorPtr& grad_output) {
+    // y = a @ b^T
+    // grad_a = grad_y @ b
+    // grad_b = grad_y^T @ a  (then transpose back to match original b shape semantics)
+    std::vector<TensorPtr> grads;
+    TensorPtr grad_a = nullptr;
+    TensorPtr grad_b = nullptr;
+    if (a_ && a_->requires_grad()) {
+        grad_a = matmul(grad_output, b_);
+    }
+    if (b_ && b_->requires_grad()) {
+        auto grad_y_T = transpose(grad_output, -2, -1);
+        grad_b = matmul(grad_y_T, a_);
+    }
+    grads.push_back(grad_a);
+    grads.push_back(grad_b);
+    return grads;
+}
+
+std::vector<TensorPtr> LoRALinearBackward::apply(const TensorPtr& grad_output) {
+    std::vector<TensorPtr> grads;
+    
+    // Gradient w.r.t. input (from both main and LoRA branches)
+    TensorPtr grad_input;
+    if (input_->requires_grad()) {
+        // Main branch: grad_output @ weight^T
+        auto grad_input_main = matmul(grad_output, transpose(weight_, 0, 1));
+        
+        // LoRA branch: grad_output @ lora_B^T @ lora_A^T * alpha
+        auto lora_B_t = transpose(lora_B_, 0, 1);
+        auto lora_A_t = transpose(lora_A_, 0, 1);
+        auto grad_input_lora = matmul(matmul(grad_output, lora_B_t), lora_A_t);
+        auto grad_input_lora_scaled = mul(grad_input_lora, alpha_);
+        
+        grad_input = add(grad_input_main, grad_input_lora_scaled);
+    } else {
+        grad_input = nullptr;
+    }
+    grads.push_back(grad_input);
+    
+    // Gradient w.r.t. weight (frozen, returns nullptr)
+    grads.push_back(nullptr);
+    
+    // Gradient w.r.t. lora_A
+    TensorPtr grad_lora_A;
+    if (lora_A_->requires_grad()) {
+        // grad_output @ lora_B^T gives grad w.r.t. lora_hidden
+        // input^T @ grad_lora_hidden gives grad w.r.t. lora_A
+        auto lora_B_t = transpose(lora_B_, 0, 1);
+        auto grad_lora_hidden = matmul(grad_output, lora_B_t);
+        auto input_t = transpose(input_, -2, -1);
+        auto grad_lora_A_raw = matmul(input_t, grad_lora_hidden);
+        grad_lora_A = mul(grad_lora_A_raw, alpha_);
+    } else {
+        grad_lora_A = nullptr;
+    }
+    grads.push_back(grad_lora_A);
+    
+    // Gradient w.r.t. lora_B
+    TensorPtr grad_lora_B;
+    if (lora_B_->requires_grad()) {
+        // lora_hidden^T @ grad_output gives grad w.r.t. lora_B
+        auto lora_hidden = matmul(input_, lora_A_);
+        auto lora_hidden_t = transpose(lora_hidden, -2, -1);
+        auto grad_lora_B_raw = matmul(lora_hidden_t, grad_output);
+        grad_lora_B = mul(grad_lora_B_raw, alpha_);
+    } else {
+        grad_lora_B = nullptr;
+    }
+    grads.push_back(grad_lora_B);
+    
+    // Gradient w.r.t. bias (if exists)
+    if (bias_ && bias_->requires_grad()) {
+        auto grad_bias = sum(grad_output, 0, false);
+        grads.push_back(grad_bias);
+    } else {
+        grads.push_back(nullptr);
+    }
+    
+    return grads;
+}
+
+}
