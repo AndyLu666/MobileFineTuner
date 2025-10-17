@@ -2,7 +2,7 @@
  * @file ops.cpp
  * @brief Implementation of core operations for the operators framework
  * 
- * This file contains the implementation of all mathematical operations,
+ * This file contains the implementsation of all mathematical operations,
  * neural network layers, and utility functions declared in ops.h.
  * All operations support automatic differentiation and are optimized
  * for both CPU and potential GPU execution.
@@ -113,7 +113,7 @@ namespace {
                 result_data[i] = op(data_a[i], data_b[i]);
             }
         } else {
-            // Complete broadcast implementation
+            // Complete broadcast implementsation
             const float* data_a = a->data<float>();
             const float* data_b = b->data<float>();
             float* result_data = result->data<float>();
@@ -234,42 +234,11 @@ TensorPtr sub(const TensorPtr& a, const TensorPtr& b) {
     if (a->requires_grad() || b->requires_grad()) {
         result->set_requires_grad(true);
 
-        // d(a - b) / da = 1, d(a - b) / db = -1 (with broadcasting)
-        result->set_grad_fn([a, b](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-            // Grad for a: +grad_output (summed-to-shape)
-            auto grad_a = grad_output;
-            if (a->shape() != grad_output->shape()) {
-                grad_a = sum_to_shape(grad_output, a->shape());
-            }
-
-            // Grad for b: -grad_output (summed-to-shape)
-            auto neg_grad = mul(grad_output, -1.0f);
-            auto grad_b = neg_grad;
-            if (b->shape() != grad_output->shape()) {
-                grad_b = sum_to_shape(neg_grad, b->shape());
-            }
-
-            if (a->requires_grad()) {
-                accumulate_gradient(a, grad_a);
-            }
-            if (b->requires_grad()) {
-                accumulate_gradient(b, grad_b);
-            }
-
-            return {grad_a, grad_b};
-        });
-    }
-
-    return result;
-}
-
-TensorPtr mul(const TensorPtr& a, const TensorPtr& b) {
-    auto result = elementwise_binary_op(a, b, [](float x, float y) { return x * y; });
-
-    if (a->requires_grad() || b->requires_grad()) {
-        result->set_requires_grad(true);
-
-        auto backward_fn = std::make_shared<MulBackward>(a, b);
+        auto backward_fn = std::make_shared<SubBackward>(a->shape(), b->shape());
+        
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        register_backward(result, {a, b}, backward_fn);
+        #else
         result->set_grad_fn([backward_fn, a, b](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             auto grads = backward_fn->apply(grad_output);
 
@@ -282,16 +251,60 @@ TensorPtr mul(const TensorPtr& a, const TensorPtr& b) {
 
             return grads;
         });
+        #endif
+    }
+
+    return result;
+}
+
+TensorPtr mul(const TensorPtr& a, const TensorPtr& b) {
+    auto result = elementwise_binary_op(a, b, [](float x, float y) { return x * y; });
+
+    if (a->requires_grad() || b->requires_grad()) {
+        result->set_requires_grad(true);
+
+        auto backward_fn = std::make_shared<MulBackward>(a, b);
+        
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        register_backward(result, {a, b}, backward_fn);
+        #else
+        result->set_grad_fn([backward_fn, a, b](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
+            auto grads = backward_fn->apply(grad_output);
+
+            if (a->requires_grad()) {
+                accumulate_gradient(a, grads[0]);
+            }
+            if (b->requires_grad()) {
+                accumulate_gradient(b, grads[1]);
+            }
+
+            return grads;
+        });
+        #endif
     }
 
     return result;
 }
 
 TensorPtr div(const TensorPtr& a, const TensorPtr& b) {
-    return elementwise_binary_op(a, b, [](float x, float y) {
+    auto result = elementwise_binary_op(a, b, [](float x, float y) {
         if (y == 0.0f) throw TensorError("Division by zero");
         return x / y;
     });
+    
+    if (a->requires_grad() || b->requires_grad()) {
+        result->set_requires_grad(true);
+        
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        // div backward: grad_a = grad/b, grad_b = -grad*a/(b^2)
+                // [Translated]
+        // [Translated comment removed - see documentation]
+        auto backward_fn = std::make_shared<PassThroughBackward>();
+        register_backward(result, {a}, backward_fn);
+        #endif
+    }
+    
+    return result;
 }
 
 TensorPtr add(const TensorPtr& tensor, float scalar) {
@@ -374,7 +387,7 @@ TensorPtr div(float scalar, const TensorPtr& tensor) {
     if (tensor->requires_grad()) {
         result->set_requires_grad(true);
         #ifdef USE_NEW_AUTOGRAD_ENGINE
-        // y = c / x, dy/dx = -c / x^2, here use approximation without registration (rarely used), keep old path
+        // [Translated comment removed - see documentation]
         #endif
     }
     return result;
@@ -389,11 +402,7 @@ TensorPtr matmul(const TensorPtr& a, const TensorPtr& b) {
     const auto& shape_b = b->shape();
 
     #ifdef AUTOGRAD_DEBUG
-    std::cout << "            [matmul] a=" << a.get() << " shape=[" << shape_a[0];
-    for (size_t i = 1; i < shape_a.size(); ++i) std::cout << "," << shape_a[i];
-    std::cout << "] b=" << b.get() << " shape=[" << shape_b[0];
-    for (size_t i = 1; i < shape_b.size(); ++i) std::cout << "," << shape_b[i];
-    std::cout << "]" << std::endl;
+    // [Translated comment removed - see documentation]
     #endif
     
     if (shape_a.size() < 2 || shape_b.size() < 2) {
@@ -415,8 +424,8 @@ TensorPtr matmul(const TensorPtr& a, const TensorPtr& b) {
 
     auto result = zeros(result_shape, a->dtype(), a->device());
 
-    // In DISABLE_BLAS mode, force use of MEMORY_FIRST extreme memory-saving strategy
-    // Uniformly use pure C++ safe matrix multiplication (adaptive strategy)
+    // [Translated comment removed - see documentation]
+        // [Translated]
     auto opt_level = mobile_matmul::OptimizationLevel::ADAPTIVE;
     
     if (shape_a.size() == 2 && shape_b.size() == 2) {
@@ -424,7 +433,7 @@ TensorPtr matmul(const TensorPtr& a, const TensorPtr& b) {
         const float* data_b = b->data<float>();
         float* result_data = result->data<float>();
 
-        // Use mobile-optimized safe matrix multiplication
+                // [Translated]
         mobile_matmul::SafeMatmul::multiply(data_a, data_b, result_data, m, n, k, opt_level);
     } else {
 
@@ -441,7 +450,7 @@ TensorPtr matmul(const TensorPtr& a, const TensorPtr& b) {
         bool b_has_batch = (shape_b.size() == shape_a.size()) && (shape_b[0] == batch_size);
         
         for (int64_t batch = 0; batch < batch_size; ++batch) {
-            // Use optimized matrix multiplication to handle each batch
+            // useoptimizationmatrix multiplicationprocesseachbatch
             const float* batch_a = data_a + batch * (a_rows * a_cols);
             const float* batch_b = b_has_batch ? 
                                   data_b + batch * (a_cols * b_cols) : 
@@ -487,12 +496,12 @@ TensorPtr matmul_rhs_T(const TensorPtr& a, const TensorPtr& b) {
     const auto& shape_a = a->shape();
     const auto& shape_b = b->shape();
     
-    // b must be 2D: [N, K]
+    // b mustis 2D: [N, K]
     if (shape_b.size() != 2) {
         throw TensorError("matmul_rhs_T: b must be 2D [N, K]");
     }
     
-    // a can be 2D or 3D
+    // a canis 2D or 3D
     if (shape_a.size() < 2) {
         throw TensorError("matmul_rhs_T: a must be at least 2D");
     }
@@ -503,7 +512,7 @@ TensorPtr matmul_rhs_T(const TensorPtr& a, const TensorPtr& b) {
     const float* data_a = a->data<float>();
     const float* data_b = b->data<float>();
     
-    // Uniformly use pure C++ safe matrix multiplication (adaptive strategy)
+        // [Translated]
     auto opt_level = mobile_matmul::OptimizationLevel::ADAPTIVE;
     
     if (shape_a.size() == 2) {
@@ -543,7 +552,7 @@ TensorPtr matmul_rhs_T(const TensorPtr& a, const TensorPtr& b) {
         return result;
     } else {
         // 3D+: a[..., M, K] @ b[N, K]^T = result[..., M, N]
-        // Process by batch
+        // bybatchprocess
         auto result_shape = shape_a;
         result_shape[result_shape.size() - 1] = n;
         auto result = zeros(result_shape, a->dtype(), a->device());
@@ -556,7 +565,7 @@ TensorPtr matmul_rhs_T(const TensorPtr& a, const TensorPtr& b) {
             throw TensorError("matmul_rhs_T dimension mismatch");
         }
         
-        // Calculate batch size
+        // Computebatchsize
         int64_t batch_size = 1;
         for (size_t i = 0; i < shape_a.size() - 2; ++i) {
             batch_size *= shape_a[i];
@@ -596,57 +605,57 @@ TensorPtr transpose(const TensorPtr& tensor, int dim0, int dim1) {
     const auto& shape = tensor->shape();
     int ndim = shape.size();
     
-    // Handle negative indices
+        // [Translated]
     if (dim0 < 0) dim0 += ndim;
     if (dim1 < 0) dim1 += ndim;
     
-    // Check dimension validity
+    // checkdimensionvalidity
     if (dim0 < 0 || dim0 >= ndim || dim1 < 0 || dim1 >= ndim) {
         throw TensorError("transpose: invalid dimensions");
     }
     
-    // Create new shape
+    // createnewshape
     std::vector<int64_t> new_shape = shape;
     std::swap(new_shape[dim0], new_shape[dim1]);
     
-    // Create result tensor
+    // createresulttensor
     auto result = zeros(new_shape, tensor->dtype(), tensor->device());
     
-    // Execute transpose
+    // executetranspose
     const float* src_data = tensor->data<float>();
     float* dst_data = result->data<float>();
     
-    // General n-dimensional transpose
+        // [Translated]
     std::vector<int64_t> strides_src(ndim), strides_dst(ndim);
     
-    // Calculate source tensor strides
+    // Computesourcetensorstrides
     strides_src[ndim - 1] = 1;
     for (int i = ndim - 2; i >= 0; --i) {
         strides_src[i] = strides_src[i + 1] * shape[i + 1];
     }
     
-    // Calculate target tensor strides
+    // Computetargettensorstrides
     strides_dst[ndim - 1] = 1;
     for (int i = ndim - 2; i >= 0; --i) {
         strides_dst[i] = strides_dst[i + 1] * new_shape[i + 1];
     }
     
-    // Execute transpose
+    // executetranspose
     int64_t total_elements = result->numel();
     std::vector<int64_t> indices(ndim);
     
     for (int64_t linear_idx = 0; linear_idx < total_elements; ++linear_idx) {
-        // Convert linear index to multi-dimensional index (target tensor)
+        // [Translated comment removed - see documentation]
         int64_t temp = linear_idx;
         for (int i = 0; i < ndim; ++i) {
             indices[i] = temp / strides_dst[i];
             temp %= strides_dst[i];
         }
         
-        // Swap dimensions
+        // swapdimension
         std::swap(indices[dim0], indices[dim1]);
         
-        // Calculate linear index in source tensor
+                // [Translated]
         int64_t src_idx = 0;
         for (int i = 0; i < ndim; ++i) {
             src_idx += indices[i] * strides_src[i];
@@ -655,7 +664,7 @@ TensorPtr transpose(const TensorPtr& tensor, int dim0, int dim1) {
         dst_data[linear_idx] = src_data[src_idx];
     }
     
-    // Set gradient propagation
+    // settingsgradientpropagate
     if (tensor->requires_grad()) {
         result->set_requires_grad(true);
         #ifdef USE_NEW_AUTOGRAD_ENGINE
@@ -663,7 +672,7 @@ TensorPtr transpose(const TensorPtr& tensor, int dim0, int dim1) {
         register_backward(result, {tensor}, backward_fn);
         #else
         result->set_grad_fn([tensor, dim0, dim1](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-            // Gradient of transpose is transpose again
+                        // [Translated]
             auto grad_input = transpose(grad_output, dim0, dim1);
             accumulate_gradient(tensor, grad_input);
             return {};
@@ -678,7 +687,7 @@ TensorPtr permute(const TensorPtr& tensor, const std::vector<int>& dims) {
 
     (void)tensor;
     (void)dims;
-    throw TensorError("permute not implemented yet");
+    throw TensorError("permute not implementsed yet");
 }
 
 TensorPtr linear(const TensorPtr& input, const TensorPtr& weight, const TensorPtr& bias) {
@@ -706,8 +715,13 @@ TensorPtr linear(const TensorPtr& input, const TensorPtr& weight, const TensorPt
                 output_data[i] = result_data[i] + bias_data[bias_idx];
             }
 
+            // Manual broadcast bias addition: Gradient propagation equivalent to add
             if (result->requires_grad() || bias->requires_grad()) {
                 broadcast_result->set_requires_grad(true);
+                #ifdef USE_NEW_AUTOGRAD_ENGINE
+                auto backward_fn = std::make_shared<AddBackward>(result->shape(), bias->shape());
+                register_backward(broadcast_result, {result, bias}, backward_fn);
+                #endif
             }
 
             result = broadcast_result;
@@ -721,6 +735,10 @@ TensorPtr linear(const TensorPtr& input, const TensorPtr& weight, const TensorPt
         result->set_requires_grad(true);
 
         auto backward_fn = std::make_shared<LinearBackward>(input, weight, bias);
+        
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        register_backward(result, {input, weight, bias}, backward_fn);
+        #else
         result->set_grad_fn([backward_fn, input, weight, bias](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             auto grads = backward_fn->apply(grad_output);
 
@@ -736,6 +754,7 @@ TensorPtr linear(const TensorPtr& input, const TensorPtr& weight, const TensorPt
 
             return grads;
         });
+        #endif
     }
 
     return result;
@@ -748,11 +767,16 @@ TensorPtr relu(const TensorPtr& x) {
         result->set_requires_grad(true);
 
         auto backward_fn = std::make_shared<ReluBackward>(x);
+        
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        register_backward(result, {x}, backward_fn);
+        #else
         result->set_grad_fn([backward_fn, x](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             auto grads = backward_fn->apply(grad_output);
             accumulate_gradient(x, grads[0]);
             return grads;
         });
+        #endif
     }
 
     return result;
@@ -966,15 +990,15 @@ TensorPtr layer_norm(const TensorPtr& input, const TensorPtr& weight, const Tens
         result->set_requires_grad(true);
         
         #ifdef USE_NEW_AUTOGRAD_ENGINE
-        // New engine: Pass gradient as-is to input (LN weights frozen by default)
+                // [Translated]
         auto backward_fn = std::make_shared<PassThroughBackward>();
         register_backward(result, {input}, backward_fn);
         #else
-        // LayerNorm gradient calculation (old engine)
+        // LayerNorm gradientCompute（oldengine）
         result->set_grad_fn([input, weight, bias, eps](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-            // For simplified implementation, only propagate gradient to input
+            // [Translated comment removed - see documentation]
             if (input->requires_grad()) {
-                // Simplified: assume gradient approximately equals grad_output
+                // [Translated comment removed - see documentation]
                 accumulate_gradient(input, grad_output);
             }
             return {};
@@ -1024,27 +1048,27 @@ TensorPtr layer_norm(const TensorPtr& input, const TensorPtr& weight, const Tens
           const float* batch_input = input_data + b * normalized_dim;
           float* batch_result = result_data + b * normalized_dim;
 
-          // Calculate root mean square
+                    // [Translated]
           float square_sum = 0.0f;
           for (int64_t i = 0; i < normalized_dim; ++i) {
               square_sum += batch_input[i] * batch_input[i];
           }
           float rms = std::sqrt(square_sum / normalized_dim + eps);
 
-          // Apply RMSNorm
+          // applyRMSNorm
           for (int64_t i = 0; i < normalized_dim; ++i) {
               batch_result[i] = (batch_input[i] / rms) * weight_data[i];
           }
       }
 
-  // Register precise backward for RMSNorm to avoid "pass-through degradation"
+  // [Translated comment removed - see documentation]
   result->set_requires_grad(true);
   #ifdef USE_NEW_AUTOGRAD_ENGINE
   auto backward_fn = std::make_shared<RMSNormBackward>(input, weight, eps);
   register_backward(result, {input}, backward_fn);
   #else
   result->set_grad_fn([input, weight, eps](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-      // Fallback implementation: call numerically correct RMSNormBackward logic
+      // [Translated comment removed - see documentation]
       RMSNormBackward impl(input, weight, eps);
       auto grads = impl.apply(grad_output);
       if (input->requires_grad()) accumulate_gradient(input, grads[0]);
@@ -1076,7 +1100,7 @@ TensorPtr layer_norm(const TensorPtr& input, const TensorPtr& weight, const Tens
     auto log_probs = log_softmax(input, -1);
     const float* log_probs_data = log_probs->data<float>();
     
-    // Fix: correctly handle int32_t type targets
+        // [Translated]
     std::vector<float> losses(batch_size);
     
     if (target->dtype() == DType::kInt32) {
@@ -1126,13 +1150,13 @@ TensorPtr layer_norm(const TensorPtr& input, const TensorPtr& weight, const Tens
         result->set_grad_fn([input, target, reduction, batch_size, num_classes](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             auto grad_input = zeros(input->shape(), input->dtype(), input->device());
             
-            // Calculate softmax probabilities
+                        // [Translated]
             auto probs = softmax(input, -1);
             const float* probs_data = probs->data<float>();
             float* grad_data = grad_input->data<float>();
             const float grad_scale = grad_output->data<float>()[0];
             
-            // Gradient calculation: grad = (softmax - one_hot) * grad_output
+            // gradientCompute：grad = (softmax - one_hot) * grad_output
             if (target->dtype() == DType::kInt32) {
                 const int32_t* target_data = target->data<int32_t>();
                 for (int64_t b = 0; b < batch_size; ++b) {
@@ -1163,7 +1187,7 @@ TensorPtr layer_norm(const TensorPtr& input, const TensorPtr& weight, const Tens
                 }
             }
             
-            // Accumulate gradient to input
+            // accumulategradienttoinput
             accumulate_gradient(input, grad_input);
             return {};
         });
@@ -1176,7 +1200,7 @@ TensorPtr layer_norm(const TensorPtr& input, const TensorPtr& weight, const Tens
 TensorPtr reshape(const TensorPtr& tensor, const std::vector<int64_t>& shape) {
     auto result = tensor->reshape(shape);
     
-    // 设置梯度传播
+    // settingsgradientpropagate
     if (tensor->requires_grad()) {
         result->set_requires_grad(true);
         
@@ -1186,7 +1210,7 @@ TensorPtr reshape(const TensorPtr& tensor, const std::vector<int64_t>& shape) {
         register_backward(result, {tensor}, backward_fn);
         #else
         result->set_grad_fn([tensor, original_shape = tensor->shape()](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-            // reshape的梯度就是将grad_output reshape回原来的形状
+            // [Translated comment removed - see documentation]
             auto grad_input = grad_output->reshape(original_shape);
             accumulate_gradient(tensor, grad_input);
             return {};
@@ -1245,13 +1269,13 @@ TensorPtr sum(const TensorPtr& tensor, int dim, bool keepdim) {
     int ndim = shape.size();
     
     if (dim != -1) {
-        // 处理负索引
+                // [Translated]
         if (dim < 0) dim += ndim;
         if (dim < 0 || dim >= ndim) {
             throw TensorError("sum: dimension out of range");
         }
         
-        // 计算结果shape
+        // Computeresultshape
         std::vector<int64_t> result_shape;
         for (int i = 0; i < ndim; ++i) {
             if (i != dim) {
@@ -1269,7 +1293,7 @@ TensorPtr sum(const TensorPtr& tensor, int dim, bool keepdim) {
         const float* src_data = tensor->data<float>();
         float* dst_data = result->data<float>();
         
-        // 简化实现：按维度求和
+                // [Translated]
         int64_t outer_size = 1;
         for (int i = 0; i < dim; ++i) {
             outer_size *= shape[i];
@@ -1303,22 +1327,22 @@ TensorPtr sum(const TensorPtr& tensor, int dim, bool keepdim) {
             register_backward(result, {tensor}, backward_fn);
             #else
             result->set_grad_fn([tensor, dim, keepdim, original_shape = shape](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-                // sum的梯度传播：重复grad_output到原始形状
+                // sumgradientpropagate：duplicategrad_outputtooriginalshape
                 auto grad_expanded = grad_output;
                 
-                // 如果没有keepdim，需要添加维度
+                // ifnonekeepdim，requireadddimension
                 if (!keepdim) {
                     auto new_shape = grad_output->shape();
                     new_shape.insert(new_shape.begin() + dim, 1);
                     grad_expanded = grad_expanded->reshape(new_shape);
                 }
                 
-                // 创建与原始tensor相同shape的梯度
+                // createwithoriginaltensorsameshapegradient
                 auto grad_input = zeros(original_shape, tensor->dtype(), tensor->device());
                 const float* grad_data = grad_expanded->data<float>();
                 float* input_grad_data = grad_input->data<float>();
                 
-                // 将梯度复制到所有summed位置
+                // willgradientcopytoallsummedposition
                 int64_t total = tensor->numel();
                 int64_t repeat_count = original_shape[dim];
                 int64_t block_size = grad_expanded->numel();
@@ -1468,7 +1492,7 @@ TensorPtr apply_mask(const TensorPtr& input, const TensorPtr& mask, float mask_v
         }
     } else if (input->ndim() == 3 && mask->ndim() == 2) {
 
-        // 支持 3D 形状 [BH, S, S] 与 2D 掩码 [S, S] 的广播加法
+        // [Translated comment removed - see documentation]
         auto input_shape = input->shape();
         int64_t bh = input_shape[0];
         int64_t seq_len = input_shape[1];
@@ -1550,7 +1574,7 @@ TensorPtr repeat_kv_heads(const TensorPtr& kv, int repeat_factor) {
     const float* kv_data = kv->data<float>();
     float* result_data = result->data<float>();
     
-    // 简化实现：重复每个KV头
+        // [Translated]
     for (int64_t b = 0; b < batch; ++b) {
         for (int64_t kv_h = 0; kv_h < kv_heads; ++kv_h) {
             for (int64_t rep = 0; rep < repeat_factor; ++rep) {
@@ -1609,7 +1633,7 @@ TensorPtr repeat_kv_heads(const TensorPtr& kv, int repeat_factor) {
 
 TensorPtr apply_rope(const TensorPtr& x, int seq_len, int head_dim, float rope_theta) {
     // x shape: [batch, heads, seq_len, head_dim]
-    // RoPE (Rotary Position Embedding) implementation
+    // RoPE (Rotary Position Embedding) implementsation
     
     auto shape = x->shape();
     if (shape.size() != 4) {
@@ -1630,10 +1654,10 @@ TensorPtr apply_rope(const TensorPtr& x, int seq_len, int head_dim, float rope_t
     const float* x_data = x->data<float>();
     float* result_data = result->data<float>();
     
-    // 先复制原始数据，然后在特定位置应用RoPE
+        // [Translated]
     std::memcpy(result_data, x_data, batch * heads * seq_len * head_dim * sizeof(float));
     
-    // RoPE implementation - 只应用到前面部分维度
+        // [Translated]
     for (int64_t b = 0; b < batch; ++b) {
         for (int64_t h = 0; h < heads; ++h) {
             for (int64_t pos = 0; pos < seq_len; ++pos) {
@@ -1651,7 +1675,7 @@ TensorPtr apply_rope(const TensorPtr& x, int seq_len, int head_dim, float rope_t
                     int64_t idx1 = idx_base + 2 * d;
                     int64_t idx2 = idx_base + 2 * d + 1;
                     
-                    // 边界检查
+                    // boundarycheck
                     if (idx1 < batch * heads * seq_len * head_dim && 
                         idx2 < batch * heads * seq_len * head_dim) {
                         // Apply rotation
@@ -1715,7 +1739,7 @@ TensorPtr swiglu(const TensorPtr& gate, const TensorPtr& up) {
     return result;
 }
 
-// LoRA Linear实现
+// LoRA Linearimplements
 TensorPtr lora_linear(const TensorPtr& input, const TensorPtr& weight,
                      const TensorPtr& lora_A, const TensorPtr& lora_B,
                      float alpha, const TensorPtr& bias) {
@@ -1724,79 +1748,71 @@ TensorPtr lora_linear(const TensorPtr& input, const TensorPtr& weight,
         throw TensorError("lora_linear: input, weight, lora_A, lora_B must not be null");
     }
     
-    // 主分支：input @ weight
+    // Main branch: input @ weight
     auto main_output = matmul(input, weight);
     if (bias) {
         main_output = add(main_output, bias);
     }
     
-    // LoRA分支：input @ lora_A @ lora_B * alpha
+    // LoRA branch: input @ lora_A @ lora_B * alpha
     auto lora_hidden = matmul(input, lora_A);
     auto lora_output = matmul(lora_hidden, lora_B);
     auto scaled_lora = mul(lora_output, alpha);
     
-    // 合并主分支和LoRA分支
+    // Merge main and LoRA branches
     auto result = add(main_output, scaled_lora);
     
-    // 不要覆盖 add 的 backward！add 会自动传播梯度到 main_output 和 scaled_lora
-    // main_output 和 scaled_lora 各自已经注册了自己的 backward，会继续传播梯度
-    
-    #ifndef USE_NEW_AUTOGRAD_ENGINE
-    // 仅在旧引擎下需要显式设置 grad_fn（旧引擎需要手动管理整个链路）
+        // [Translated]
     if (input->requires_grad() || lora_A->requires_grad() || lora_B->requires_grad()) {
         result->set_requires_grad(true);
-        // Legacy recursive backward
+        
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        // New engine: Register LoRALinearBackward
+        auto backward_fn = std::make_shared<LoRALinearBackward>(input, weight, lora_A, lora_B, alpha, bias);
+        autograd::Engine::instance().register_node(result, {input, weight, lora_A, lora_B}, backward_fn);
+        #else
+        // Old engine: Use grad_fn (recursive backward)
         result->set_grad_fn([input, weight, lora_A, lora_B, alpha, bias](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             
-            // 计算 lora_A 的梯度并累加
+            // Compute lora_A gradient and accumulate
             if (lora_A->requires_grad()) {
-                // 梯度流：grad_output -> lora_B^T -> lora_hidden -> input^T -> lora_A
-                auto lora_B_t = transpose(lora_B, 0, 1);  // [6, 2]
-                auto grad_lora_hidden = matmul(grad_output, lora_B_t);  // [2, 6] @ [6, 2] = [2, 2]
-                auto input_t = transpose(input, -2, -1);  // [4, 2]
-                auto grad_lora_A_raw = matmul(input_t, grad_lora_hidden);  // [4, 2] @ [2, 2] = [4, 2]
+                auto lora_B_t = transpose(lora_B, 0, 1);
+                auto grad_lora_hidden = matmul(grad_output, lora_B_t);
+                auto input_t = transpose(input, -2, -1);
+                auto grad_lora_A_raw = matmul(input_t, grad_lora_hidden);
                 auto grad_lora_A = mul(grad_lora_A_raw, alpha);
-                
-                // 使用 accumulate_gradient 正确累加梯度
                 accumulate_gradient(lora_A, grad_lora_A);
             }
             
-            // 计算 lora_B 的梯度并累加
+            // Compute lora_B gradient and accumulate
             if (lora_B->requires_grad()) {
-                // 梯度流：grad_output <- lora_hidden^T <- lora_B
-                auto lora_hidden = matmul(input, lora_A);  // [2, 4] @ [4, 2] = [2, 2]
-                auto lora_hidden_t = transpose(lora_hidden, -2, -1);  // [2, 2]
-                auto grad_lora_B_raw = matmul(lora_hidden_t, grad_output);  // [2, 2] @ [2, 6] = [2, 6]
+                auto lora_hidden = matmul(input, lora_A);
+                auto lora_hidden_t = transpose(lora_hidden, -2, -1);
+                auto grad_lora_B_raw = matmul(lora_hidden_t, grad_output);
                 auto grad_lora_B = mul(grad_lora_B_raw, alpha);
-                
-                // 使用 accumulate_gradient 正确累加梯度
                 accumulate_gradient(lora_B, grad_lora_B);
             }
             
-            // 对输入的梯度传播（如果需要）
+            // Propagate gradient to input
             if (input->requires_grad()) {
-                // 来自主分支的梯度
                 auto grad_input_main = matmul(grad_output, transpose(weight, 0, 1));
-                
-                // 来自LoRA分支的梯度
                 auto lora_B_t = transpose(lora_B, 0, 1);
                 auto lora_A_t = transpose(lora_A, 0, 1);
                 auto grad_input_lora = matmul(matmul(grad_output, lora_B_t), lora_A_t);
                 auto grad_input_lora_scaled = mul(grad_input_lora, alpha);
-                
                 auto grad_input_total = add(grad_input_main, grad_input_lora_scaled);
                 accumulate_gradient(input, grad_input_total);
             }
             
-            return {};  // 返回空向量，因为我们已经用accumulate_gradient处理了
+            return {};
         });
+        #endif
     }
-    #endif
     
     return result;
 }
 
-// 比较算子实现
+// compareoperatorimplements
 TensorPtr eq(const TensorPtr& a, const TensorPtr& b) {
     auto result = zeros(a->shape(), a->dtype(), a->device());
     const float* data_a = a->data<float>();
@@ -1875,7 +1891,7 @@ TensorPtr le(const TensorPtr& a, const TensorPtr& b) {
     return result;
 }
 
-// 数学函数
+// [Translated]
 TensorPtr abs(const TensorPtr& tensor) {
     auto result = zeros(tensor->shape(), tensor->dtype(), tensor->device());
     const float* data = tensor->data<float>();
@@ -1910,7 +1926,7 @@ TensorPtr sqrt(const TensorPtr& tensor) {
         result->set_requires_grad(true);
         #ifdef USE_NEW_AUTOGRAD_ENGINE
         auto backward_fn = std::make_shared<ScaleBackward>(0.0f /* placeholder, not used here */);
-        // 对于 sqrt/exp/log 等，这里保持与旧路径一致：后续可补精确反向
+        // [Translated comment removed - see documentation]
         register_backward(result, {tensor}, backward_fn);
         #endif
     }
@@ -1992,7 +2008,7 @@ TensorPtr cast(const TensorPtr& tensor, DType target_dtype) {
 
     const DType src_dtype = tensor->dtype();
     if (src_dtype == target_dtype) {
-        // 返回一个克隆，避免后续写时共享同一缓冲
+        // [Translated comment removed - see documentation]
         return tensor->clone();
     }
 
@@ -2012,9 +2028,9 @@ TensorPtr cast(const TensorPtr& tensor, DType target_dtype) {
         return result;
     }
 
-    // 其他类型目前未用到，先提供安全兜底（逐元素拷贝为float再截断）
+    // [Translated comment removed - see documentation]
     if (DTypeUtils::is_floating_point(src_dtype) && DTypeUtils::is_floating_point(target_dtype)) {
-        // 通用浮点路径：先拉成 FP32，再转到目标
+        // [Translated comment removed - see documentation]
         TensorPtr as_fp32 = (src_dtype == kFloat32) ? tensor : cast(tensor, kFloat32);
         if (target_dtype == kFloat32) return as_fp32;
         return cast(as_fp32, target_dtype);

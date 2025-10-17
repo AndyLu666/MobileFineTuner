@@ -4,28 +4,28 @@
 using namespace ops;
 
 int main() {
-    std::cout << "Testing merged operators framework..." << std::endl;
+    std::cout << "🧪 test[Output]operatorsframework..." << std::endl;
     
     try {
-        // Test basic tensor creation
+        // testbasictensorcreate
         auto a = zeros({2, 3});
         auto b = ones({2, 3});
-        std::cout << "[PASS] Basic tensor creation" << std::endl;
+        std::cout << "✅ fundamentaltensorcreate[Output]" << std::endl;
         
-        // Test newly added activation functions
+                // [Translated]
         auto x = randn({2, 3});
         auto silu_out = silu(x);
-        std::cout << "[PASS] SiLU activation function" << std::endl;
+        std::cout << "✅ SiLUactivation function[Output]" << std::endl;
         
-        // Test RMS normalization
+        // testRMSnormalization
         auto rms_weight = ones({3});
         auto rms_out = rms_norm(x, rms_weight);
-        std::cout << "[PASS] RMS Normalization" << std::endl;
+        std::cout << "✅ RMS Normalization[Output]" << std::endl;
         
-        std::cout << "All core functionality tests passed!" << std::endl;
+        std::cout << "🎉 allcore functionalitytestvia！" << std::endl;
         
     } catch (const std::exception& e) {
-        std::cout << "[FAIL] Test failed: " << e.what() << std::endl;
+        std::cout << "❌ testfailed: " << e.what() << std::endl;
         return 1;
     }
     

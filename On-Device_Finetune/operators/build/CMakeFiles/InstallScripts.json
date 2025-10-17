@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/tony/Documents/On-Device_Finetune_v1/operators/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

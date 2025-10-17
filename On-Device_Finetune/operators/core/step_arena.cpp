@@ -1,6 +1,6 @@
 /**
  * @file step_arena.cpp
- * @brief Step-level arena implementation
+ * [Documentation available in English]
  */
 
 #include "step_arena.h"
@@ -8,7 +8,9 @@
 namespace ops {
 
 StepArena& get_step_arena() {
-    static StepArena arena(64);  // 64MB arena
+        // [Translated]
+    // [Translated comment removed - see documentation]
+    static StepArena arena(16);  // 16MB arena（mobile）
     return arena;
 }
 

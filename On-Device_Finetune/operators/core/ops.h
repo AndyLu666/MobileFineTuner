@@ -63,7 +63,7 @@ TensorPtr transpose(const TensorPtr& tensor, int dim0, int dim1);
 /** @brief Permute dimensions of a tensor according to given order */
 TensorPtr permute(const TensorPtr& tensor, const std::vector<int>& dims);
 
-/** @brief Linear transformation: output = input @ weight + bias */
+/** @brief Linear transforation: output = input @ weight + bias */
 TensorPtr linear(const TensorPtr& input, const TensorPtr& weight, const TensorPtr& bias = nullptr);
 
 // ============================================================================
@@ -146,7 +146,7 @@ TensorPtr le(const TensorPtr& a, const TensorPtr& b);
 TensorPtr dropout(const TensorPtr& tensor, float p = 0.5f, bool training = true);
 TensorPtr normal(const std::vector<int64_t>& shape, float mean = 0.0f, float std = 1.0f,
                  DType dtype = kFloat32, Device device = kCPU);
-TensorPtr uniform(const std::vector<int64_t>& shape, float low = 0.0f, float high = 1.0f,
+TensorPtr unifor(const std::vector<int64_t>& shape, float low = 0.0f, float high = 1.0f,
                   DType dtype = kFloat32, Device device = kCPU);
 
 TensorPtr abs(const TensorPtr& tensor);
@@ -156,7 +156,7 @@ TensorPtr log(const TensorPtr& tensor);
 TensorPtr pow(const TensorPtr& tensor, float exponent);
 TensorPtr clamp(const TensorPtr& tensor, float min_val, float max_val);
 
-// Comparison operators (new)
+// [Translated]
 TensorPtr eq(const TensorPtr& a, const TensorPtr& b);
 TensorPtr ne(const TensorPtr& a, const TensorPtr& b);
 TensorPtr gt(const TensorPtr& a, const TensorPtr& b);
@@ -164,7 +164,7 @@ TensorPtr lt(const TensorPtr& a, const TensorPtr& b);
 TensorPtr ge(const TensorPtr& a, const TensorPtr& b);
 TensorPtr le(const TensorPtr& a, const TensorPtr& b);
 
-// Qwen/Transformer specific operators
+// [Translated]
 TensorPtr create_causal_mask(int seq_len, DType dtype = kFloat32, Device device = kCPU);
 TensorPtr apply_mask(const TensorPtr& input, const TensorPtr& mask, float mask_value = -1e9f);
 TensorPtr repeat_kv_heads(const TensorPtr& kv, int repeat_factor);

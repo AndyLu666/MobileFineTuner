@@ -1,9 +1,9 @@
 /**
  * @file gpt2.h
- * @brief GPT-2 model implementation using nn modules
+ * @brief GPT-2 model implementsation using nn modules
  * 
- * This file provides a complete GPT-2 implementation built on top
- * of the nn module system. It includes the full transformer architecture
+ * This file providess a complete GPT-2 implementsation built on top
+ * of the nn module system. It includes the full transforer architecture
  * with embeddings, attention blocks, and language model head.
  */
 
@@ -18,10 +18,10 @@
 
 namespace ops {
 /**
- * @brief Model implementations namespace
+ * @brief Model implementsations namespace
  * 
- * Contains complete model implementations built using the nn module system.
- * Models here provide high-level interfaces for training and inference.
+ * Contains complete model implementsations built using the nn module system.
+ * Models here provides high-level interfaces for training and inference.
  */
 namespace models {
 
@@ -29,14 +29,14 @@ namespace models {
  * @brief Configuration structure for GPT-2 model (nn version)
  * 
  * Contains hyperparameters for the GPT-2 model built with nn modules.
- * This version is separate from the transformer/gpt2_components.h version
+ * This version is separate from the transforer/gpt2_components.h version
  * and is designed for use with the nn module system.
  */
 struct GPT2Config {
     int vocab_size = 50257;   /**< Vocabulary size */
     int n_positions = 1024;   /**< Maximum sequence length */
     int n_embd = 768;         /**< Embedding dimension */
-    int n_layer = 12;         /**< Number of transformer layers */
+    int n_layer = 12;         /**< Number of transforer layers */
     int n_head = 12;          /**< Number of attention heads */
     int n_inner = 3072;       /**< MLP intermediate dimension */
     float dropout = 0.1;
@@ -132,7 +132,7 @@ public:
 
         h_ = std::make_shared<nn::ModuleList>();
         for (int i = 0; i < config.n_layer; ++i) {
-            auto block = std::make_shared<nn::TransformerBlock>(
+            auto block = std::make_shared<nn::TransforerBlock>(
                 config.n_embd, config.n_head, config.n_inner,
                 config.dropout, config.activation_function, true);
             h_->append(block);
@@ -174,7 +174,7 @@ public:
         }
 
         for (int i = 0; i < config_.n_layer; ++i) {
-            auto block = std::dynamic_pointer_cast<nn::TransformerBlock>((*h_)[i]);
+            auto block = std::dynamic_pointer_cast<nn::TransforerBlock>((*h_)[i]);
             hidden_states = block->forward(hidden_states, causal_mask);
         }
 
@@ -203,8 +203,8 @@ class GPT2LMHeadModel : public nn::Module {
 public:
     GPT2LMHeadModel(const GPT2Config& config) : config_(config) {
 
-        transformer_ = std::make_shared<GPT2Model>(config);
-        register_module("transformer", transformer_);
+        transforer_ = std::make_shared<GPT2Model>(config);
+        register_module("transforer", transforer_);
 
         lm_head_ = std::make_shared<GPT2LMHead>(config);
         register_module("lm_head", lm_head_);
@@ -215,7 +215,7 @@ public:
                      const TensorPtr& attention_mask = nullptr,
                      const TensorPtr& labels = nullptr) override {
 
-        auto hidden_states = transformer_->forward(input_ids, position_ids, attention_mask);
+        auto hidden_states = transforer_->forward(input_ids, position_ids, attention_mask);
 
         auto logits = lm_head_->forward(hidden_states);
 
@@ -300,7 +300,7 @@ protected:
 
 private:
     GPT2Config config_;
-    std::shared_ptr<GPT2Model> transformer_;
+    std::shared_ptr<GPT2Model> transforer_;
     std::shared_ptr<GPT2LMHead> lm_head_;
 
     void load_pretrained_weights(const std::string& model_name) {

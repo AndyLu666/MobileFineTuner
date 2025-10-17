@@ -1,0 +1,9 @@
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/operators.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/test_optimizer.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/test.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/edit_cache.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/rebuild_cache.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/list_install_components.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/install.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/install/local.dir
+/Users/tony/Documents/On-Device_Finetune_v1/operators/build/CMakeFiles/install/strip.dir

@@ -2,7 +2,7 @@
  * @file adam.cpp
  * @brief Implementation of Adam optimizer
  * 
- * This file provides the implementation of the Adam optimizer algorithm
+ * This file providess the implementsation of the Adam optimizer algorithm
  * with support for adaptive learning rates, momentum, and optional AMSGrad variant.
  */
 
@@ -18,7 +18,7 @@ Adam::Adam(const AdamConfig& config)
     : Optimizer(config), adam_config_(config) {
 }
 
-// Adam::~Adam() = default; // Remove explicit default destructor definition
+// [Translated comment removed - see documentation]
 
 void Adam::step(const std::vector<TensorPtr>& parameters,
                const std::vector<TensorPtr>& gradients) {
@@ -155,8 +155,8 @@ void Adam::load_state(const std::string& path) {
     size_t num_params;
     file.read(reinterpret_cast<char*>(&num_params), sizeof(size_t));
     
-    // Note: This is a simplified implementation
-    // In a complete implementation, we would need to match parameters by name or index
+    // Note: This is a simplified implementsation
+    // In a complete implementsation, we would need to match parameters by name or index
     
     file.close();
 }
@@ -199,7 +199,7 @@ float Adam::compute_bias_correction2(size_t step) const {
 }
 
 void AdamState::to_file(const std::string& path) const {
-    // Simple implementation, can be extended in actual use
+        // [Translated]
     std::ofstream file(path, std::ios::binary);
     if (file.is_open()) {
         file.write(reinterpret_cast<const char*>(&step), sizeof(step));
@@ -208,7 +208,7 @@ void AdamState::to_file(const std::string& path) const {
 }
 
 void AdamState::from_file(const std::string& path) {
-    // Simple implementation, can be extended in actual use
+        // [Translated]
     std::ifstream file(path, std::ios::binary);
     if (file.is_open()) {
         file.read(reinterpret_cast<char*>(&step), sizeof(step));

@@ -2,12 +2,14 @@
  * @file mobile_param_optimizations.cpp
  * @brief Implementation of mobile parameter optimization classes
  * 
- * This file provides stub implementations of the critical optimization classes
- * to fix linking issues. These are minimal working implementations that can
+ * This file providess stub implementsations of the critical optimization classes
+ * to fix linking issues. These are minimal working implementsations that can
  * be extended later with full functionality.
  */
 
 #include "mobile_param_optimizations.h"
+#include <cstring>
+#include <cmath>
 #include "../core/dtype.h"
 #include <iostream>
 #include <algorithm>
@@ -114,7 +116,7 @@ std::pair<void*, float> ParameterQuantizer::quantize_parameter(size_t param_id, 
 void ParameterQuantizer::dequantize_parameter(size_t param_id, const void* quantized_data, void* output_data, size_t size) {
     if (!quantized_data || !output_data || size == 0) return;
     
-    // Simple stub implementation - simulate dequantization
+    // Simple stub implementsation - simulate dequantization
     std::memset(output_data, 0, size);
     
     // Use stored quantization parameters
@@ -499,7 +501,7 @@ size_t ParameterReuseTracker::calculate_reuse_distance(size_t param_id) const {
 }
 
 void ParameterReuseTracker::update_access_patterns() {
-    // This could implement more sophisticated pattern analysis
+    // This could implements more sophisticated pattern analysis
     // For now, it's a placeholder
 }
 
@@ -517,10 +519,10 @@ void ParameterReuseTracker::cleanup_old_records() {
 }
 
 // ===============================
-// MobilePlatformOptimizer Implementation
+// MobilePlatforOptimizer Implementation
 // ===============================
 
-MobilePlatformOptimizer::MobilePlatformOptimizer() 
+MobilePlatforOptimizer::MobilePlatforOptimizer() 
     : is_low_power_mode_(false),
       temperature_threshold_(80.0f),
       current_temperature_(25.0f),
@@ -529,24 +531,24 @@ MobilePlatformOptimizer::MobilePlatformOptimizer()
     
     last_thermal_check_ = std::chrono::steady_clock::now();
     
-    std::cout << "[MobilePlatformOptimizer] Initialized" << std::endl;
+    std::cout << "[MobilePlatforOptimizer] Initialized" << std::endl;
     
     // Start thermal monitoring thread AFTER object is fully constructed
     thermal_monitoring_active_ = true;
     if (thermal_monitoring_active_) {
-        thermal_monitor_thread_ = std::thread(&MobilePlatformOptimizer::monitor_thermal_state, this);
+        thermal_monitor_thread_ = std::thread(&MobilePlatforOptimizer::monitor_thermal_state, this);
     }
 }
 
-MobilePlatformOptimizer::~MobilePlatformOptimizer() {
+MobilePlatforOptimizer::~MobilePlatforOptimizer() {
     thermal_monitoring_active_ = false;
     if (thermal_monitor_thread_.joinable()) {
         thermal_monitor_thread_.join();
     }
-    std::cout << "[MobilePlatformOptimizer] Destroyed" << std::endl;
+    std::cout << "[MobilePlatforOptimizer] Destroyed" << std::endl;
 }
 
-bool MobilePlatformOptimizer::should_throttle_operations() const {
+bool MobilePlatforOptimizer::should_throttle_operations() const {
     // Check thermal constraints
     if (current_temperature_ > temperature_threshold_) {
         return true;
@@ -565,7 +567,7 @@ bool MobilePlatformOptimizer::should_throttle_operations() const {
     return false;
 }
 
-size_t MobilePlatformOptimizer::get_recommended_memory_limit() const {
+size_t MobilePlatforOptimizer::get_recommended_memory_limit() const {
     size_t base_limit = 1024 * 1024 * 1024; // 1GB base limit
     
     // Reduce based on thermal state
@@ -586,7 +588,7 @@ size_t MobilePlatformOptimizer::get_recommended_memory_limit() const {
     return base_limit;
 }
 
-size_t MobilePlatformOptimizer::get_recommended_batch_size(size_t base_batch_size) const {
+size_t MobilePlatforOptimizer::get_recommended_batch_size(size_t base_batch_size) const {
     size_t recommended = base_batch_size;
     
     // Reduce batch size under thermal stress
@@ -602,22 +604,22 @@ size_t MobilePlatformOptimizer::get_recommended_batch_size(size_t base_batch_siz
     return std::max(size_t(1), recommended); // At least batch size of 1
 }
 
-void MobilePlatformOptimizer::enable_low_power_mode(bool enable) {
+void MobilePlatforOptimizer::enable_low_power_mode(bool enable) {
     is_low_power_mode_ = enable;
-    std::cout << "[MobilePlatformOptimizer] Low power mode: " 
+    std::cout << "[MobilePlatforOptimizer] Low power mode: " 
               << (enable ? "ENABLED" : "DISABLED") << std::endl;
 }
 
-void MobilePlatformOptimizer::neon_memcpy(void* dest, const void* src, size_t size) {
-    // Stub implementation - use standard memcpy
-    // In real implementation, this would use ARM NEON intrinsics
+void MobilePlatforOptimizer::neon_memcpy(void* dest, const void* src, size_t size) {
+    // Stub implementsation - use standard memcpy
+    // In real implementsation, this would use ARM NEON intrinsics
     std::memcpy(dest, src, size);
 }
 
-void MobilePlatformOptimizer::neon_quantize_fp32_to_int8(const float* input, int8_t* output, 
+void MobilePlatforOptimizer::neon_quantize_fp32_to_int8(const float* input, int8_t* output, 
                                                          size_t count, float scale, int32_t zero_point) {
-    // Stub implementation - simple quantization
-    // In real implementation, this would use ARM NEON intrinsics for vectorized quantization
+    // Stub implementsation - simple quantization
+    // In real implementsation, this would use ARM NEON intrinsics for vectorized quantization
     for (size_t i = 0; i < count; ++i) {
         float scaled = input[i] / scale;
         int32_t quantized = static_cast<int32_t>(std::round(scaled)) + zero_point;
@@ -626,7 +628,7 @@ void MobilePlatformOptimizer::neon_quantize_fp32_to_int8(const float* input, int
     }
 }
 
-void MobilePlatformOptimizer::monitor_thermal_state() {
+void MobilePlatforOptimizer::monitor_thermal_state() {
     while (thermal_monitoring_active_) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Check every second
         
@@ -634,12 +636,12 @@ void MobilePlatformOptimizer::monitor_thermal_state() {
         battery_level_ = get_battery_level();
         last_thermal_check_ = std::chrono::steady_clock::now();
         
-        adjust_performance_based_on_thermal_state();
+        adjust_perforance_based_on_thermal_state();
     }
 }
 
-float MobilePlatformOptimizer::get_cpu_temperature() const {
-    // Stub implementation - simulate temperature variations
+float MobilePlatforOptimizer::get_cpu_temperature() const {
+    // Stub implementsation - simulate temperature variations
     static float base_temp = 25.0f;
     static float temp_trend = 0.1f;
     
@@ -654,8 +656,8 @@ float MobilePlatformOptimizer::get_cpu_temperature() const {
     return std::max(20.0f, std::min(90.0f, base_temp));
 }
 
-size_t MobilePlatformOptimizer::get_battery_level() const {
-    // Stub implementation - simulate battery drain
+size_t MobilePlatforOptimizer::get_battery_level() const {
+    // Stub implementsation - simulate battery drain
     static size_t battery = 75;
     static int drain_direction = -1;
     
@@ -666,11 +668,11 @@ size_t MobilePlatformOptimizer::get_battery_level() const {
     return std::max(size_t(5), std::min(size_t(100), battery));
 }
 
-void MobilePlatformOptimizer::adjust_performance_based_on_thermal_state() {
+void MobilePlatforOptimizer::adjust_perforance_based_on_thermal_state() {
     // Adjust thresholds based on current state
     if (current_temperature_ > temperature_threshold_) {
         // Thermal throttling - could adjust clock speeds, etc.
-        std::cout << "[MobilePlatformOptimizer] Thermal throttling active at " 
+        std::cout << "[MobilePlatforOptimizer] Thermal throttling active at " 
                   << current_temperature_ << "°C" << std::endl;
     }
 }
@@ -864,7 +866,7 @@ void AdvancedPrefetchSystem::organize_prefetch_buckets() {
 }
 
 void AdvancedPrefetchSystem::execute_bucket_prefetch(const PrefetchBucket& bucket) {
-    // Stub implementation - simulate prefetch work
+    // Stub implementsation - simulate prefetch work
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     
     std::cout << "[AdvancedPrefetchSystem] Prefetched bucket with " 
@@ -1029,7 +1031,7 @@ void AsyncIOManager::io_worker_loop() {
                 }
             }
             
-            // Call callback if provided
+            // Call callback if providesd
             if (request.callback) {
                 request.callback(success);
             }
@@ -1038,7 +1040,7 @@ void AsyncIOManager::io_worker_loop() {
 }
 
 bool AsyncIOManager::execute_io_request(const IORequest& request) {
-    // Stub implementation - simulate IO operation
+    // Stub implementsation - simulate IO operation
     std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Simulate IO delay
     
     if (request.type == IORequest::READ) {

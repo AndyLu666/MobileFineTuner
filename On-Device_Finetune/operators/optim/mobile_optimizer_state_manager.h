@@ -1,20 +1,20 @@
 /**
  * @file mobile_optimizer_state_manager.h
- * @brief Mobile optimizer state memory management system - Based on DeepSpeed ZeRO technology adaptation
+ * [Documentation available in English]
  * 
- * This file implements a memory optimization system for optimizer states on mobile devices.
- * Key innovations:
- * 1. Temporal-sliced ZeRO: Adapt DeepSpeed's spatial partitioning to single-device temporal partitioning
- * 2. State compression: Use FP16/INT8 to compress momentum and variance states
- * 3. CPU optimization: SIMD optimization and cache-friendly design for CPU
- * 4. Tiered offloading: Multi-level offloading strategy from memory to storage
- * 5. Deep integration with parameter/activation management
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation in English - see separate docs]
+ * 2. statecompression: useFP16/INT8compressionmomentumandvariancestate
+ * [Documentation available in English]
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
  * 
- * DeepSpeed ZeRO core technology migration:
- * - ZeRO Stage 1: Optimizer State Partitioning (temporal dimension adaptation)
- * - CPU Offload: Optimizer state CPU offload (already CPU, optimize to storage offload)
- * - Pin Memory: Changed to CPU cache alignment optimization
- * - Contiguous Buffers: Contiguous memory buffers to avoid fragmentation
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation in English - see separate docs]
  * 
  * @author Your Name
  * @date 2025
@@ -37,78 +37,78 @@
 namespace ops {
 namespace optim {
 
-// Forward declarations (actual definition in param_manager_lite.h)
-// class MobileParameterManager;  // Already defined in param_manager_lite.h
+// Forward declarations (actualdefinesat param_manager_lite.h)
+// [Translated]
 
 /**
- * @brief Optimizer state type (corresponding to Adam optimizer)
+ * @brief Optimizerstatetype（correspondingAdamoptimizer）
  */
 enum class OptimizerStateType {
-    MOMENTUM = 0,          // First moment (Adam's exp_avg, SGD's momentum)
-    VARIANCE = 1,          // Second moment (Adam's exp_avg_sq)
-    MASTER_WEIGHTS = 2,    // FP32 master weights (mixed precision training)
-    STEP_COUNT = 3         // Step count
+    MOMENTUM = 0,              // [Translated]
+    VARIANCE = 1,              // [Translated]
+    MASTER_WEIGHTS = 2,        // [Translated]
+    STEP_COUNT = 3             // [Translated]
 };
 
 /**
- * @brief Optimizer state storage location
+ * @brief Optimizerstatestorageposition
  */
 enum class OptimizerStateTier {
-    ACTIVE_MEMORY = 0,     // Active memory (currently in use)
-    STANDBY_MEMORY = 1,    // Standby memory (loaded but not active)
-    COMPRESSED = 2,        // Compressed storage (in memory but compressed)
-    DISK_STORAGE = 3       // Disk storage (completely offloaded)
+    ACTIVE_MEMORY = 0,         // [Translated]
+    STANDBY_MEMORY = 1,        // [Translated]
+    COMPRESSED = 2,            // [Translated]
+    DISK_STORAGE = 3           // [Translated]
 };
 
 /**
- * @brief Optimizer state compression mode
+ * @brief Optimizerstatecompressionmode
  */
 enum class OptimizerStateCompression {
-    NONE = 0,              // No compression (FP32)
-    FP16 = 1,              // Half precision (2x compression)
-    BFLOAT16 = 2,          // BFloat16 (2x compression, better numerical stability)
-    INT8_QUANTIZED = 3,    // 8-bit quantization (4x compression)
-    INT8_SPARSE = 4,       // 8-bit sparse quantization (4-8x compression)
-    ADAPTIVE = 5           // Adaptive compression (select based on importance)
+    NONE = 0,              // nocompression (FP32)
+    FP16 = 1,                  // [Translated]
+    BFLOAT16 = 2,              // [Translated]
+    INT8_QUANTIZED = 3,        // [Translated]
+    INT8_SPARSE = 4,           // [Translated]
+    ADAPTIVE = 5               // [Translated]
 };
 
 /**
- * @brief Optimizer state metadata for a single parameter
+ * [Documentation available in English]
  */
 struct OptimizerStateMetadata {
-    size_t param_id;                              // Parameter ID
-    std::string param_name;                       // Parameter name
-    size_t param_size;                            // Parameter size (element count)
+    size_t param_id;                              // parameterID
+    std::string param_name;                       // parametername
+    size_t param_size;                                // [Translated]
     
-    // State type and location
-    OptimizerStateTier momentum_tier;             // Momentum state location
-    OptimizerStateTier variance_tier;             // Variance state location
-    OptimizerStateCompression compression_mode;    // Compression mode
+        // [Translated]
+    OptimizerStateTier momentum_tier;             // Momentumstateposition
+    OptimizerStateTier variance_tier;             // Variancestateposition
+    OptimizerStateCompression compression_mode;    // compressionmode
     
-    // Memory usage
-    size_t momentum_size_bytes;                   // Momentum memory usage
-    size_t variance_size_bytes;                   // Variance memory usage
-    size_t original_size_bytes;                   // Original size (uncompressed)
-    float compression_ratio;                      // Actual compression ratio
+    // memoryusage
+    size_t momentum_size_bytes;                   // Momentummemoryusage
+    size_t variance_size_bytes;                   // Variancememoryusage
+    size_t original_size_bytes;                       // [Translated]
+    float compression_ratio;                          // [Translated]
     
-    // Access pattern
+        // [Translated]
     std::chrono::steady_clock::time_point last_access_time;
     std::chrono::steady_clock::time_point creation_time;
-    size_t access_count;                          // Access count
-    int priority;                                 // Priority (0-10)
+    size_t access_count;                              // [Translated]
+    int priority;                                 // priority（0-10）
     
-    // State flags
-    bool is_loaded;                               // Whether loaded
-    bool is_dirty;                                // Whether modified
-    bool requires_grad;                           // Whether requires gradient
-    bool is_trainable;                            // Whether trainable
+    // stateflag
+    bool is_loaded;                                   // [Translated]
+    bool is_dirty;                                // is notbemodify
+    bool requires_grad;                           // is notrequiregradient
+    bool is_trainable;                            // is nottrainable
     
-    // Mobile-specific
-    bool is_cpu_optimized;                        // Whether CPU optimized
-    bool use_simd_acceleration;                   // Whether using SIMD acceleration
-    bool is_cache_aligned;                        // Whether cache aligned
+        // [Translated]
+    bool is_cpu_optimized;                        // is notforCPUoptimization
+    bool use_simd_acceleration;                       // [Translated]
+    bool is_cache_aligned;                            // [Translated]
     
-    // Storage paths (for disk offload)
+    // [Translated comment removed - see documentation]
     std::string momentum_storage_path;
     std::string variance_storage_path;
     
@@ -132,24 +132,24 @@ struct OptimizerStateMetadata {
 };
 
 /**
- * @brief Optimizer state group - Corresponding to DeepSpeed's Parameter Group concept
- * Organize related parameters' optimizer states together for batch management
+ * [Documentation available in English]
+ * [Documentation available in English]
  */
 struct OptimizerStateGroup {
-    std::string group_name;                       // Group name (e.g., "transformer.layer.0")
-    std::vector<size_t> param_ids;                // Parameter IDs included in this group
+    std::string group_name;                           // [Translated]
+    std::vector<size_t> param_ids;                    // [Translated]
     
-    // Group-level state
-    bool is_active;                               // Whether active (currently training)
-    size_t total_memory_usage;                    // Total memory usage
-    OptimizerStateCompression group_compression;   // Group-level compression strategy
+        // [Translated]
+    bool is_active;                                   // [Translated]
+    size_t total_memory_usage;                        // [Translated]
+    OptimizerStateCompression group_compression;       // [Translated]
     
-    // Group-level optimization strategy
-    bool enable_group_prefetch;                   // Enable group prefetch
-    bool enable_group_offload;                    // Enable group offload
-    int access_priority;                          // Access priority
+        // [Translated]
+    bool enable_group_prefetch;                       // [Translated]
+    bool enable_group_offload;                        // [Translated]
+    int access_priority;                              // [Translated]
     
-    // Statistics
+    // statisticsinfo
     std::chrono::steady_clock::time_point last_group_access;
     size_t group_access_count;
     
@@ -163,41 +163,41 @@ struct OptimizerStateGroup {
 };
 
 /**
- * @brief Optimizer state buffer - Corresponding to DeepSpeed's Contiguous Buffer
- * Use contiguous memory to avoid fragmentation and improve CPU cache utilization
+ * @brief Optimizerstatebuffer - correspondingDeepSpeedContiguous Buffer
+ * [Documentation in English - see separate docs]
  */
 class OptimizerStateBuffer {
 private:
-    void* buffer_ptr_;                            // Buffer pointer
-    size_t buffer_size_;                          // Buffer size (bytes)
-    size_t used_size_;                            // Used size
-    [[maybe_unused]] bool is_cache_aligned_;      // Whether cache aligned
-    mutable std::mutex buffer_mutex_;             // Buffer mutex (mutable for const methods)
+    void* buffer_ptr_;                            // bufferpointer
+    size_t buffer_size_;                              // [Translated]
+    size_t used_size_;                                // [Translated]
+    [[maybe_unused]] bool is_cache_aligned_;          // [Translated]
+    mutable std::mutex buffer_mutex_;                 // [Translated]
     
-    // Fragmentation management
+        // [Translated]
     std::vector<std::pair<size_t, size_t>> free_chunks_; // (offset, size)
     
 public:
     OptimizerStateBuffer(size_t size_bytes, bool cache_align = true);
     ~OptimizerStateBuffer();
     
-    // Allocation and deallocation
+    // allocateandrelease
     void* allocate(size_t size_bytes);
     void deallocate(void* ptr, size_t size_bytes);
     
-    // Defragmentation
+    // [Translated comment removed - see documentation]
     void defragment();
     float get_fragmentation_ratio() const;
     
-    // Statistics
+    // statisticsinfo
     size_t get_used_size() const { return used_size_; }
     size_t get_free_size() const { return buffer_size_ - used_size_; }
     size_t get_total_size() const { return buffer_size_; }
 };
 
 /**
- * @brief Optimizer state compressor
- * Implements various compression algorithms, optimized for CPU
+ * [Documentation available in English]
+ * [Documentation available in English]
  */
 class OptimizerStateCompressor {
 private:
@@ -207,46 +207,46 @@ public:
     explicit OptimizerStateCompressor(OptimizerStateCompression mode = OptimizerStateCompression::FP16);
     
     /**
-     * @brief Compress optimizer state
-     * @param input Input tensor (FP32)
-     * @param mode Compression mode
-     * @return Compressed tensor and compression ratio
+     * @brief compressionoptimizerstate
+     * @param input inputtensor (FP32)
+     * @param mode compressionmode
+     * [Documentation available in English]
      */
     std::pair<TensorPtr, float> compress(const TensorPtr& input, OptimizerStateCompression mode);
     
     /**
-     * @brief Decompress optimizer state
-     * @param compressed Compressed tensor
-     * @param mode Compression mode
-     * @return Decompressed tensor (FP32)
+     * @brief decompressoptimizerstate
+     * @param compressed compressionbacktensor
+     * @param mode compressionmode
+     * @return decompressbacktensor (FP32)
      */
     TensorPtr decompress(const TensorPtr& compressed, OptimizerStateCompression mode);
     
     /**
-     * @brief Adaptive compression - select compression mode based on state importance
-     * @param input Input tensor
-     * @param importance Importance score (0.0-1.0)
-     * @return Compressed tensor, used compression mode, and compression ratio
+     * [Documentation available in English]
+     * @param input inputtensor
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     std::tuple<TensorPtr, OptimizerStateCompression, float> 
     adaptive_compress(const TensorPtr& input, float importance);
     
 private:
-    // Various compression algorithm implementations
+        // [Translated]
     TensorPtr compress_fp16(const TensorPtr& input);
     TensorPtr decompress_fp16(const TensorPtr& compressed);
     
     TensorPtr compress_int8_quantized(const TensorPtr& input);
     TensorPtr decompress_int8_quantized(const TensorPtr& compressed);
     
-    // CPU-optimized SIMD implementation
+    // CPUoptimizationSIMDimplements
     void compress_fp32_to_fp16_simd(const float* src, uint16_t* dst, size_t count);
     void decompress_fp16_to_fp32_simd(const uint16_t* src, float* dst, size_t count);
 };
 
 /**
- * @brief Optimizer state I/O manager
- * Responsible for disk offloading and loading of optimizer states
+ * @brief OptimizerstateI/Omanager
+ * [Documentation in English - see separate docs]
  */
 class OptimizerStateIOManager {
 private:
@@ -260,29 +260,29 @@ public:
     explicit OptimizerStateIOManager(const std::string& path, bool compress = true);
     
     /**
-     * @brief Save optimizer state to disk
-     * @param state_id State ID
-     * @param state_type State type (MOMENTUM/VARIANCE)
-     * @param data State tensor
-     * @return Save path
+     * [Documentation available in English]
+     * @param state_id stateID
+     * @param state_type statetype (MOMENTUM/VARIANCE)
+     * @param data statetensor
+     * @return savepath
      */
     std::string save_state_to_disk(size_t state_id, OptimizerStateType state_type, const TensorPtr& data);
     
     /**
-     * @brief Load optimizer state from disk
-     * @param path Storage path
-     * @return State tensor
+     * [Documentation available in English]
+     * @param path storagepath
+     * @return statetensor
      */
     TensorPtr load_state_from_disk(const std::string& path);
     
     /**
-     * @brief Delete state file on disk
-     * @param path Storage path
+     * [Documentation available in English]
+     * @param path storagepath
      */
     void delete_state_file(const std::string& path);
     
     /**
-     * @brief Get I/O statistics
+     * @brief acquireI/Ostatisticsinforation
      */
     struct IOStats {
         size_t total_operations;
@@ -295,148 +295,148 @@ public:
 };
 
 /**
- * @brief Configuration structure
+ * @brief configurationstructure
  */
 struct MobileOptimizerStateConfig {
-    // Basic configuration
-    size_t max_active_memory_mb = 256;            // Max active memory (256MB)
-    size_t max_standby_memory_mb = 512;           // Max standby memory (512MB)
-    std::string storage_path = "./optimizer_states"; // Storage path
+    // basicconfiguration
+    size_t max_active_memory_mb = 256;                // [Translated]
+    size_t max_standby_memory_mb = 512;               // [Translated]
+    std::string storage_path = "./optimizer_states"; // storagepath
     
-    // Compression configuration
-    bool enable_compression = true;               // Enable compression
+    // compressionconfiguration
+    bool enable_compression = true;               // enablecompression
     OptimizerStateCompression default_compression = OptimizerStateCompression::FP16;
-    bool enable_adaptive_compression = true;      // Adaptive compression
-    float compression_threshold = 0.7f;           // Compression threshold (70% memory usage)
+    bool enable_adaptive_compression = true;      // adaptivecompression
+    float compression_threshold = 0.7f;           // compressionthreshold（70%memoryuse）
     
-    // CPU optimization configuration
-    bool enable_cpu_simd = true;                  // Enable SIMD optimization
-    bool enable_cache_alignment = true;           // Enable cache alignment
-    size_t cache_line_size = 64;                  // Cache line size
-    bool enable_prefetch = true;                  // Enable prefetch
+    // CPUoptimizationconfiguration
+    bool enable_cpu_simd = true;                  // enableSIMDoptimization
+    bool enable_cache_alignment = true;               // [Translated]
+    size_t cache_line_size = 64;                      // [Translated]
+    bool enable_prefetch = true;                      // [Translated]
     
-    // Offload configuration
-    bool enable_disk_offload = true;              // Enable disk offload
-    float offload_threshold = 0.8f;               // Offload threshold (80% memory)
-    bool enable_async_io = true;                  // Async I/O
+        // [Translated]
+    bool enable_disk_offload = true;                  // [Translated]
+    float offload_threshold = 0.8f;                   // [Translated]
+    bool enable_async_io = true;                  // asyncI/O
     
-    // Memory management configuration
-    bool use_contiguous_buffers = true;           // Use contiguous buffers
-    size_t buffer_size_mb = 128;                  // Buffer size
-    bool enable_defragmentation = true;           // Enable defragmentation
-    float defrag_threshold = 0.3f;                // Defragmentation threshold (30% fragmentation)
+    // memorymanageconfiguration
+    bool use_contiguous_buffers = true;               // [Translated]
+    size_t buffer_size_mb = 128;                  // buffersize
+    bool enable_defragmentation = true;               // [Translated]
+    float defrag_threshold = 0.3f;                    // [Translated]
     
-    // Mobile-specific configuration
-    bool optimize_for_mobile_cpu = true;          // Mobile CPU optimization
-    bool respect_thermal_limits = true;           // Respect thermal limits
-    bool respect_battery_limits = true;           // Respect battery limits
-    float cpu_utilization_target = 0.7f;          // CPU utilization target (70%)
+        // [Translated]
+    bool optimize_for_mobile_cpu = true;          // moveCPUoptimization
+    bool respect_thermal_limits = true;               // [Translated]
+    bool respect_battery_limits = true;               // [Translated]
+    float cpu_utilization_target = 0.7f;              // [Translated]
     
-    // Group management configuration
-    bool enable_group_management = true;          // Enable group management
-    bool enable_group_prefetch = true;            // Group prefetch
-    bool enable_group_offload = true;             // Group offload
+        // [Translated]
+    bool enable_group_management = true;              // [Translated]
+    bool enable_group_prefetch = true;                // [Translated]
+    bool enable_group_offload = true;                 // [Translated]
     
-    // Advanced optimization configuration
-    bool enable_gradient_accumulation = true;     // Gradient accumulation
-    int gradient_accumulation_steps = 1;          // Accumulation steps
-    bool enable_mixed_precision = true;           // Mixed precision
-    bool enable_loss_scaling = false;             // Loss scaling
+    // advancedoptimizationconfiguration
+    bool enable_gradient_accumulation = true;     // gradientaccumulate
+    int gradient_accumulation_steps = 1;          // accumulatestep
+    bool enable_mixed_precision = true;           // mixed precision
+    bool enable_loss_scaling = false;             // lossscale
 };
 
 /**
- * @brief Statistics information
+ * @brief statisticsinforation
  */
 struct OptimizerStateStats {
-    // Memory statistics
-    size_t total_states;                          // Total state count
-    size_t active_states;                         // Active state count
-    size_t compressed_states;                     // Compressed state count
-    size_t offloaded_states;                      // Offloaded state count
+    // memorystatistics
+    size_t total_states;                              // [Translated]
+    size_t active_states;                             // [Translated]
+    size_t compressed_states;                         // [Translated]
+    size_t offloaded_states;                          // [Translated]
     
-    size_t active_memory_used;                    // Active memory usage
-    size_t standby_memory_used;                   // Standby memory usage
-    size_t compressed_memory_used;                // Compressed memory usage
-    size_t disk_storage_used;                     // Disk usage
+    size_t active_memory_used;                        // [Translated]
+    size_t standby_memory_used;                       // [Translated]
+    size_t compressed_memory_used;                // compressionmemoryuse
+    size_t disk_storage_used;                         // [Translated]
     
-    // Compression statistics
-    size_t total_compressions;                    // Total compression count
-    size_t total_decompressions;                  // Total decompression count
-    float average_compression_ratio;              // Average compression ratio
-    size_t memory_saved_by_compression;           // Memory saved by compression
+    // compressionstatistics
+    size_t total_compressions;                        // [Translated]
+    size_t total_decompressions;                      // [Translated]
+    float average_compression_ratio;                  // [Translated]
+    size_t memory_saved_by_compression;               // [Translated]
     
-    // I/O statistics
-    size_t total_loads;                           // Total load count
-    size_t total_offloads;                        // Total offload count
-    double average_load_time_ms;                  // Average load time
-    double average_offload_time_ms;               // Average offload time
+    // I/Ostatistics
+    size_t total_loads;                               // [Translated]
+    size_t total_offloads;                            // [Translated]
+    double average_load_time_ms;                      // [Translated]
+    double average_offload_time_ms;                   // [Translated]
     
-    // Performance statistics
-    size_t cache_hits;                            // Cache hits
-    size_t cache_misses;                          // Cache misses
-    float cache_hit_ratio;                        // Cache hit ratio
-    size_t defragmentation_count;                 // Defragmentation count
+    // perforancestatistics
+    size_t cache_hits;                                // [Translated]
+    size_t cache_misses;                              // [Translated]
+    float cache_hit_ratio;                            // [Translated]
+    size_t defragmentation_count;                     // [Translated]
     
-    // Mobile statistics
-    size_t thermal_throttle_events;               // Thermal throttle events
-    size_t battery_optimization_events;           // Battery optimization events
-    float cpu_utilization;                        // CPU utilization
+    // mobilestatistics
+    size_t thermal_throttle_events;                   // [Translated]
+    size_t battery_optimization_events;           // batteryoptimizationevent
+    float cpu_utilization;                            // [Translated]
 };
 
 /**
- * @brief Main class: Mobile Optimizer state manager
+ * [Documentation available in English]
  * 
- * Core responsibilities:
- * 1. Manage optimizer states for all parameters (momentum, variance, etc.)
- * 2. Implement temporally-sliced ZeRO optimization (layer-by-layer load/offload states)
- * 3. Compress and decompress optimizer states
- * 4. CPU-optimized memory management
- * 5. Integration with MobileParameterManager
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * 3. compressionanddecompressoptimizerstate
+ * 4. CPUoptimizationmemorymanage
+ * [Documentation available in English]
  */
 class MobileOptimizerStateManager {
 private:
     MobileOptimizerStateConfig config_;
     
-    // State storage
+    // statestorage
     std::unordered_map<size_t, std::unique_ptr<OptimizerStateMetadata>> state_metadata_;
     std::unordered_map<size_t, TensorPtr> momentum_states_;     // param_id -> momentum tensor
     std::unordered_map<size_t, TensorPtr> variance_states_;     // param_id -> variance tensor
     std::unordered_map<size_t, TensorPtr> master_weights_;      // param_id -> FP32 master weight
     
-    // Group management
+        // [Translated]
     std::vector<std::unique_ptr<OptimizerStateGroup>> state_groups_;
     std::unordered_map<size_t, size_t> param_to_group_map_;     // param_id -> group_id
     std::unordered_map<std::string, size_t> group_name_to_id_;  // group_name -> group_id
     
-    // Memory management
+    // memorymanage
     std::unique_ptr<OptimizerStateBuffer> active_buffer_;
     std::unique_ptr<OptimizerStateBuffer> standby_buffer_;
     std::unique_ptr<OptimizerStateCompressor> compressor_;
     std::unique_ptr<OptimizerStateIOManager> io_manager_;
     
-    // Parameter manager reference (deep integration)
+        // [Translated]
     MobileParameterManager* param_manager_;
     
-    // Memory usage tracking
+    // memoryusetrace
     std::atomic<size_t> active_memory_used_;
     std::atomic<size_t> standby_memory_used_;
     std::atomic<size_t> compressed_memory_used_;
     
-    // Statistics
+    // statisticsinfo
     OptimizerStateStats stats_;
     mutable std::mutex stats_mutex_;
     mutable std::mutex manager_mutex_;
     
-    // Mobile monitoring
+    // mobilemonitor
     std::atomic<float> current_cpu_utilization_;
     std::atomic<bool> is_thermal_throttling_;
     std::atomic<bool> is_low_battery_;
 
 public:
     /**
-     * @brief Constructor
-     * @param config Configuration
-     * @param param_manager Parameter manager (optional, for deep integration)
+     * @brief constructfunction
+     * @param config configuration
+     * [Documentation available in English]
      */
     explicit MobileOptimizerStateManager(
         const MobileOptimizerStateConfig& config,
@@ -445,15 +445,17 @@ public:
     
     ~MobileOptimizerStateManager();
     
-    // Core API: Optimizer state registration and access
+    // ============================================================================
+        // [Translated]
+    // ============================================================================
     
     /**
-     * @brief Register optimizer state for parameter
-     * @param param_id Parameter ID
-     * @param param_name Parameter name
-     * @param param_size Parameter size (element count)
-     * @param group_name Group name (optional)
-     * @param requires_grad Whether requires gradient
+     * @brief registerparameteroptimizerstate
+     * @param param_id parameterID
+     * @param param_name parametername
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * @param requires_grad is notrequiregradient
      */
     void register_parameter_state(
         size_t param_id,
@@ -464,196 +466,210 @@ public:
     );
     
     /**
-     * @brief Get parameter's momentum state
-     * @param param_id Parameter ID
-     * @return Momentum tensor (auto-loaded)
+     * @brief acquireparametermomentumstate
+     * @param param_id parameterID
+     * [Documentation available in English]
      */
     TensorPtr get_momentum_state(size_t param_id);
     
     /**
-     * @brief Get parameter's variance state
-     * @param param_id Parameter ID
-     * @return Variance tensor (auto-loaded)
+     * @brief acquireparametervariancestate
+     * @param param_id parameterID
+     * [Documentation available in English]
      */
     TensorPtr get_variance_state(size_t param_id);
     
     /**
-     * @brief Update momentum state
-     * @param param_id Parameter ID
-     * @param new_momentum New momentum value
+     * @brief updatemomentumstate
+     * @param param_id parameterID
+     * @param new_momentum newmomentumvalue
      */
     void update_momentum_state(size_t param_id, const TensorPtr& new_momentum);
     
     /**
-     * @brief Update variance state
-     * @param param_id Parameter ID
-     * @param new_variance New variance value
+     * @brief updatevariancestate
+     * @param param_id parameterID
+     * @param new_variance newvariancevalue
      */
     void update_variance_state(size_t param_id, const TensorPtr& new_variance);
     
     /**
-     * @brief Release parameter's optimizer state (mark as offloadable)
-     * @param param_id Parameter ID
+     * [Documentation available in English]
+     * @param param_id parameterID
      */
     void release_parameter_state(size_t param_id);
     
-    // Group management API: Implement batch state management
+    // ============================================================================
+        // [Translated]
+    // ============================================================================
     
     /**
-     * @brief Load entire group's optimizer states
-     * @param group_name Group name
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     void load_group_states(const std::string& group_name);
     
     /**
-     * @brief Offload entire group's optimizer states
-     * @param group_name Group name
-     * @param force Whether to force offload (even if marked dirty)
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation in English - see separate docs]
      */
     void offload_group_states(const std::string& group_name, bool force = false);
     
     /**
-     * @brief Set group's compression mode
-     * @param group_name Group name
-     * @param compression Compression mode
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * @param compression compressionmode
      */
     void set_group_compression(const std::string& group_name, OptimizerStateCompression compression);
     
-    // Memory optimization API
+    // ============================================================================
+    // memoryoptimizationAPI
+    // ============================================================================
     
     /**
-     * @brief Compress optimizer state to save memory
-     * @param param_id Parameter ID
-     * @param compression Compression mode
-     * @return Memory saved (bytes)
+     * [Documentation available in English]
+     * @param param_id parameterID
+     * @param compression compressionmode
+     * [Documentation available in English]
      */
     size_t compress_parameter_state(size_t param_id, OptimizerStateCompression compression);
     
     /**
-     * @brief Offload optimizer state to disk
-     * @param param_id Parameter ID
-     * @return Memory freed (bytes)
+     * [Documentation available in English]
+     * @param param_id parameterID
+     * [Documentation available in English]
      */
     size_t offload_parameter_state(size_t param_id);
     
     /**
-     * @brief Automatically optimize memory usage
-     * Automatically compress or offload states based on current memory pressure
+     * [Documentation available in English]
+     * [Documentation in English - see separate docs]
      */
     void optimize_memory_usage();
     
     /**
-     * @brief Execute defragmentation
-     * @return Memory reclaimed (bytes)
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     size_t defragment_memory();
     
     /**
-     * @brief Emergency memory cleanup
-     * Free as much memory as possible in critical memory situations
-     * @return Memory freed (bytes)
+     * [Documentation available in English]
+     * [Documentation in English - see separate docs]
+     * [Documentation available in English]
      */
     size_t emergency_memory_cleanup();
     
-    // Mobile-specific API
+    // ============================================================================
+        // [Translated]
+    // ============================================================================
     
     /**
-     * @brief Update mobile system state
-     * @param cpu_util CPU utilization (0.0-1.0)
-     * @param is_thermal_throttle Whether thermal throttling
-     * @param is_low_battery Whether low battery
+     * @brief updatemobilesystemstate
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * @param is_low_battery is notlow battery
      */
     void update_mobile_state(float cpu_util, bool is_thermal_throttle, bool is_low_battery);
     
     /**
-     * @brief Enable/disable CPU SIMD optimization
-     * @param enable Whether to enable
+     * @brief enabled/disabledCPU SIMDoptimization
+     * @param enable is notenabled
      */
     void enable_cpu_simd_optimization(bool enable);
     
     /**
-     * @brief Set CPU utilization target
-     * @param target Target utilization (0.0-1.0)
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     void set_cpu_utilization_target(float target);
     
-    // Statistics and monitoring API
+    // ============================================================================
+    // statisticsandmonitorAPI
+    // ============================================================================
     
     /**
-     * @brief Get statistics
+     * @brief acquirestatisticsinforation
      */
     OptimizerStateStats get_statistics() const;
     
     /**
-     * @brief Get state metadata for specified parameter
+     * [Documentation available in English]
      */
     const OptimizerStateMetadata* get_state_metadata(size_t param_id) const;
     
     /**
-     * @brief Export detailed report
-     * @param report_path Report save path
+     * [Documentation available in English]
+     * @param report_path reportsavepath
      */
     void export_detailed_report(const std::string& report_path) const;
     
-    // Checkpoint API
+    // ============================================================================
+    // checkpointAPI
+    // ============================================================================
     
     /**
-     * @brief Save all optimizer states to checkpoint
-     * @param checkpoint_path Checkpoint path
+     * @brief savealloptimizerstatetocheckpoint
+     * @param checkpoint_path checkpointpath
      */
     void save_checkpoint(const std::string& checkpoint_path);
     
     /**
-     * @brief Load optimizer states from checkpoint
-     * @param checkpoint_path Checkpoint path
+     * @brief fromcheckpointloadoptimizerstate
+     * @param checkpoint_path checkpointpath
      */
     void load_checkpoint(const std::string& checkpoint_path);
     
-    // Configuration API
+    // ============================================================================
+    // configurationAPI
+    // ============================================================================
     
     /**
-     * @brief Get current configuration
+     * @brief acquirecurrentconfiguration
      */
     const MobileOptimizerStateConfig& get_config() const { return config_; }
     
     /**
-     * @brief Set parameter manager (for deep integration)
+     * [Documentation available in English]
      */
     void set_parameter_manager(MobileParameterManager* param_manager);
 
 private:
-    // Internal implementation methods
+    // ============================================================================
+    // internalimplementsmethod
+    // ============================================================================
     
-    // Initialization methods
+    // initializemethod
     void initialize_components();
     void cleanup_components();
     
-    // State loading and offloading
+        // [Translated]
     void load_state_internal(size_t param_id, OptimizerStateType state_type);
     void offload_state_internal(size_t param_id, OptimizerStateType state_type);
     
-    // Memory management
+    // memorymanage
     void* allocate_from_buffer(size_t size_bytes, bool is_active);
     void deallocate_from_buffer(void* ptr, size_t size_bytes, bool is_active);
     size_t calculate_memory_pressure() const;
     
-    // Selection algorithms
+    // selectalgorithm
     std::vector<size_t> select_states_to_compress(size_t target_memory_reduction);
     std::vector<size_t> select_states_to_offload(size_t target_memory_reduction);
     OptimizerStateCompression select_optimal_compression(size_t param_id);
     
-    // Statistics update
+    // statisticsupdate
     void update_statistics();
     void update_access_pattern(size_t param_id);
     
-    // Mobile optimization
+    // mobileoptimization
     void apply_cpu_optimization();
     void apply_thermal_optimization();
     void apply_battery_optimization();
 };
 
 /**
- * @brief Factory function: Create mobile optimizer state manager
+ * [Documentation available in English]
  */
 std::unique_ptr<MobileOptimizerStateManager> create_mobile_optimizer_state_manager(
     size_t available_memory_mb = 256,

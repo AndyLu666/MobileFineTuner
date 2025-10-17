@@ -77,13 +77,13 @@ public:
     ~AdamAMP() override = default;
     
     /**
-     * @brief Perform optimization step (implementation of base class method)
+     * @brief Perfor optimization step (implementsation of base class method)
      */
     void step(const std::vector<TensorPtr>& parameters,
              const std::vector<TensorPtr>& gradients) override;
     
     /**
-     * @brief Perform optimization step using gradients from parameters
+     * @brief Perfor optimization step using gradients from parameters
      */
     void step_with_params(const std::vector<TensorPtr>& parameters);
     

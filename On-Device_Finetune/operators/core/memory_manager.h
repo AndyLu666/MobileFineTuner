@@ -2,8 +2,8 @@
  * @file memory_manager.h
  * @brief Advanced memory management for the operators framework
  * 
- * This file provides memory pool, caching, and automatic cleanup mechanisms
- * to prevent memory leaks and improve performance in deep learning training.
+ * This file providess memory pool, caching, and automatic cleanup mechanisms
+ * to prevent memory leaks and improve perforance in deep learning training.
  */
 
 #pragma once

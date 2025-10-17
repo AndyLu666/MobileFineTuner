@@ -23,13 +23,13 @@ TensorPtr forward(const Tensor& input,
 
     auto dropped_input = apply_dropout(input, config.dropout, training);
 
-    // 期望维度：
+        // [Translated]
     // input:   [batch_size, in_features]
     // lora_A:  [in_features, rank]
     // hidden:  [batch_size, rank]
     // lora_B:  [rank, out_features]
     // output:  [batch_size, out_features]
-    // 注意：batch_matmul(A, B, batch, M, N, K) 需要 B 的形状为 [M, N]
+    // Note: batch_matmul(A, B, batch, M, N, K) require B shapeas [M, N]
     auto hidden = batch_matmul(*dropped_input, lora_A, batch_size, in_features, config.rank, in_features);
 
     int out_features = lora_B.shape()[0];
@@ -42,7 +42,7 @@ TensorPtr forward(const Tensor& input,
         scaled_output = ops::add_bias(*scaled_output, bias);
     }
 
-    // out_features 已获取
+        // [Translated]
     if (config.residual && in_features == out_features) {
         scaled_output = ops::add(*scaled_output, input);
     }

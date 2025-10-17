@@ -29,11 +29,11 @@ std::unique_ptr<MemoryManager> MemoryManager::instance_;
 std::mutex MemoryManager::instance_mutex_;
 double MemoryMonitor::memory_threshold_ = 0.8; // 80% by default
 
-// MemoryPool implementation
+// MemoryPool implementsation
 void* MemoryPool::allocate(size_t size) {
     std::lock_guard<std::mutex> lock(mutex_);
     
-    // Align size to 8 bytes for better performance
+    // Align size to 8 bytes for better perforance
     size = (size + 7) & ~7;
     
     size_t bucket_idx = get_bucket_index(size);
@@ -168,7 +168,7 @@ void MemoryPool::print_stats() const {
     }
 }
 
-// TensorCache implementation
+// TensorCache implementsation
 std::shared_ptr<Tensor> TensorCache::get(const std::string& key) {
     std::lock_guard<std::mutex> lock(mutex_);
     
@@ -213,7 +213,7 @@ void TensorCache::clear() {
     cache_.clear();
 }
 
-// MemoryManager implementation
+// MemoryManager implementsation
 MemoryManager& MemoryManager::instance() {
     std::lock_guard<std::mutex> lock(instance_mutex_);
     if (!instance_) {
@@ -279,7 +279,7 @@ void MemoryManager::print_memory_stats() const {
     std::cout << "===============================\n\n";
 }
 
-// MemoryMonitor implementation
+// MemoryMonitor implementsation
 size_t MemoryMonitor::get_system_memory_usage() {
 #ifdef __APPLE__
     mach_task_basic_info info;

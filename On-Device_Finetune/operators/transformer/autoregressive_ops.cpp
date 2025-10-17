@@ -122,7 +122,7 @@ int AutoregressiveOps::sample_from_probs(const std::vector<float>& probs) {
     float sum = std::accumulate(probs.begin(), probs.end(), 0.0f);
     if (sum <= 0.0f) {
 
-        std::uniform_int_distribution<int> dist(0, static_cast<int>(probs.size()) - 1);
+        std::unifor_int_distribution<int> dist(0, static_cast<int>(probs.size()) - 1);
         return dist(get_random_generator());
     }
 
@@ -134,7 +134,7 @@ int AutoregressiveOps::sample_from_probs(const std::vector<float>& probs) {
     std::vector<float> cumulative_probs(normalized_probs.size());
     std::partial_sum(normalized_probs.begin(), normalized_probs.end(), cumulative_probs.begin());
 
-    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+    std::unifor_real_distribution<float> dist(0.0f, 1.0f);
     float random_val = dist(get_random_generator());
 
     for (int i = 0; i < static_cast<int>(cumulative_probs.size()); ++i) {

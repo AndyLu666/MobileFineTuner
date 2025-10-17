@@ -2,7 +2,7 @@
  * @file activation_storage.h
  * @brief Mobile-optimized hierarchical activation storage system
  * 
- * This component implements a sophisticated multi-tier storage system for activations,
+ * This component implementss a sophisticated multi-tier storage system for activations,
  * specifically designed for mobile constraints. It manages activation storage across
  * GPU memory, CPU memory, compressed memory, and persistent storage with intelligent
  * migration policies based on access patterns and system state.
@@ -45,7 +45,7 @@ struct StorageLocation {
     bool is_compressed;
     ActivationCompressionMode compression_mode;
     
-    // Access pattern information
+    // Access pattern inforation
     std::chrono::steady_clock::time_point last_access_time;
     std::chrono::steady_clock::time_point creation_time;
     int access_count;
@@ -75,7 +75,7 @@ struct StorageTierConfig {
     float eviction_threshold;     // Start eviction at this threshold
     float migration_threshold;    // Start migration at this threshold
     
-    // Performance characteristics
+    // Perforance characteristics
     double read_bandwidth_mbps;   // Read bandwidth in MB/s
     double write_bandwidth_mbps;  // Write bandwidth in MB/s
     double access_latency_ms;     // Average access latency
@@ -132,12 +132,12 @@ struct StorageConfig {
     bool enable_storage_encryption = false;   // Encrypt sensitive data
     bool enable_memory_mapping = true;        // Use memory mapping for large files
     
-    // Performance tuning
+    // Perforance tuning
     size_t prefetch_buffer_size_mb = 64;      // Prefetch buffer size
     int migration_worker_threads = 2;         // Migration worker threads
     float cache_locality_weight = 0.7f;       // Weight for cache locality in decisions
     
-    // Performance monitoring and analytics
+    // Perforance monitoring and analytics
     bool enable_storage_profiling = false;    // Enable detailed profiling
     bool log_storage_events = false;          // Log storage events
     std::string profiling_output_path = "./storage_profile.json";
@@ -269,7 +269,7 @@ public:
      * @param activation_id Unique activation identifier
      * @param activation The activation tensor to store
      * @param preferred_tier Preferred storage tier (hint)
-     * @return Storage location information
+     * @return Storage location inforation
      */
     std::unique_ptr<StorageLocation> store_activation(
         size_t activation_id,
@@ -289,7 +289,7 @@ public:
      * @brief Migrate an activation to a different storage tier
      * @param activation_id Activation identifier
      * @param target_tier Target storage tier
-     * @param async_migration Whether to perform migration asynchronously
+     * @param async_migration Whether to perfor migration asynchronously
      * @return True if migration was successful or scheduled
      */
     bool migrate_activation(size_t activation_id, ActivationTier target_tier, bool async_migration = true);
@@ -327,9 +327,9 @@ public:
                            float temperature, bool is_on_cellular);
     
     /**
-     * @brief Get information about where an activation is stored
+     * @brief Get inforation about where an activation is stored
      * @param activation_id Activation identifier
-     * @return Storage location information (null if not found)
+     * @return Storage location inforation (null if not found)
      */
     const StorageLocation* get_storage_location(size_t activation_id) const;
     
@@ -346,7 +346,7 @@ public:
     void configure_storage(const StorageConfig& config);
     
     /**
-     * @brief Perform storage system garbage collection
+     * @brief Perfor storage system garbage collection
      * Cleans up unused storage, defragments memory pools, and optimizes layout
      */
     void garbage_collect_storage();
@@ -389,10 +389,10 @@ private:
     TensorPtr read_activation_from_file(size_t activation_id);
     void cleanup_activation_files();
     
-    // Performance optimization
+    // Perforance optimization
     void optimize_memory_layout();
     void defragment_memory_pools();
-    void update_tier_performance_metrics();
+    void update_tier_perforance_metrics();
     
     // Error handling and recovery
     void handle_storage_error(const StorageOperation& operation, const std::string& error);
@@ -435,7 +435,7 @@ namespace mobile_storage_utils {
         std::vector<std::pair<size_t, ActivationTier>> recommended_placements;
         std::vector<size_t> candidates_for_prefetch;
         std::vector<size_t> candidates_for_eviction;
-        float expected_performance_improvement;
+        float expected_perforance_improvement;
     };
     StorageOptimizationAdvice analyze_access_patterns_for_optimization(
         const std::vector<std::pair<size_t, std::chrono::steady_clock::time_point>>& access_history,
@@ -443,18 +443,18 @@ namespace mobile_storage_utils {
     );
     
     /**
-     * @brief Estimate storage performance for different configurations
+     * @brief Estimate storage perforance for different configurations
      * @param config Storage configuration to evaluate
      * @param workload_pattern Expected workload pattern
-     * @return Performance estimates
+     * @return Perforance estimates
      */
-    struct StoragePerformanceEstimate {
+    struct StoragePerforanceEstimate {
         double average_access_latency_ms;
         double sustained_bandwidth_mbps;
         double power_consumption_mw;
         float storage_efficiency_ratio;
     };
-    StoragePerformanceEstimate estimate_storage_performance(
+    StoragePerforanceEstimate estimate_storage_perforance(
         const StorageConfig& config,
         const std::string& workload_pattern
     );

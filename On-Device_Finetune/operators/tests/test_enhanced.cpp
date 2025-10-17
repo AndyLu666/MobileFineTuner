@@ -5,84 +5,84 @@
 using namespace ops;
 
 int main() {
-    std::cout << "Testing enhanced operators framework" << std::endl;
+    std::cout << "🚀 testenhancebackoperatorsframework" << std::endl;
     std::cout << "==========================================" << std::endl;
     
     try {
-        // Test basic functionality
-        std::cout << "\nTesting basic tensor operations..." << std::endl;
+                // [Translated]
+        std::cout << "\n📊 testfundamentaltensoroperation..." << std::endl;
         auto a = randn({2, 3});
         auto b = ones({2, 3});
         auto c = add(a, b);
-        std::cout << "[PASS] Basic operations" << std::endl;
+        std::cout << "✅ fundamentaloperation[Output]" << std::endl;
         
-        // Test newly added activation functions
-        std::cout << "\nTesting activation functions..." << std::endl;
+                // [Translated]
+        std::cout << "\n🔥 testactivation function..." << std::endl;
         auto x = randn({2, 4});
         auto silu_out = silu(x);
-        std::cout << "[PASS] SiLU activation function" << std::endl;
+        std::cout << "✅ SiLUactivation function[Output]" << std::endl;
         
-        // Test RMS normalization
-        std::cout << "\nTesting normalization..." << std::endl;
+        // testRMSnormalization
+        std::cout << "\n📏 testnormalization..." << std::endl;
         auto rms_weight = ones({4});
         auto rms_out = rms_norm(x, rms_weight);
-        std::cout << "[PASS] RMS Normalization" << std::endl;
+        std::cout << "✅ RMS Normalization[Output]" << std::endl;
         
-        // Test math functions
-        std::cout << "\nTesting math functions..." << std::endl;
+                // [Translated]
+        std::cout << "\n🧮 test[Output]function..." << std::endl;
         auto pos_tensor = abs(x);
-        auto sqrt_tensor = sqrt(add(x, 1.0f));  // Avoid negative sqrt
-        auto exp_tensor = exp(mul(x, 0.1f));   // Avoid exp overflow
-        std::cout << "[PASS] abs, sqrt, exp functions" << std::endl;
+        auto sqrt_tensor = sqrt(add(x, 1.0f));          // [Translated]
+        auto exp_tensor = exp(mul(x, 0.1f));           // [Translated]
+        std::cout << "✅ abs, sqrt, expfunction[Output]" << std::endl;
         
-        // Test statistical functions
-        std::cout << "\nTesting statistical functions..." << std::endl;
+        // teststatisticsfunction
+        std::cout << "\n📈 teststatisticsfunction..." << std::endl;
         auto sum_val = sum(x);
         auto mean_val = mean(x);
-        std::cout << "[PASS] sum, mean functions" << std::endl;
+        std::cout << "✅ sum, meanfunction[Output]" << std::endl;
         
-        // Test Transformer operators
-        std::cout << "\nTesting Transformer operators..." << std::endl;
+        // testTransforeroperator
+        std::cout << "\n🤖 testTransforeroperator..." << std::endl;
         
-        // Test causal mask
+        // testcausal mask
         auto mask = create_causal_mask(4);
-        std::cout << "[PASS] causal mask creation" << std::endl;
+        std::cout << "✅ causal maskcreate[Output]" << std::endl;
         
-        // Test KV head repetition (GQA)
+                // [Translated]
         auto kv_tensor = randn({1, 2, 4, 8});  // [batch=1, kv_heads=2, seq=4, head_dim=8]
-        auto repeated_kv = repeat_kv_heads(kv_tensor, 3);  // Repeat 3 times
+        auto repeated_kv = repeat_kv_heads(kv_tensor, 3);          // [Translated]
         auto expected_shape = repeated_kv->shape();
         if (expected_shape[1] == 6) {  // 2*3=6
-            std::cout << "[PASS] repeat_kv_heads (2 heads -> 6 heads)" << std::endl;
+            std::cout << "✅ repeat_kv_heads[Output] (2 heads -> 6 heads)" << std::endl;
         } else {
-            std::cout << "[FAIL] repeat_kv_heads shape error" << std::endl;
+            std::cout << "❌ repeat_kv_headsshapeincorrect" << std::endl;
         }
         
-        // Test RoPE
+        // testRoPE
         auto q_tensor = randn({1, 4, 8, 16});  // [batch=1, heads=4, seq=8, head_dim=16]
         auto rope_out = apply_rope(q_tensor, 8, 16);
-        std::cout << "[PASS] apply_rope" << std::endl;
+        std::cout << "✅ apply_rope[Output]" << std::endl;
         
-        // Test SwiGLU
-        std::cout << "\nTesting SwiGLU..." << std::endl;
+        // testSwiGLU
+        std::cout << "\n🌟 testSwiGLU..." << std::endl;
         auto gate = randn({2, 8});
         auto up = randn({2, 8});
         auto swiglu_out = swiglu(gate, up);
-        std::cout << "[PASS] SwiGLU" << std::endl;
+        std::cout << "✅ SwiGLU[Output]" << std::endl;
         
-        std::cout << "\nAll enhanced features tests passed!" << std::endl;
-        std::cout << "Operators framework now supports:" << std::endl;
-        std::cout << "  * Basic tensor operations" << std::endl;
-        std::cout << "  * Activation functions (GELU, SiLU, ReLU, Sigmoid, Tanh)" << std::endl;
-        std::cout << "  * Normalization (LayerNorm, RMSNorm, BatchNorm)" << std::endl;
-        std::cout << "  * Math functions (abs, sqrt, exp, log, pow, clamp)" << std::endl;
-        std::cout << "  * Statistical functions (sum, mean)" << std::endl;
-        std::cout << "  * Transformer operators (causal_mask, repeat_kv, RoPE, SwiGLU)" << std::endl;
-        std::cout << "  * LoRA support (lora_linear)" << std::endl;
-        std::cout << "  * Automatic differentiation and gradient computation" << std::endl;
+        std::cout << "\n🎉 allenhance[Output]testvia！" << std::endl;
+        std::cout << "📊 operatorsframeworknowsupport:" << std::endl;
+        std::cout << "  ✓ fundamentaltensoroperation" << std::endl;
+        std::cout << "  ✓ activation function (GELU, SiLU, ReLU, Sigmoid, Tanh)" << std::endl;
+        std::cout << "  ✓ normalization (LayerNorm, RMSNorm, BatchNorm)" << std::endl;
+        std::cout << "  ✓ [Output]function (abs, sqrt, exp, log, pow, clamp)" << std::endl;
+        std::cout << "  ✓ statisticsfunction (sum, mean)" << std::endl;
+        std::cout << "  ✓ Transforeroperator (causal_mask, repeat_kv, RoPE, SwiGLU)" << std::endl;
+        std::cout << "  ✓ LoRAsupport (lora_linear)" << std::endl;
+        std::cout << "  ✓ automatic differentiationandgradientcompute" << std::endl;
         
     } catch (const std::exception& e) {
-        std::cout << "[FAIL] Test failed: " << e.what() << std::endl;
+        std::cout << "❌ testfailed: " << e.what() << std::endl;
         return 1;
     }
     

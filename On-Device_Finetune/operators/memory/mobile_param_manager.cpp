@@ -250,9 +250,9 @@ MobileParameterManager::MobileParameterManager(const MobileParamConfig& config)
         }
         
         if (config_.enable_thermal_monitoring) {
-            platform_optimizer_ = std::make_unique<MobilePlatformOptimizer>();
-            if (platform_optimizer_) {
-                std::cout << "  Mobile platform optimizer initialized" << std::endl;
+            platfor_optimizer_ = std::make_unique<MobilePlatforOptimizer>();
+            if (platfor_optimizer_) {
+                std::cout << "  Mobile platfor optimizer initialized" << std::endl;
             }
         }
         
@@ -513,7 +513,7 @@ void MobileParameterManager::load_checkpoint(const std::string& checkpoint_path)
             
             // Allocate memory if needed
             if (!partition->tensor || partition->tensor->numel() == 0) {
-                // Create new tensor - implementation depends on your tensor API
+                // Create new tensor - implementsation depends on your tensor API
                 // partition->tensor = create_tensor_from_size(size_bytes);
             }
             
@@ -753,14 +753,14 @@ std::unique_ptr<MobileParameterManager> create_mobile_param_manager(
 }
 
 // ===============================
-// Add missing method implementations
+// Add missing method implementsations
 // ===============================
 
 float MobileParameterManager::get_current_temperature() const {
-    // Since get_cpu_temperature() is private, we implement temperature detection directly
-    // In a real implementation, this would read from system sensors
+    // Since get_cpu_temperature() is private, we implements temperature detection directly
+    // In a real implementsation, this would read from system sensors
     
-    // Simulate temperature based on system activity (stub implementation)
+    // Simulate temperature based on system activity (stub implementsation)
     static float base_temperature = 25.0f;
     static float temperature_variation = 0.1f;
     

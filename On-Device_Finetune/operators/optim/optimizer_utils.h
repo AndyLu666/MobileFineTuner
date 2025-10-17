@@ -1,6 +1,6 @@
 /**
  * @file optimizer_utils.h
- * @brief Auxiliary utility functions for Optimizer state manager
+ * @brief Optimizerstatemanagerhelpertoolfunction
  */
 
 #pragma once
@@ -13,23 +13,23 @@
 #include <chrono>
 #include <iostream>
 
-// Type definition (DType) imported from core module to avoid indirect inclusion by dependents
+// [Translated comment removed - see documentation]
 #include "core/dtype.h"
 
 namespace ops {
 namespace optim {
 
 /**
- * @brief FP32 ↔ FP16 conversion tools
- * Based on IEEE 754 standard implementation
+ * @brief FP32 ↔ FP16 converttool
+ * [Documentation available in English]
  */
 
-// FP32 -> FP16 conversion
+// FP32 -> FP16 convert
 inline uint16_t float_to_half(float value) {
-    // FP32 format: 1 sign bit + 8 exp bits + 23 mantissa bits
-    // FP16 format: 1 sign bit + 5 exp bits + 10 mantissa bits
+    // FP32forat: 1 sign bit + 8 exp bits + 23 mantissa bits
+    // FP16forat: 1 sign bit + 5 exp bits + 10 mantissa bits
     
-    // Use memcpy to avoid undefined behavior caused by aliasing rules
+    // [Translated comment removed - see documentation]
     uint32_t bits;
     std::memcpy(&bits, &value, sizeof(uint32_t));
     
@@ -37,46 +37,46 @@ inline uint16_t float_to_half(float value) {
     uint32_t exponent = (bits >> 23) & 0xFF;
     uint32_t mantissa = bits & 0x7FFFFF;
     
-    // Handle special cases
+    // [Translated comment removed - see documentation]
     if (exponent == 0xFF) {
-        // Inf or NaN
+        // InforNaN
         return sign | 0x7C00 | (mantissa ? 0x0200 : 0);
     }
     
     if (exponent == 0) {
-        // Zero or denormal
+        // zeroordenormal
         return sign;
     }
     
-    // Adjust exponent bias: FP32 bias 127 -> FP16 bias 15
+        // [Translated]
     int32_t new_exp = static_cast<int32_t>(exponent) - 127 + 15;
     
     if (new_exp >= 31) {
-        // Overflow -> Inf
+                // [Translated]
         return sign | 0x7C00;
     }
     
     if (new_exp <= 0) {
-        // Underflow -> zero
+        // underflow -> zero
         return sign;
     }
     
-    // Truncate mantissa: 23 bits -> 10 bits
+    // [Translated comment removed - see documentation]
     uint16_t new_mantissa = mantissa >> 13;
     
     return sign | (new_exp << 10) | new_mantissa;
 }
 
-// FP16 -> FP32 conversion
+// FP16 -> FP32 convert
 inline float half_to_float(uint16_t half) {
-    // Extract fields
+    // extractfield
     uint16_t sign = half & 0x8000;
     uint16_t exponent = (half >> 10) & 0x1F;
     uint16_t mantissa = half & 0x3FF;
     
-    // Handle special cases
+    // [Translated comment removed - see documentation]
     if (exponent == 0x1F) {
-        // Inf or NaN
+        // InforNaN
         if (mantissa == 0) {
             // Inf
             uint32_t bits = (sign << 16) | 0x7F800000;
@@ -93,17 +93,17 @@ inline float half_to_float(uint16_t half) {
     }
     
     if (exponent == 0 && mantissa == 0) {
-        // Zero
+        // zero
         uint32_t bits = sign << 16;
         float out;
         std::memcpy(&out, &bits, sizeof(float));
         return out;
     }
     
-    // Adjust exponent bias: FP16 bias 15 -> FP32 bias 127
+        // [Translated]
     uint32_t new_exp = exponent + 127 - 15;
     
-    // Expand mantissa: 10 bits -> 23 bits
+        // [Translated]
     uint32_t new_mantissa = static_cast<uint32_t>(mantissa) << 13;
     
     uint32_t bits = (static_cast<uint32_t>(sign) << 16) | (new_exp << 23) | new_mantissa;
@@ -113,7 +113,7 @@ inline float half_to_float(uint16_t half) {
 }
 
 /**
- * @brief INT8 quantization tools
+ * @brief INT8quantizationtool
  */
 struct QuantizationParams {
     float scale;
@@ -122,22 +122,22 @@ struct QuantizationParams {
     float max_val;
 };
 
-// Calculate quantization parameters
+// computequantizationparameter
 inline QuantizationParams calculate_quantization_params(const float* data, size_t count) {
     QuantizationParams params;
     
-    // Find min and max values
+        // [Translated]
     params.min_val = *std::min_element(data, data + count);
     params.max_val = *std::max_element(data, data + count);
     
-    // Calculate scale and zero_point
+    // computescaleandzero_point
     params.scale = (params.max_val - params.min_val) / 255.0f;
     params.zero_point = -params.min_val / params.scale;
     
     return params;
 }
 
-// FP32 -> INT8 quantization
+// FP32 -> INT8quantization
 inline void quantize_fp32_to_int8(const float* src, int8_t* dst, size_t count, 
                                   const QuantizationParams& params) {
     for (size_t i = 0; i < count; ++i) {
@@ -147,7 +147,7 @@ inline void quantize_fp32_to_int8(const float* src, int8_t* dst, size_t count,
     }
 }
 
-// INT8 -> FP32 dequantization
+// [Translated]
 inline void dequantize_int8_to_fp32(const int8_t* src, float* dst, size_t count,
                                     const QuantizationParams& params) {
     for (size_t i = 0; i < count; ++i) {
@@ -157,7 +157,7 @@ inline void dequantize_int8_to_fp32(const int8_t* src, float* dst, size_t count,
 }
 
 /**
- * @brief DType utility class
+ * @brief DTypetoolclass
  */
 class DTypeUtils {
 public:
@@ -173,7 +173,7 @@ public:
 };
 
 /**
- * @brief Memory alignment tools
+ * [Documentation available in English]
  */
 inline size_t align_size(size_t size, size_t alignment) {
     return (size + alignment - 1) & ~(alignment - 1);
@@ -184,7 +184,7 @@ inline bool is_aligned(void* ptr, size_t alignment) {
 }
 
 /**
- * @brief Memory statistics tools
+ * @brief memorystatisticstool
  */
 struct MemorySnapshot {
     size_t active_memory;
@@ -212,7 +212,7 @@ struct MemorySnapshot {
 };
 
 /**
- * @brief Performance timing tools
+ * [Documentation available in English]
  */
 class ScopedTimer {
 private:
@@ -241,7 +241,7 @@ public:
 };
 
 /**
- * @brief Automatic memory management RAII wrapper
+ * [Documentation available in English]
  */
 template<typename T>
 class AlignedMemoryGuard {
@@ -269,11 +269,11 @@ public:
     const T* get() const { return ptr_; }
     size_t size() const { return size_; }
     
-    // Prohibit copying
+        // [Translated]
     AlignedMemoryGuard(const AlignedMemoryGuard&) = delete;
     AlignedMemoryGuard& operator=(const AlignedMemoryGuard&) = delete;
     
-    // Allow moving
+    // allowmove
     AlignedMemoryGuard(AlignedMemoryGuard&& other) noexcept
         : ptr_(other.ptr_), size_(other.size_), alignment_(other.alignment_) {
         other.ptr_ = nullptr;

@@ -1,9 +1,9 @@
 /**
  * @file attention.h
- * @brief Multi-Head Attention implementation for transformer architectures
+ * @brief Multi-Head Attention implementsation for transforer architectures
  * 
- * This file provides the MultiHeadAttention class which implements
- * the scaled dot-product attention mechanism used in transformer models.
+ * This file providess the MultiHeadAttention class which implementss
+ * the scaled dot-product attention mechanism used in transforer models.
  * It supports both training and inference modes with optional caching.
  */
 
@@ -40,11 +40,11 @@ struct AttentionConfig {
 };
 
 /**
- * @brief Multi-Head Attention layer implementation
+ * @brief Multi-Head Attention layer implementsation
  * 
  * Implements the scaled dot-product attention mechanism with multiple heads.
  * This class handles the computation of attention weights and the weighted
- * combination of values based on query-key similarities.
+ * combination of values based on query-key similar toities.
  */
 class MultiHeadAttention {
 private:

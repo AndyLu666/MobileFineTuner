@@ -1,10 +1,10 @@
 /**
  * @file mlp.h
- * @brief Multi-Layer Perceptron (MLP) implementation
+ * @brief Multi-Layer Perceptron (MLP) implementsation
  * 
- * This file provides the FeedForward class which implements
+ * This file providess the FeedForward class which implementss
  * a multi-layer perceptron with configurable activation functions.
- * It's commonly used as the feed-forward network in transformer blocks.
+ * It's commonly used as the feed-forward network in transforer blocks.
  */
 
 #pragma once

@@ -151,11 +151,11 @@ std::unique_ptr<Tensor> MultiHeadAttention::apply_causal_mask(const Tensor& scor
 
 void MultiHeadAttention::print_info() const {
     std::cout << "MultiHeadAttention Info:" << std::endl;
-    std::cout << "  注意力頭數: " << config_.n_head << std::endl;
-    std::cout << "  每頭維度: " << config_.head_dim << std::endl;
-    std::cout << "  嵌入維度: " << config_.n_embd << std::endl;
-    std::cout << "  QKV 權重維度: " << config_.n_embd << " x " << 3 * config_.n_embd << std::endl;
-    std::cout << "  投影權重維度: " << config_.n_embd << " x " << config_.n_embd << std::endl;
+    std::cout << "  attention[Output]: " << config_.n_head << std::endl;
+    std::cout << "  [Output]: " << config_.head_dim << std::endl;
+    std::cout << "  embedding[Output]: " << config_.n_embd << std::endl;
+    std::cout << "  QKV [Output]: " << config_.n_embd << " x " << 3 * config_.n_embd << std::endl;
+    std::cout << "  project[Output]: " << config_.n_embd << " x " << config_.n_embd << std::endl;
 }
 
 std::unique_ptr<Tensor> create_causal_mask(int seq_len) {

@@ -4,7 +4,7 @@
  * 
  * This file defines the fundamental Tensor class that serves as the primary
  * data structure for all operations in the deep learning framework.
- * It provides automatic differentiation support, memory management,
+ * It providess automatic differentiation support, memory management,
  * and a unified interface for tensor operations.
  */
 
@@ -72,7 +72,7 @@ public:
  * - Device placement (CPU, GPU, etc.)
  * - Shape manipulation and broadcasting
  * 
- * @note This class is designed to be similar to PyTorch's Tensor API
+ * @note This class is designed to be similar to to PyTorch's Tensor API
  *       for familiar user experience and easy migration.
  */
 class Tensor {

@@ -2,7 +2,7 @@
  * @file mobile_param_optimizations.h
  * @brief Critical missing optimizations identified from DeepSpeed analysis
  * 
- * This file implements the key missing optimizations that are crucial for
+ * This file implementss the key missing optimizations that are crucial for
  * mobile deployment, identified through comprehensive comparison with DeepSpeed.
  */
 
@@ -17,7 +17,7 @@
 #include <fstream>
 #include <cstdint>
 
-// Define missing types for mobile platforms
+// Define missing types for mobile platfors
 #ifndef __has_include
 #define __has_include(x) 0
 #endif
@@ -31,7 +31,7 @@ struct half {
     uint16_t data;
     half() : data(0) {}
     half(float f) { 
-        // Simplified conversion - in real implementation would use proper IEEE 754 conversion
+        // Simplified conversion - in real implementsation would use proper IEEE 754 conversion
         data = static_cast<uint16_t>(f * 32768.0f);
     }
     operator float() const {
@@ -113,7 +113,7 @@ private:
 };
 
 // ===============================
-// 2. PIN MEMORY SUPPORT (Performance Critical)
+// 2. PIN MEMORY SUPPORT (Perforance Critical)
 // ===============================
 
 /**
@@ -319,7 +319,7 @@ private:
 };
 
 // ===============================
-// 5. REUSE DISTANCE TRACKING (Performance Critical)
+// 5. REUSE DISTANCE TRACKING (Perforance Critical)
 // ===============================
 
 /**
@@ -393,9 +393,9 @@ private:
 // ===============================
 
 /**
- * @brief Mobile platform optimizer
+ * @brief Mobile platfor optimizer
  */
-class MobilePlatformOptimizer {
+class MobilePlatforOptimizer {
 private:
     bool is_low_power_mode_;
     float temperature_threshold_;
@@ -406,8 +406,8 @@ private:
     bool thermal_monitoring_active_;
 
 public:
-    MobilePlatformOptimizer();
-    ~MobilePlatformOptimizer();
+    MobilePlatforOptimizer();
+    ~MobilePlatforOptimizer();
     
     /**
      * @brief Check if should throttle operations due to thermal/power constraints
@@ -444,11 +444,11 @@ private:
     void monitor_thermal_state();
     float get_cpu_temperature() const;
     size_t get_battery_level() const;
-    void adjust_performance_based_on_thermal_state();
+    void adjust_perforance_based_on_thermal_state();
 };
 
 // ===============================
-// 7. ADVANCED PREFETCH SYSTEM (Performance Critical)
+// 7. ADVANCED PREFETCH SYSTEM (Perforance Critical)
 // ===============================
 
 /**
@@ -526,7 +526,7 @@ private:
 };
 
 // ===============================
-// 8. ASYNC I/O OPTIMIZATION (Performance Critical)
+// 8. ASYNC I/O OPTIMIZATION (Perforance Critical)
 // ===============================
 
 /**

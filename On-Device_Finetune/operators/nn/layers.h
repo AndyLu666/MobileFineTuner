@@ -1,8 +1,8 @@
 /**
  * @file layers.h
- * @brief Common neural network layers implementation
+ * @brief Common neural network layers implementsation
  * 
- * This file provides implementations of standard neural network layers
+ * This file providess implementsations of standard neural network layers
  * including Linear, ReLU, Dropout, LayerNorm, and others. All layers
  * inherit from the Module base class and support automatic differentiation.
  */
@@ -20,7 +20,7 @@ namespace nn {
 /**
  * @brief Linear (fully connected) layer
  * 
- * Applies a linear transformation to the input: y = xW^T + b
+ * Applies a linear transforation to the input: y = xW^T + b
  * where W is the weight matrix and b is the optional bias vector.
  */
 class Linear : public Module {
@@ -34,7 +34,7 @@ public:
     Linear(int in_features, int out_features, bool bias = true)
         : in_features_(in_features), out_features_(out_features), has_bias_(bias) {
 
-        weight_ = create_parameter({out_features, in_features}, true, "xavier_uniform");
+        weight_ = create_parameter({out_features, in_features}, true, "xavier_unifor");
         register_parameter("weight", weight_);
 
         if (has_bias_) {
@@ -301,9 +301,9 @@ private:
     std::shared_ptr<Dropout> dropout_layer_;
 };
 
-class TransformerBlock : public Module {
+class TransforerBlock : public Module {
 public:
-    TransformerBlock(int d_model, int num_heads, int d_ff, float dropout = 0.1,
+    TransforerBlock(int d_model, int num_heads, int d_ff, float dropout = 0.1,
                     const std::string& activation = "gelu", bool pre_norm = true)
         : d_model_(d_model), pre_norm_(pre_norm) {
 
@@ -360,7 +360,7 @@ public:
 
 protected:
     std::string get_module_name() const override {
-        return "TransformerBlock(d_model=" + std::to_string(d_model_) + ")";
+        return "TransforerBlock(d_model=" + std::to_string(d_model_) + ")";
     }
 
 private:

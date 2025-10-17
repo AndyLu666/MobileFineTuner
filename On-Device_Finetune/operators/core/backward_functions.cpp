@@ -79,6 +79,15 @@ std::vector<TensorPtr> MulBackward::apply(const TensorPtr& grad_output) {
     return {grad_a, grad_b};
 }
 
+std::vector<TensorPtr> SubBackward::apply(const TensorPtr& grad_output) {
+    // d(a - b)/da = 1, d(a - b)/db = -1
+    auto grad_a = sum_to_shape(grad_output, shape_a_);
+    auto neg_grad = mul(grad_output, -1.0f);
+    auto grad_b = sum_to_shape(neg_grad, shape_b_);
+
+    return {grad_a, grad_b};
+}
+
 std::vector<TensorPtr> MatmulBackward::apply(const TensorPtr& grad_output) {
 
     auto grad_a = matmul(grad_output, transpose(b_, -2, -1));
@@ -280,7 +289,7 @@ std::vector<TensorPtr> CrossEntropyLossBackward::apply(const TensorPtr& grad_out
         }
     }
     
-    // grad_output is usually a scalar [1], directly use the first element
+    // [Translated comment removed - see documentation]
     float grad_scale = 1.0f;
     if (grad_output->numel() == 1) {
         grad_scale = grad_output->data<float>()[0];
@@ -381,6 +390,74 @@ std::vector<TensorPtr> ApplyRoPEBackward::apply(const TensorPtr& grad_output) {
         }
     }
 
+    return {grad_input};
+}
+
+std::vector<TensorPtr> MemoryFirstMLPBackward::apply(const TensorPtr& grad_output) {
+    // Recomputation-based backward (consistent with memory_first_mlp.cpp implementsation)
+    auto grad_input = zeros(input_->shape(), input_->dtype(), input_->device());
+    
+    const float* input_data = input_->data<float>();
+    const float* fc_w_data = fc_weight_->data<float>();
+    const float* proj_w_data = proj_weight_->data<float>();
+    const float* grad_out_data = grad_output->data<float>();
+    float* grad_in_data = grad_input->data<float>();
+    
+    // Backward propagation chunk by chunk
+    for (int64_t chunk_start = 0; chunk_start < n_inner_; chunk_start += chunk_size_) {
+        int64_t chunk_end = std::min(chunk_start + chunk_size_, n_inner_);
+        int64_t actual_chunk_size = chunk_end - chunk_start;
+        
+        // Recompute forward intermediate values
+        std::vector<float> hidden_chunk(batch_seq_ * actual_chunk_size);
+        std::vector<float> gelu_grad(batch_seq_ * actual_chunk_size);
+        
+        // Recompute hidden & gelu_grad
+        for (int64_t i = 0; i < batch_seq_; ++i) {
+            for (int64_t j = 0; j < actual_chunk_size; ++j) {
+                int64_t fc_row = chunk_start + j;
+                float sum = fc_bias_->data<float>()[fc_row];
+                for (int64_t k = 0; k < n_embd_; ++k) {
+                    sum += input_data[i * n_embd_ + k] * fc_w_data[fc_row * n_embd_ + k];
+                }
+                hidden_chunk[i * actual_chunk_size + j] = sum;
+                
+                // GELU derivative
+                float x = sum;
+                float tanh_input = 0.7978845608f * (x + 0.044715f * x * x * x);
+                float tanh_val = std::tanh(tanh_input);
+                float sech2 = 1.0f - tanh_val * tanh_val;
+                float tanh_grad = 0.7978845608f * (1.0f + 3.0f * 0.044715f * x * x);
+                gelu_grad[i * actual_chunk_size + j] = 0.5f * (1.0f + tanh_val) + 0.5f * x * sech2 * tanh_grad;
+            }
+        }
+        
+        // Backward: grad_activated -> grad_hidden -> grad_input
+        std::vector<float> grad_activated_chunk(batch_seq_ * actual_chunk_size, 0.0f);
+        for (int64_t i = 0; i < batch_seq_; ++i) {
+            for (int64_t k = 0; k < actual_chunk_size; ++k) {
+                float sum = 0.0f;
+                for (int64_t j = 0; j < n_embd_; ++j) {
+                    int64_t proj_col = chunk_start + k;
+                    sum += grad_out_data[i * n_embd_ + j] * proj_w_data[j * n_inner_ + proj_col];
+                }
+                grad_activated_chunk[i * actual_chunk_size + k] = sum * gelu_grad[i * actual_chunk_size + k];
+            }
+        }
+        
+        // Propagate to input
+        for (int64_t i = 0; i < batch_seq_; ++i) {
+            for (int64_t j = 0; j < n_embd_; ++j) {
+                float sum = 0.0f;
+                for (int64_t k = 0; k < actual_chunk_size; ++k) {
+                    int64_t fc_row = chunk_start + k;
+                    sum += grad_activated_chunk[i * actual_chunk_size + k] * fc_w_data[fc_row * n_embd_ + j];
+                }
+                grad_in_data[i * n_embd_ + j] += sum;
+            }
+        }
+    }
+    
     return {grad_input};
 }
 

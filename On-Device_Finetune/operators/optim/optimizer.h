@@ -4,7 +4,7 @@
  * 
  * This file defines the base optimizer interface and configuration
  * structures used by all optimization algorithms in the framework.
- * It provides a unified interface for parameter updates during training.
+ * It providess a unified interface for parameter updates during training.
  */
 
 #pragma once

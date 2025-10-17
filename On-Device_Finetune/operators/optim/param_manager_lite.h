@@ -1,13 +1,13 @@
 /**
  * @file param_manager_lite.h  
- * @brief Lightweight parameter manager - Provide parameter ID/name mapping for MobileOptimizer
+ * @brief lightweightparametermanager - as MobileOptimizer providesparameterID/namemapping
  * 
- * This is a simplified adaptation of MobileParameterManager, providing only core features needed by optimizer:
- * - Parameter registration and ID allocation
- * - Parameter name and size recording
- * - Group management (optional)
+ * [Documentation in English - see separate docs]
+ * - parameterregisterwithIDallocate
+ * - parameternamewithsizerecord
+ * [Documentation available in English]
  * 
- * Does not include complete memory management features (those are StateManager's responsibility)
+ * [Documentation in English - see separate docs]
  */
 
 #pragma once
@@ -22,19 +22,19 @@ namespace ops {
 namespace optim {
 
 /**
- * @brief Parameter metadata
+ * [Documentation available in English]
  */
 struct ParameterMetadata {
     size_t param_id;
     std::string param_name;
-    size_t param_size;  // Element count
+    size_t param_size;      // [Translated]
     std::string group_name;
     bool requires_grad;
     
-    // Actual parameter reference (weak reference, does not own)
-    TensorPtr param_tensor;  // Save shared_ptr for state manager access
+    // [Translated comment removed - see documentation]
+    TensorPtr param_tensor;      // [Translated]
     
-    // Default constructor (for container use)
+        // [Translated]
     ParameterMetadata() 
         : param_id(0), param_name(""), param_size(0),
           group_name("default"), requires_grad(false), param_tensor(nullptr) {}
@@ -46,13 +46,13 @@ struct ParameterMetadata {
 };
 
 /**
- * @brief Lightweight parameter manager
+ * @brief lightweightparametermanager
  * 
- * Responsibilities:
- * 1. Allocate unique IDs for parameters
- * 2. Record parameter metadata (name/size/group)
- * 3. Provide parameter query interface
- * 4. Support group management (optional)
+ * [Documentation available in English]
+ * 1. asparameterallocateuniqueID
+ * [Documentation available in English]
+ * 3. providesparameterqueryinterface
+ * [Documentation available in English]
  */
 class ParameterManagerLite {
 private:
@@ -66,11 +66,11 @@ public:
     ParameterManagerLite() = default;
     
     /**
-     * @brief Register parameter
-     * @param param Parameter tensor
-     * @param name Parameter name
-     * @param group_name Group name (optional)
-     * @return Allocated parameter ID
+     * @brief registerparameter
+     * @param param parametertensor
+     * @param name parametername
+     * [Documentation available in English]
+     * @return allocateparameterID
      */
     size_t register_parameter(const TensorPtr& param, 
                              const std::string& name,
@@ -90,11 +90,11 @@ public:
     }
     
     /**
-     * @brief Batch register parameters
-     * @param params Parameter list
-     * @param name_prefix Name prefix
-     * @param group_name Group name
-     * @return Parameter ID list
+     * [Documentation available in English]
+     * @param params parameterlist
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * @return parameterIDlist
      */
     std::vector<size_t> register_parameters(const std::vector<TensorPtr>& params,
                                            const std::string& name_prefix = "param",
@@ -111,7 +111,7 @@ public:
     }
     
     /**
-     * @brief Get parameter metadata
+     * [Documentation available in English]
      */
     const ParameterMetadata* get_metadata(size_t param_id) const {
         auto it = param_registry_.find(param_id);
@@ -119,7 +119,7 @@ public:
     }
     
     /**
-     * @brief Get parameter ID by name
+     * @brief according tonameacquireparameterID
      */
     size_t get_param_id(const std::string& name) const {
         auto it = name_to_id_.find(name);
@@ -130,7 +130,7 @@ public:
     }
     
     /**
-     * @brief Get all parameter IDs in group
+     * [Documentation available in English]
      */
     std::vector<size_t> get_group_params(const std::string& group_name) const {
         auto it = groups_.find(group_name);
@@ -138,7 +138,7 @@ public:
     }
     
     /**
-     * @brief Get parameter tensor
+     * @brief acquireparametertensor
      */
     TensorPtr get_parameter(size_t param_id) const {
         auto metadata = get_metadata(param_id);
@@ -146,12 +146,12 @@ public:
     }
     
     /**
-     * @brief Get total parameter count
+     * [Documentation available in English]
      */
     size_t num_parameters() const { return param_registry_.size(); }
     
     /**
-     * @brief Get total parameter element count
+     * [Documentation available in English]
      */
     size_t total_parameter_count() const {
         size_t total = 0;
@@ -162,7 +162,7 @@ public:
     }
     
     /**
-     * @brief Clear all registrations
+     * @brief clearallregister
      */
     void clear() {
         param_registry_.clear();
@@ -172,9 +172,9 @@ public:
     }
 };
 
-// Backward compatibility alias (for StateManager use)
-// Note: MobileOptimizerStateManager.h also forward declares MobileParameterManager
-// Here provides actual definition
+// [Translated comment removed - see documentation]
+// [Translated]
+// [Translated comment removed - see documentation]
 class MobileParameterManager : public ParameterManagerLite {
 public:
     using ParameterManagerLite::ParameterManagerLite;

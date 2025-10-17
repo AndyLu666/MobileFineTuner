@@ -3,8 +3,8 @@
  * @brief GPT-2 model components and configuration
  * 
  * This file defines the core components of the GPT-2 model including
- * configuration structures, transformer blocks, and model architecture.
- * It provides both the base GPT-2 implementation and fine-tuning variants.
+ * configuration structures, transforer blocks, and model architecture.
+ * It providess both the base GPT-2 implementsation and fine-tuning variants.
  */
 
 #pragma once
@@ -27,7 +27,7 @@ struct GPT2Config {
     int vocab_size = 50257;           /**< Vocabulary size */
     int n_positions = 1024;           /**< Maximum sequence length */
     int n_embd = 768;                 /**< Embedding dimension */
-    int n_layer = 12;                 /**< Number of transformer layers */
+    int n_layer = 12;                 /**< Number of transforer layers */
     int n_head = 12;                  /**< Number of attention heads */
     int n_inner = 3072;               /**< MLP intermediate dimension */
     float layer_norm_epsilon = 1e-5f; /**< Layer normalization epsilon */
@@ -45,7 +45,7 @@ struct GPT2Config {
      * @param vocab Vocabulary size
      * @param pos Maximum sequence length
      * @param embd Embedding dimension
-     * @param layer Number of transformer layers
+     * @param layer Number of transforer layers
      * @param head Number of attention heads
      * @param inner MLP intermediate dimension
      */
@@ -117,7 +117,7 @@ public:
     void print_info() const;
 };
 
-class TransformerBlock {
+class TransforerBlock {
 private:
     std::unique_ptr<LayerNorm> ln1_;
     std::unique_ptr<LayerNorm> ln2_;
@@ -132,8 +132,8 @@ private:
     int n_embd_;
 
 public:
-    TransformerBlock(const GPT2Config& config);
-    ~TransformerBlock() = default;
+    TransforerBlock(const GPT2Config& config);
+    ~TransforerBlock() = default;
 
     std::unique_ptr<Tensor> forward(const Tensor& hidden_states);
     void print_info() const;

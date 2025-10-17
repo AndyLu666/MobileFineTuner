@@ -1,11 +1,11 @@
 /**
  * @file step_arena.h  
- * @brief Step-level memory arena (temporary tensor reuse within training step)
+ * [Documentation available in English]
  * 
- * Purpose:
- * - Temporary tensors in forward/backward (score blocks, hidden blocks, transposes, etc.) allocated from arena
- * - Reset at end of step, reuse same memory block in next step
- * - Reduce fragmentation, stabilize RSS
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
  */
 
 #pragma once
@@ -30,10 +30,10 @@ public:
     }
     
     /**
-     * @brief Allocate aligned memory
+     * [Documentation available in English]
      */
     void* allocate(size_t size, size_t alignment = 64) {
-        // Align to alignment
+                // [Translated]
         size_t aligned_offset = (offset_ + alignment - 1) / alignment * alignment;
         
         if (aligned_offset + size > capacity_) {
@@ -48,21 +48,21 @@ public:
     }
     
     /**
-     * @brief Allocate float array
+     * [Documentation available in English]
      */
     float* allocate_floats(size_t count) {
         return static_cast<float*>(allocate(count * sizeof(float), 64));
     }
     
     /**
-     * @brief Reset arena (called at end of step)
+     * [Documentation available in English]
      */
     void reset() {
         offset_ = 0;
     }
     
     /**
-     * @brief Get current usage
+     * [Documentation available in English]
      */
     size_t current_usage() const {
         return offset_;
@@ -73,7 +73,7 @@ public:
     }
 };
 
-// Global step-level arena (singleton)
+// [Translated]
 StepArena& get_step_arena();
 
 } // namespace ops

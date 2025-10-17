@@ -1,9 +1,9 @@
 /**
  * @file mobile_zero.h
- * @brief Mobile-optimized ZeRO (Zero Redundancy Optimizer) implementation
+ * @brief Mobile-optimized ZeRO (Zero Redundancy Optimizer) implementsation
  * 
- * This file implements a mobile-specific version of Microsoft DeepSpeed's ZeRO technology
- * adapted for single-device training on resource-constrained mobile platforms.
+ * This file implementss a mobile-specific version of Microsoft DeepSpeed's ZeRO technology
+ * adapted for single-device training on resource-constrained mobile platfors.
  * 
  * Key adaptations from DeepSpeed ZeRO:
  * - Single-device parameter partitioning (temporal partitioning instead of spatial)
@@ -76,7 +76,7 @@ public:
 /**
  * @brief Mobile-optimized ZeRO optimizer
  * 
- * This class implements a ZeRO-inspired optimization strategy adapted for mobile devices:
+ * This class implementss a ZeRO-inspired optimization strategy adapted for mobile devices:
  * 1. Temporal parameter partitioning - load/unload parameters as needed
  * 2. Layer-wise gradient management - process gradients layer by layer
  * 3. Optimizer state compression - use lower precision for momentum/variance
@@ -140,9 +140,9 @@ public:
     
     /**
      * @brief Register model parameters with the optimizer
-     * @param name Parameter name (e.g., "transformer.layer.0.weight")  
+     * @param name Parameter name (e.g., "transforer.layer.0.weight")  
      * @param tensor Parameter tensor
-     * @param group_name Group name (e.g., "transformer.layer.0")
+     * @param group_name Group name (e.g., "transforer.layer.0")
      * @param requires_grad Whether parameter needs gradients
      * @return Parameter ID
      */
@@ -162,14 +162,14 @@ public:
     TensorPtr get_parameter(const std::string& name);
     
     /**
-     * @brief Perform backward pass and gradient accumulation
+     * @brief Perfor backward pass and gradient accumulation
      * @param param_id Parameter ID
      * @param gradient Computed gradient
      */
     void backward(size_t param_id, const TensorPtr& gradient);
     
     /**
-     * @brief Perform optimizer step (parameter update)
+     * @brief Perfor optimizer step (parameter update)
      * @param param_ids Parameters to update (empty = all active parameters)
      */
     void step(const std::vector<size_t>& param_ids = {});
@@ -285,7 +285,7 @@ public:
 /**
  * @brief Memory-efficient training loop helper
  * 
- * This class provides utilities to coordinate forward/backward passes
+ * This class providess utilities to coordinate forward/backward passes
  * with parameter loading/unloading for maximum memory efficiency.
  */
 class MobileTrainingCoordinator {

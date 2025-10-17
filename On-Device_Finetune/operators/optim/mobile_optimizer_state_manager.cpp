@@ -1,6 +1,6 @@
 /**
  * @file mobile_optimizer_state_manager.cpp
- * @brief Mobile Optimizer state manager implementation
+ * @brief mobileOptimizerstatemanagerimplements
  */
 
 #include "mobile_optimizer_state_manager.h"
@@ -21,13 +21,15 @@
 namespace ops {
 namespace optim {
 
-// OptimizerStateBuffer implementation
+// ===============================================================================
+// OptimizerStateBuffer implements
+// ===============================================================================
 
 OptimizerStateBuffer::OptimizerStateBuffer(size_t size_bytes, bool cache_align)
     : buffer_size_(size_bytes), used_size_(0), is_cache_aligned_(cache_align) {
     
     if (cache_align) {
-        // 64-byte alignment (typical CPU cache line size)
+                // [Translated]
         buffer_ptr_ = std::aligned_alloc(64, size_bytes);
     } else {
         buffer_ptr_ = std::malloc(size_bytes);
@@ -37,7 +39,7 @@ OptimizerStateBuffer::OptimizerStateBuffer(size_t size_bytes, bool cache_align)
         throw std::runtime_error("Failed to allocate optimizer state buffer");
     }
     
-    // Initialize as all free
+    // initializeasallidle
     free_chunks_.emplace_back(0, size_bytes);
 }
 
@@ -51,16 +53,16 @@ OptimizerStateBuffer::~OptimizerStateBuffer() {
 void* OptimizerStateBuffer::allocate(size_t size_bytes) {
     std::lock_guard<std::mutex> lock(buffer_mutex_);
     
-    // Align to 8 bytes
+        // [Translated]
     size_bytes = (size_bytes + 7) & ~7;
     
-    // Find a free block large enough
+        // [Translated]
     for (auto it = free_chunks_.begin(); it != free_chunks_.end(); ++it) {
         if (it->second >= size_bytes) {
             size_t offset = it->first;
             size_t remaining = it->second - size_bytes;
             
-            // Remove or update free block
+            // removeorupdateidleblock
             if (remaining > 0) {
                 it->first += size_bytes;
                 it->second = remaining;
@@ -73,22 +75,22 @@ void* OptimizerStateBuffer::allocate(size_t size_bytes) {
         }
     }
     
-    return nullptr; // Not enough free space
+    return nullptr;     // [Translated]
 }
 
 void OptimizerStateBuffer::deallocate(void* ptr, size_t size_bytes) {
     std::lock_guard<std::mutex> lock(buffer_mutex_);
     
-    // Align to 8 bytes
+        // [Translated]
     size_bytes = (size_bytes + 7) & ~7;
     
     size_t offset = static_cast<char*>(ptr) - static_cast<char*>(buffer_ptr_);
     
-    // Add to free list
+    // addtoidlelist
     free_chunks_.emplace_back(offset, size_bytes);
     used_size_ -= size_bytes;
     
-    // Merge adjacent free blocks
+        // [Translated]
     std::sort(free_chunks_.begin(), free_chunks_.end());
     
     for (size_t i = 0; i + 1 < free_chunks_.size(); ) {
@@ -102,12 +104,12 @@ void OptimizerStateBuffer::deallocate(void* ptr, size_t size_bytes) {
 }
 
 void OptimizerStateBuffer::defragment() {
-    // TODO: Implement complete defragmentation algorithm
-    // This requires moving active memory blocks, which is complex
+    // [Translated comment removed - see documentation]
+        // [Translated]
     std::lock_guard<std::mutex> lock(buffer_mutex_);
     
-    // Simple version: merge adjacent free blocks (already implemented in deallocate)
-    // Full version needs to move blocks in use
+    // [Translated comment removed - see documentation]
+        // [Translated]
 }
 
 float OptimizerStateBuffer::get_fragmentation_ratio() const {
@@ -125,11 +127,13 @@ float OptimizerStateBuffer::get_fragmentation_ratio() const {
     
     if (total_free == 0) return 0.0f;
     
-    // Fragmentation ratio = 1 - (largest free block / total free space)
+    // [Translated comment removed - see documentation]
     return 1.0f - static_cast<float>(largest_chunk) / total_free;
 }
 
-// OptimizerStateCompressor implementation
+// ===============================================================================
+// OptimizerStateCompressor implements
+// ===============================================================================
 
 OptimizerStateCompressor::OptimizerStateCompressor(OptimizerStateCompression mode)
     : default_compression_(mode) {
@@ -187,13 +191,13 @@ OptimizerStateCompressor::adaptive_compress(const TensorPtr& input, float import
     
     OptimizerStateCompression selected_mode;
     
-    // Select compression mode based on importance
+        // [Translated]
     if (importance > 0.8f) {
-        selected_mode = OptimizerStateCompression::FP16; // High importance: mild compression
+        selected_mode = OptimizerStateCompression::FP16;         // [Translated]
     } else if (importance > 0.5f) {
-        selected_mode = OptimizerStateCompression::INT8_QUANTIZED; // Medium importance: moderate compression
+        selected_mode = OptimizerStateCompression::INT8_QUANTIZED;         // [Translated]
     } else {
-        selected_mode = OptimizerStateCompression::INT8_SPARSE; // Low importance: aggressive compression
+        selected_mode = OptimizerStateCompression::INT8_SPARSE;         // [Translated]
     }
     
     auto [compressed, ratio] = compress(input, selected_mode);
@@ -209,10 +213,10 @@ TensorPtr OptimizerStateCompressor::compress_fp16(const TensorPtr& input) {
     uint16_t* dst = compressed->data<uint16_t>();
     
 #ifdef __ARM_NEON
-    // Use NEON SIMD acceleration
+        // [Translated]
     compress_fp32_to_fp16_simd(src, dst, numel);
 #else
-    // Scalar version
+    // scalarversion
     for (size_t i = 0; i < numel; ++i) {
         dst[i] = float_to_half(src[i]);
     }
@@ -222,7 +226,7 @@ TensorPtr OptimizerStateCompressor::compress_fp16(const TensorPtr& input) {
 }
 
 TensorPtr OptimizerStateCompressor::decompress_fp16(const TensorPtr& compressed) {
-    // FP16 -> FP32 decompression
+    // FP16 -> FP32 decompress
     size_t numel = compressed->numel();
     auto decompressed = ops::empty({static_cast<int64_t>(numel)}, ops::kFloat32);
     
@@ -230,10 +234,10 @@ TensorPtr OptimizerStateCompressor::decompress_fp16(const TensorPtr& compressed)
     float* dst = decompressed->data<float>();
     
 #ifdef __ARM_NEON
-    // Use NEON SIMD acceleration
+        // [Translated]
     decompress_fp16_to_fp32_simd(src, dst, numel);
 #else
-    // Scalar version
+    // scalarversion
     for (size_t i = 0; i < numel; ++i) {
         dst[i] = half_to_float(src[i]);
     }
@@ -243,27 +247,27 @@ TensorPtr OptimizerStateCompressor::decompress_fp16(const TensorPtr& compressed)
 }
 
 TensorPtr OptimizerStateCompressor::compress_int8_quantized(const TensorPtr& input) {
-    // INT8 quantization compression
+    // INT8quantizationcompression
     size_t numel = input->numel();
     const float* src = input->data<float>();
     
-    // Calculate scale and zero_point
+    // computescaleandzero_point
     float min_val = *std::min_element(src, src + numel);
     float max_val = *std::max_element(src, src + numel);
     
     float scale = (max_val - min_val) / 255.0f;
     float zero_point = -min_val / scale;
     
-    // Create quantized tensor (store int8 + scale + zero_point)
+    // createquantizationtensor（storageint8 + scale + zero_point）
     auto compressed = ops::empty({static_cast<int64_t>(numel + 2)}, ops::kInt8);
     int8_t* dst = compressed->data<int8_t>();
     
-    // Store scale and zero_point
+    // storagescaleandzero_point
     float* meta = reinterpret_cast<float*>(dst + numel);
     meta[0] = scale;
     meta[1] = zero_point;
     
-    // Quantize
+    // quantization
     for (size_t i = 0; i < numel; ++i) {
         float quantized = src[i] / scale + zero_point;
         dst[i] = static_cast<int8_t>(std::round(std::max(0.0f, std::min(255.0f, quantized)))) - 128;
@@ -273,11 +277,11 @@ TensorPtr OptimizerStateCompressor::compress_int8_quantized(const TensorPtr& inp
 }
 
 TensorPtr OptimizerStateCompressor::decompress_int8_quantized(const TensorPtr& compressed) {
-    // INT8 dequantization
+        // [Translated]
     size_t numel = compressed->numel() - 2;
     const int8_t* src = compressed->data<int8_t>();
     
-    // Read scale and zero_point
+    // readscaleandzero_point
     const float* meta = reinterpret_cast<const float*>(src + numel);
     float scale = meta[0];
     float zero_point = meta[1];
@@ -285,7 +289,7 @@ TensorPtr OptimizerStateCompressor::decompress_int8_quantized(const TensorPtr& c
     auto decompressed = ops::empty({static_cast<int64_t>(numel)}, ops::kFloat32);
     float* dst = decompressed->data<float>();
     
-    // Dequantize
+        // [Translated]
     for (size_t i = 0; i < numel; ++i) {
         dst[i] = (static_cast<float>(src[i]) + 128.0f - zero_point) * scale;
     }
@@ -297,7 +301,7 @@ TensorPtr OptimizerStateCompressor::decompress_int8_quantized(const TensorPtr& c
 void OptimizerStateCompressor::compress_fp32_to_fp16_simd(
     const float* src, uint16_t* dst, size_t count) {
     
-    // Use NEON vcvt instruction for FP32->FP16 conversion
+    // [Translated comment removed - see documentation]
     size_t simd_count = count / 4;
     
     for (size_t i = 0; i < simd_count; ++i) {
@@ -306,7 +310,7 @@ void OptimizerStateCompressor::compress_fp32_to_fp16_simd(
         vst1_u16(dst + i * 4, vreinterpret_u16_f16(v_fp16));
     }
     
-    // Handle remaining elements (count % 4)
+    // [Translated comment removed - see documentation]
     for (size_t i = simd_count * 4; i < count; ++i) {
         dst[i] = float_to_half(src[i]);
     }
@@ -315,7 +319,7 @@ void OptimizerStateCompressor::compress_fp32_to_fp16_simd(
 void OptimizerStateCompressor::decompress_fp16_to_fp32_simd(
     const uint16_t* src, float* dst, size_t count) {
     
-    // Use NEON vcvt instruction for FP16->FP32 conversion
+    // [Translated comment removed - see documentation]
     size_t simd_count = count / 4;
     
     for (size_t i = 0; i < simd_count; ++i) {
@@ -324,7 +328,7 @@ void OptimizerStateCompressor::decompress_fp16_to_fp32_simd(
         vst1q_f32(dst + i * 4, v_fp32);
     }
     
-    // Handle remaining elements (count % 4)
+    // [Translated comment removed - see documentation]
     for (size_t i = simd_count * 4; i < count; ++i) {
         dst[i] = half_to_float(src[i]);
     }
@@ -332,7 +336,7 @@ void OptimizerStateCompressor::decompress_fp16_to_fp32_simd(
 #endif
 
 // ===============================================================================
-// OptimizerStateIOManager Implementation
+// OptimizerStateIOManager implements
 // ===============================================================================
 
 OptimizerStateIOManager::OptimizerStateIOManager(const std::string& path, bool compress)
@@ -371,7 +375,7 @@ std::string OptimizerStateIOManager::save_state_to_disk(
         throw std::runtime_error("Failed to create state file: " + filename);
     }
     
-    // Write tensor shape and dtype
+    // writetensor shapeanddtype
     auto shape = data->shape();
     size_t ndim = shape.size();
     file.write(reinterpret_cast<const char*>(&ndim), sizeof(ndim));
@@ -380,15 +384,15 @@ std::string OptimizerStateIOManager::save_state_to_disk(
     int dtype = static_cast<int>(data->dtype());
     file.write(reinterpret_cast<const char*>(&dtype), sizeof(dtype));
     
-    // Write tensor data
+    // writetensordata
     size_t data_size = data->numel() * DTypeUtils::size_of(data->dtype());
     file.write(reinterpret_cast<const char*>(data->data_ptr()), data_size);
     
     file.close();
     
     auto end_time = std::chrono::steady_clock::now();
-    // Record I/O performance (for future statistics)
-    (void)end_time;  // Avoid unused warning
+        // [Translated]
+    (void)end_time;      // [Translated]
     (void)start_time;
     
     total_io_operations_++;
@@ -405,7 +409,7 @@ TensorPtr OptimizerStateIOManager::load_state_from_disk(const std::string& path)
         throw std::runtime_error("Failed to open state file: " + path);
     }
     
-    // Read tensor shape and dtype
+    // readtensor shapeanddtype
     size_t ndim;
     file.read(reinterpret_cast<char*>(&ndim), sizeof(ndim));
     
@@ -416,7 +420,7 @@ TensorPtr OptimizerStateIOManager::load_state_from_disk(const std::string& path)
     file.read(reinterpret_cast<char*>(&dtype_int), sizeof(dtype_int));
     DType dtype = static_cast<DType>(dtype_int);
     
-    // Create tensor and read data
+        // [Translated]
     auto tensor = ops::empty(shape, dtype);
     size_t data_size = tensor->numel() * DTypeUtils::size_of(dtype);
     file.read(reinterpret_cast<char*>(tensor->data_ptr()), data_size);
@@ -424,8 +428,8 @@ TensorPtr OptimizerStateIOManager::load_state_from_disk(const std::string& path)
     file.close();
     
     auto end_time = std::chrono::steady_clock::now();
-    // Record I/O performance (for future statistics)
-    (void)end_time;  // Avoid unused warning
+        // [Translated]
+    (void)end_time;      // [Translated]
     (void)start_time;
     
     total_io_operations_++;
@@ -444,15 +448,15 @@ OptimizerStateIOManager::IOStats OptimizerStateIOManager::get_io_stats() const {
     stats.total_bytes_written = total_bytes_written_.load();
     stats.total_bytes_read = total_bytes_read_.load();
     
-    // Calculate average speed (simplified version)
-    stats.average_write_speed_mbps = 100.0; // TODO: actual calculation
-    stats.average_read_speed_mbps = 100.0;  // TODO: actual calculation
+    // [Translated comment removed - see documentation]
+    stats.average_write_speed_mbps = 100.0; // TODO: actualcompute
+    stats.average_read_speed_mbps = 100.0;  // TODO: actualcompute
     
     return stats;
 }
 
 // ===============================================================================
-// MobileOptimizerStateManager Main Class Implementation
+// [Translated]
 // ===============================================================================
 
 MobileOptimizerStateManager::MobileOptimizerStateManager(
@@ -484,7 +488,7 @@ MobileOptimizerStateManager::~MobileOptimizerStateManager() {
 }
 
 void MobileOptimizerStateManager::initialize_components() {
-    // Create memory buffers
+    // creatememorybuffer
     if (config_.use_contiguous_buffers) {
         active_buffer_ = std::make_unique<OptimizerStateBuffer>(
             config_.max_active_memory_mb * 1024 * 1024,
@@ -499,13 +503,13 @@ void MobileOptimizerStateManager::initialize_components() {
         std::cout << "  Created contiguous memory buffers" << std::endl;
     }
     
-    // Create compressor
+        // [Translated]
     if (config_.enable_compression) {
         compressor_ = std::make_unique<OptimizerStateCompressor>(config_.default_compression);
         std::cout << "  Created state compressor" << std::endl;
     }
     
-    // Create I/O manager
+    // createI/Omanager
     if (config_.enable_disk_offload) {
         io_manager_ = std::make_unique<OptimizerStateIOManager>(
             config_.storage_path,
@@ -514,12 +518,12 @@ void MobileOptimizerStateManager::initialize_components() {
         std::cout << "  Created I/O manager" << std::endl;
     }
     
-    // Initialize statistics
+    // initializestatisticsinfo
     stats_ = {};
 }
 
 void MobileOptimizerStateManager::cleanup_components() {
-    // Cleanup all resources
+        // [Translated]
     momentum_states_.clear();
     variance_states_.clear();
     master_weights_.clear();
@@ -541,12 +545,12 @@ void MobileOptimizerStateManager::register_parameter_state(
     
     std::lock_guard<std::mutex> lock(manager_mutex_);
     
-    // Create state metadata
+        // [Translated]
     auto metadata = std::make_unique<OptimizerStateMetadata>(param_id, param_name, param_size);
     metadata->requires_grad = requires_grad;
     metadata->is_trainable = requires_grad;
     
-    // Find or create group
+        // [Translated]
     size_t group_id;
     auto group_it = group_name_to_id_.find(group_name);
     if (group_it == group_name_to_id_.end()) {
@@ -558,7 +562,7 @@ void MobileOptimizerStateManager::register_parameter_state(
         group_id = group_it->second;
     }
     
-    // Add to group
+        // [Translated]
     state_groups_[group_id]->param_ids.push_back(param_id);
     param_to_group_map_[param_id] = group_id;
     
@@ -573,18 +577,18 @@ void MobileOptimizerStateManager::register_parameter_state(
 TensorPtr MobileOptimizerStateManager::get_momentum_state(size_t param_id) {
     std::lock_guard<std::mutex> lock(manager_mutex_);
     
-    // Check if loaded
+        // [Translated]
     auto it = momentum_states_.find(param_id);
     if (it != momentum_states_.end()) {
         update_access_pattern(param_id);
         stats_.cache_hits++;
         
-        // Fix: Check if decompression is needed
+                // [Translated]
         auto metadata_it = state_metadata_.find(param_id);
         if (metadata_it != state_metadata_.end()) {
             auto& metadata = metadata_it->second;
             if (metadata->compression_mode != OptimizerStateCompression::NONE && compressor_) {
-                // Need to decompress before use
+                                // [Translated]
                 TensorPtr decompressed = compressor_->decompress(it->second, metadata->compression_mode);
                 return decompressed;
             }
@@ -595,7 +599,7 @@ TensorPtr MobileOptimizerStateManager::get_momentum_state(size_t param_id) {
     
     stats_.cache_misses++;
     
-    // Need to load
+    // requireload
     load_state_internal(param_id, OptimizerStateType::MOMENTUM);
     
     return momentum_states_[param_id];
@@ -604,18 +608,18 @@ TensorPtr MobileOptimizerStateManager::get_momentum_state(size_t param_id) {
 TensorPtr MobileOptimizerStateManager::get_variance_state(size_t param_id) {
     std::lock_guard<std::mutex> lock(manager_mutex_);
     
-    // Check if loaded
+        // [Translated]
     auto it = variance_states_.find(param_id);
     if (it != variance_states_.end()) {
         update_access_pattern(param_id);
         stats_.cache_hits++;
         
-        // Fix: Check if decompression is needed
+                // [Translated]
         auto metadata_it = state_metadata_.find(param_id);
         if (metadata_it != state_metadata_.end()) {
             auto& metadata = metadata_it->second;
             if (metadata->compression_mode != OptimizerStateCompression::NONE && compressor_) {
-                // Need to decompress before use
+                                // [Translated]
                 TensorPtr decompressed = compressor_->decompress(it->second, metadata->compression_mode);
                 return decompressed;
             }
@@ -626,7 +630,7 @@ TensorPtr MobileOptimizerStateManager::get_variance_state(size_t param_id) {
     
     stats_.cache_misses++;
     
-    // Need to load
+    // requireload
     load_state_internal(param_id, OptimizerStateType::VARIANCE);
     
     return variance_states_[param_id];
@@ -641,17 +645,17 @@ void MobileOptimizerStateManager::update_momentum_state(size_t param_id, const T
     if (metadata_it != state_metadata_.end()) {
         auto& metadata = metadata_it->second;
         
-        // Fix: If previously compressed, now uncompressed, need to update memory stats
+                // [Translated]
         size_t old_size = metadata->momentum_size_bytes;
         size_t new_size = new_momentum->numel() * sizeof(float);
         if (metadata->momentum_tier == OptimizerStateTier::COMPRESSED) {
-            // From compressed to uncompressed, memory usage increases
+            // [Translated comment removed - see documentation]
             active_memory_used_ += (new_size - old_size);
         }
         
-        // Critical fix: Must reset compression info after updating state
-        // Reason: new_momentum is FP32, if not reset compression_mode,
-        // next get will try to decompress an FP32 tensor, causing data corruption
+        // 🔴 criticalfix: update statebackmustresetcompressioninfo
+                // [Translated]
+        // [Translated comment removed - see documentation]
         metadata->compression_mode = OptimizerStateCompression::NONE;
         metadata->momentum_tier = OptimizerStateTier::ACTIVE_MEMORY;
         metadata->momentum_size_bytes = new_size;
@@ -671,17 +675,17 @@ void MobileOptimizerStateManager::update_variance_state(size_t param_id, const T
     if (metadata_it != state_metadata_.end()) {
         auto& metadata = metadata_it->second;
         
-        // Fix: If previously compressed, now uncompressed, need to update memory stats
+                // [Translated]
         size_t old_size = metadata->variance_size_bytes;
         size_t new_size = new_variance->numel() * sizeof(float);
         if (metadata->variance_tier == OptimizerStateTier::COMPRESSED) {
-            // From compressed to uncompressed, memory usage increases
+            // [Translated comment removed - see documentation]
             active_memory_used_ += (new_size - old_size);
         }
         
-        // Critical fix: Must reset compression info after updating state
-        // Reason: new_variance is FP32, if not reset compression_mode,
-        // next get will try to decompress an FP32 tensor, causing data corruption
+        // 🔴 criticalfix: update statebackmustresetcompressioninfo
+                // [Translated]
+        // [Translated comment removed - see documentation]
         metadata->compression_mode = OptimizerStateCompression::NONE;
         metadata->variance_tier = OptimizerStateTier::ACTIVE_MEMORY;
         metadata->variance_size_bytes = new_size;
@@ -700,7 +704,7 @@ void MobileOptimizerStateManager::release_parameter_state(size_t param_id) {
         return;
     }
     
-    // If memory pressure high, offload immediately
+    // [Translated comment removed - see documentation]
     float memory_pressure = calculate_memory_pressure();
     if (memory_pressure > config_.offload_threshold) {
         offload_state_internal(param_id, OptimizerStateType::MOMENTUM);
@@ -716,7 +720,7 @@ void MobileOptimizerStateManager::load_state_internal(size_t param_id, Optimizer
     
     auto& metadata = metadata_it->second;
     
-    // Check if need to load from disk
+        // [Translated]
     bool from_disk = false;
     std::string storage_path;
     
@@ -731,15 +735,15 @@ void MobileOptimizerStateManager::load_state_internal(size_t param_id, Optimizer
     TensorPtr state;
     
     if (from_disk && !storage_path.empty() && io_manager_) {
-        // Load from disk
+                // [Translated]
         state = io_manager_->load_state_from_disk(storage_path);
         stats_.total_loads++;
     } else {
-        // Create new state (initialize to zero)
+        // createnewstate（initializeaszero）
         state = ops::zeros({static_cast<int64_t>(metadata->param_size)}, ops::kFloat32);
     }
     
-    // Store to memory
+    // storagetomemory
     if (state_type == OptimizerStateType::MOMENTUM) {
         momentum_states_[param_id] = state;
         metadata->momentum_tier = OptimizerStateTier::ACTIVE_MEMORY;
@@ -784,12 +788,12 @@ void MobileOptimizerStateManager::offload_state_internal(size_t param_id, Optimi
     
     if (!state || !io_manager_) return;
     
-    // Save to disk
+        // [Translated]
     *storage_path_ptr = io_manager_->save_state_to_disk(param_id, state_type, state);
     *tier_ptr = OptimizerStateTier::DISK_STORAGE;
     
-    // Fix: Use actual memory size, not assume FP32
-    // If state was previously compressed, should use compressed size
+        // [Translated]
+    // ifstatebeforebecompression，shouldusecompressionbacksize
     size_t actual_size = (state_type == OptimizerStateType::MOMENTUM) 
         ? metadata->momentum_size_bytes 
         : metadata->variance_size_bytes;
@@ -805,7 +809,7 @@ void MobileOptimizerStateManager::optimize_memory_usage() {
     float memory_pressure = calculate_memory_pressure();
     
     if (memory_pressure > config_.offload_threshold) {
-        // High memory pressure: offload some states
+        // [Translated comment removed - see documentation]
         size_t target_reduction = (memory_pressure - config_.compression_threshold) * 
                                  config_.max_active_memory_mb * 1024 * 1024;
         
@@ -819,7 +823,7 @@ void MobileOptimizerStateManager::optimize_memory_usage() {
         std::cout << "[OptimizerStateManager] Offloaded " << states_to_offload.size() 
                   << " states due to memory pressure" << std::endl;
     } else if (memory_pressure > config_.compression_threshold && config_.enable_compression) {
-        // Medium pressure: compress some states
+        // [Translated comment removed - see documentation]
         size_t target_reduction = (memory_pressure - 0.5f) * 
                                  config_.max_active_memory_mb * 1024 * 1024;
         
@@ -846,10 +850,10 @@ size_t MobileOptimizerStateManager::compress_parameter_state(
     auto& metadata = metadata_it->second;
     size_t memory_saved = 0;
     
-    // Compress momentum
-    // Note: Directly overwrite original FP32 data after compression to save memory
-    // Safety: get_momentum_state() will decompress before return, ensuring optimizer gets FP32 data
-    // Trade-off: Each get needs decompression, has CPU overhead, but saves much memory
+    // compressionmomentum
+    // [Translated comment removed - see documentation]
+    // [Translated comment removed - see documentation]
+    // [Translated comment removed - see documentation]
     auto momentum_it = momentum_states_.find(param_id);
     if (momentum_it != momentum_states_.end()) {
         auto [compressed, ratio] = compressor_->compress(momentum_it->second, compression);
@@ -861,16 +865,16 @@ size_t MobileOptimizerStateManager::compress_parameter_state(
         metadata->momentum_size_bytes = compressed_size;
         metadata->compression_ratio = ratio;
         metadata->compression_mode = compression;
-        metadata->momentum_tier = OptimizerStateTier::COMPRESSED;  // Mark as compressed state
+        metadata->momentum_tier = OptimizerStateTier::COMPRESSED;          // [Translated]
         
         memory_saved += (original_size - compressed_size);
-        // Fix: Update memory stats, compression saved memory
+                // [Translated]
         active_memory_used_ -= (original_size - compressed_size);
     }
     
-    // Compress variance
-    // Note: Directly overwrite original FP32 data after compression to save memory
-    // Safety: get_variance_state() will decompress before return, ensuring optimizer gets FP32 data
+    // compressionvariance
+    // [Translated comment removed - see documentation]
+    // [Translated comment removed - see documentation]
     auto variance_it = variance_states_.find(param_id);
     if (variance_it != variance_states_.end()) {
         auto [compressed, ratio] = compressor_->compress(variance_it->second, compression);
@@ -880,10 +884,10 @@ size_t MobileOptimizerStateManager::compress_parameter_state(
         
         variance_states_[param_id] = compressed;
         metadata->variance_size_bytes = compressed_size;
-        metadata->variance_tier = OptimizerStateTier::COMPRESSED;  // Mark as compressed state
+        metadata->variance_tier = OptimizerStateTier::COMPRESSED;          // [Translated]
         
         memory_saved += (original_size - compressed_size);
-        // Fix: Update memory stats, compression saved memory
+                // [Translated]
         active_memory_used_ -= (original_size - compressed_size);
     }
     
@@ -922,18 +926,18 @@ std::vector<size_t> MobileOptimizerStateManager::select_states_to_compress(size_
     
     for (const auto& [param_id, metadata] : state_metadata_) {
         if (metadata->compression_mode == OptimizerStateCompression::NONE) {
-            // Calculate compression priority (low priority compressed first)
+                        // [Translated]
             float priority = static_cast<float>(metadata->access_count) / 
                            (metadata->param_size + 1.0f);
             candidates.emplace_back(param_id, priority);
         }
     }
     
-    // Sort by priority
+    // byprioritysort
     std::sort(candidates.begin(), candidates.end(),
              [](const auto& a, const auto& b) { return a.second < b.second; });
     
-    // Select sufficient states
+        // [Translated]
     std::vector<size_t> selected;
     size_t accumulated_reduction = 0;
     
@@ -942,7 +946,7 @@ std::vector<size_t> MobileOptimizerStateManager::select_states_to_compress(size_
         
         auto metadata_it = state_metadata_.find(param_id);
         if (metadata_it != state_metadata_.end()) {
-            // Assume 2x compression ratio
+                        // [Translated]
             accumulated_reduction += metadata_it->second->param_size * sizeof(float);
         }
         
@@ -959,17 +963,17 @@ std::vector<size_t> MobileOptimizerStateManager::select_states_to_offload(size_t
     
     for (const auto& [param_id, metadata] : state_metadata_) {
         if (metadata->is_loaded && !metadata->is_dirty) {
-            // Calculate offload priority (low priority offloaded first)
+            // [Translated comment removed - see documentation]
             float priority = static_cast<float>(metadata->access_count) * metadata->priority;
             candidates.emplace_back(param_id, priority);
         }
     }
     
-    // Sort by priority
+    // byprioritysort
     std::sort(candidates.begin(), candidates.end(),
              [](const auto& a, const auto& b) { return a.second < b.second; });
     
-    // Select sufficient states
+        // [Translated]
     std::vector<size_t> selected;
     size_t accumulated_reduction = 0;
     
@@ -1006,7 +1010,7 @@ void MobileOptimizerStateManager::update_mobile_state(
     is_thermal_throttling_ = is_thermal_throttle;
     is_low_battery_ = is_low_battery;
     
-    // Adjust strategy based on mobile state
+    // according tomobilestateadjuststrategy
     if (is_thermal_throttle) {
         apply_thermal_optimization();
     }
@@ -1021,24 +1025,24 @@ void MobileOptimizerStateManager::update_mobile_state(
 }
 
 void MobileOptimizerStateManager::apply_cpu_optimization() {
-    // Low CPU utilization: can perform optimization operations
-    // Such as prefetching, decompression, etc.
+        // [Translated]
+    // [Translated comment removed - see documentation]
 }
 
 void MobileOptimizerStateManager::apply_thermal_optimization() {
-    // During thermal throttling: reduce compute-intensive operations
-    // Pause compression/decompression, use simple offload strategy
+    // [Translated comment removed - see documentation]
+        // [Translated]
 }
 
 void MobileOptimizerStateManager::apply_battery_optimization() {
-    // During low battery: reduce disk I/O
-    // Prefer compression over offload
+    // [Translated comment removed - see documentation]
+    // [Translated comment removed - see documentation]
 }
 
 OptimizerStateStats MobileOptimizerStateManager::get_statistics() const {
     std::lock_guard<std::mutex> lock(stats_mutex_);
     
-    // Create local copy and update real-time statistics
+        // [Translated]
     OptimizerStateStats current_stats = stats_;
     current_stats.active_memory_used = active_memory_used_.load();
     current_stats.standby_memory_used = standby_memory_used_.load();
@@ -1065,21 +1069,21 @@ void MobileOptimizerStateManager::save_checkpoint(const std::string& checkpoint_
     
     std::filesystem::create_directories(std::filesystem::path(checkpoint_path).parent_path());
     
-    // Save all optimizer states
-    // TODO: implement complete checkpoint save logic
+    // savealloptimizerstate
+        // [Translated]
     std::cout << "[MobileOptimizerStateManager] Checkpoint save at: " << checkpoint_path << std::endl;
 }
 
 void MobileOptimizerStateManager::load_checkpoint(const std::string& checkpoint_path) {
-    (void)checkpoint_path;  // TODO: implement
+    (void)checkpoint_path;  // TODO: implements
     std::lock_guard<std::mutex> lock(manager_mutex_);
     
-    // Load optimizer states
-    // TODO: implement complete checkpoint load logic
+    // loadoptimizerstate
+        // [Translated]
 }
 
 // ===============================================================================
-// Factory Functions
+// [Translated]
 // ===============================================================================
 
 std::unique_ptr<MobileOptimizerStateManager> create_mobile_optimizer_state_manager(
@@ -1092,19 +1096,19 @@ std::unique_ptr<MobileOptimizerStateManager> create_mobile_optimizer_state_manag
     config.max_standby_memory_mb = available_memory_mb;
     config.storage_path = storage_path;
     
-    // Adjust configuration based on available memory
+    // according toavailablememoryadjustconfiguration
     if (available_memory_mb < 256) {
-        // Low memory device: aggressive compression
+                // [Translated]
         config.default_compression = OptimizerStateCompression::INT8_QUANTIZED;
         config.compression_threshold = 0.6f;
         config.offload_threshold = 0.7f;
     } else if (available_memory_mb < 512) {
-        // Medium memory: moderate compression
+                // [Translated]
         config.default_compression = OptimizerStateCompression::FP16;
         config.compression_threshold = 0.7f;
         config.offload_threshold = 0.8f;
     } else {
-        // High memory: minimal compression
+                // [Translated]
         config.default_compression = OptimizerStateCompression::FP16;
         config.enable_compression = true;
         config.compression_threshold = 0.8f;

@@ -1,13 +1,13 @@
 /**
  * @file deepspeed_checkpoint_integration.h
- * @brief DeepSpeed-style gradient checkpoint deep integration system
+ * [Documentation in English - see separate docs]
  * 
- * This component implements gradient checkpointing technology fully comparable to DeepSpeed,
- * with mobile-specific optimizations. Unlike traditional checkpointing, this system:
- * 1. Deeply integrates with automatic differentiation system
- * 2. Implements intelligent recomputation scheduling
- * 3. Supports mobile-aware checkpointing strategies
- * 4. Provides PyTorch-compatible API interface
+ * [Documentation in English - see separate docs]
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
  */
 
 #pragma once
@@ -24,6 +24,7 @@
 #include <mutex>
 #include <future>
 #include <atomic>
+#include <stack>
 
 namespace ops {
 namespace memory {
@@ -32,12 +33,12 @@ using ops::TensorPtr;
 using ops::GradFn;
 
 /**
- * @brief DeepSpeed-style forward function signature
+ * [Documentation available in English]
  */
 using DeepSpeedForwardFunction = std::function<std::vector<TensorPtr>(const std::vector<TensorPtr>&)>;
 
 /**
- * @brief Checkpoint context, similar to PyTorch's CheckpointFunction
+ * [Documentation available in English]
  */
 class CheckpointContext {
 private:
@@ -61,7 +62,7 @@ public:
 };
 
 /**
- * @brief DeepSpeed-style CheckpointFunction implementation
+ * [Documentation available in English]
  */
 class DeepSpeedCheckpointFunction {
 private:
@@ -69,7 +70,7 @@ private:
     
 public:
     /**
-     * @brief Forward pass - Save checkpoint information
+     * @brief forwardpropagate - savecheckpointinforation
      */
     static std::vector<TensorPtr> forward(
         DeepSpeedForwardFunction forward_fn,
@@ -78,7 +79,7 @@ public:
     );
     
     /**
-     * @brief Backward pass - Recompute and calculate gradients
+     * [Documentation available in English]
      */
     static std::vector<TensorPtr> backward(
         const std::shared_ptr<CheckpointContext>& ctx,
@@ -86,13 +87,13 @@ public:
     );
     
     /**
-     * @brief Get current checkpoint context
+     * [Documentation available in English]
      */
     static std::shared_ptr<CheckpointContext> get_current_context();
 };
 
 /**
- * @brief Mobile intelligent recomputation scheduler
+ * [Documentation available in English]
  */
 class MobileRecomputationScheduler {
 private:
@@ -119,7 +120,7 @@ private:
     std::condition_variable queue_cv_;
     std::atomic<bool> shutdown_flag_;
     
-    // Mobile state monitoring
+    // mobilestatemonitor
     std::atomic<float> current_battery_level_;
     std::atomic<float> current_temperature_;
     std::atomic<bool> is_ui_thread_blocked_;
@@ -130,7 +131,7 @@ public:
     ~MobileRecomputationScheduler();
     
     /**
-     * @brief Schedule async recomputation task
+     * [Documentation available in English]
      */
     std::future<std::vector<TensorPtr>> schedule_recomputation(
         size_t checkpoint_id,
@@ -140,7 +141,7 @@ public:
     );
     
     /**
-     * @brief Synchronous recomputation (blocking)
+     * [Documentation available in English]
      */
     std::vector<TensorPtr> recompute_sync(
         std::shared_ptr<CheckpointContext> context,
@@ -148,12 +149,12 @@ public:
     );
     
     /**
-     * @brief Update mobile system state
+     * @brief updatemobilesystemstate
      */
     void update_mobile_state(float battery_level, float temperature, bool ui_blocked);
     
     /**
-     * @brief Get scheduler statistics
+     * @brief acquireschedulestatisticsinforation
      */
     struct SchedulerStats {
         size_t total_recomputations;
@@ -175,24 +176,24 @@ private:
 };
 
 /**
- * @brief DeepSpeed-style activation checkpointing main class
+ * [Documentation available in English]
  */
 class DeepSpeedActivationCheckpointing {
 private:
     std::unique_ptr<ActivationCheckpointer> base_checkpointer_;
     std::unique_ptr<MobileRecomputationScheduler> recomputation_scheduler_;
     
-    // Checkpoint management
+    // Checkpointmanage
     std::unordered_map<size_t, std::shared_ptr<CheckpointContext>> checkpoint_contexts_;
     std::atomic<size_t> next_checkpoint_id_;
     mutable std::mutex checkpoint_mutex_;
     
-    // Mobile optimization parameters
-    float memory_vs_compute_tradeoff_;  // 0.0=minimize memory, 1.0=minimize compute
+    // mobileoptimizationparameter
+    float memory_vs_compute_tradeoff_;      // [Translated]
     bool enable_smart_checkpointing_;
     bool enable_mobile_optimizations_;
     
-    // Statistics
+    // statisticsinfo
     struct CheckpointingStats {
         size_t total_checkpoints;
         size_t active_checkpoints;
@@ -209,12 +210,12 @@ public:
     ~DeepSpeedActivationCheckpointing();
     
     /**
-     * @brief DeepSpeed-style checkpoint decorator
+     * [Documentation available in English]
      * 
-     * Usage:
+     * usemethod：
      * auto output = checkpointing.checkpoint(forward_function, inputs);
      * 
-     * Equivalent to PyTorch:
+     * equivalentinPyTorch:
      * output = torch.utils.checkpoint.checkpoint(forward_function, *inputs)
      */
     std::vector<TensorPtr> checkpoint(
@@ -224,18 +225,18 @@ public:
     );
     
     /**
-     * @brief Checkpoint with custom split points
+     * [Documentation available in English]
      * 
-     * Similar to DeepSpeed's checkpoint_sequential
+     * similar toDeepSpeedcheckpoint_sequential
      */
     std::vector<TensorPtr> checkpoint_sequential(
         const std::vector<DeepSpeedForwardFunction>& functions,
         const std::vector<TensorPtr>& inputs,
-        int segments = -1  // -1 means auto-determine segment count
+        int segments = -1          // [Translated]
     );
     
     /**
-     * @brief Smart checkpoint - Dynamically determine checkpoint points based on memory pressure
+     * [Documentation in English - see separate docs]
      */
     std::vector<TensorPtr> smart_checkpoint(
         const std::vector<DeepSpeedForwardFunction>& functions,
@@ -244,7 +245,7 @@ public:
     );
     
     /**
-     * @brief Mobile-aware checkpoint - Considers battery, thermal state, etc.
+     * [Documentation in English - see separate docs]
      */
     std::vector<TensorPtr> mobile_aware_checkpoint(
         DeepSpeedForwardFunction forward_fn,
@@ -253,60 +254,60 @@ public:
     );
     
     /**
-     * @brief Configure checkpointing parameters
+     * @brief configurationcheckpointingparameter
      */
     void configure(
-        float memory_vs_compute_tradeoff = 0.7f,  // Favor memory savings
+        float memory_vs_compute_tradeoff = 0.7f,          // [Translated]
         bool enable_smart_checkpointing = true,
         bool enable_mobile_optimizations = true
     );
     
     /**
-     * @brief Clean up expired checkpoints
+     * @brief cleanupexpiredcheckpoint
      */
     void cleanup_expired_checkpoints(size_t before_checkpoint_id);
     
     /**
-     * @brief Get memory statistics
+     * @brief acquirememorystatisticsinforation
      */
     CheckpointingStats get_checkpointing_stats() const;
     
     /**
-     * @brief Force memory optimization
+     * [Documentation available in English]
      */
     void optimize_memory_usage(size_t target_memory_mb);
     
     /**
-     * @brief Set mobile system state callback
+     * @brief settingsmobilesystemstatecallback
      */
     void set_mobile_state_callback(std::function<MobileActivationState()> callback);
 
 private:
-    // Checkpoint selection algorithms
+    // Checkpointselectalgorithm
     std::vector<int> calculate_optimal_checkpoint_points(
         const std::vector<DeepSpeedForwardFunction>& functions,
         const std::vector<TensorPtr>& inputs,
         float memory_budget_mb
     );
     
-    // Mobile optimization algorithms
+    // mobileoptimizationalgorithm
     bool should_checkpoint_for_mobile_state(MobileActivationState state, size_t memory_footprint);
     RecomputationCost estimate_recomputation_cost_mobile(const DeepSpeedForwardFunction& fn);
     
-    // Memory analysis
+    // memoryanalyze
     size_t estimate_function_memory_footprint(
         const DeepSpeedForwardFunction& fn,
         const std::vector<TensorPtr>& inputs
     );
     
-    // Statistics update
+    // statisticsupdate
     void update_checkpointing_stats(size_t checkpoint_id, size_t memory_saved, double recomputation_time);
 };
 
 /**
- * @brief Global checkpoint manager
+ * @brief globalcheckpointmanager
  * 
- * Provides global access point, similar to PyTorch's torch.utils.checkpoint
+ * [Documentation available in English]
  */
 class GlobalCheckpointManager {
 private:
@@ -320,12 +321,12 @@ public:
 };
 
 /**
- * @brief Convenience functions, similar to PyTorch's API
+ * [Documentation available in English]
  */
 namespace checkpoint_utils {
     
     /**
-     * @brief Convenience function similar to torch.utils.checkpoint.checkpoint
+     * [Documentation available in English]
      */
     inline std::vector<TensorPtr> checkpoint(
         DeepSpeedForwardFunction forward_fn,
@@ -338,7 +339,7 @@ namespace checkpoint_utils {
     }
     
     /**
-     * @brief Convenience function similar to torch.utils.checkpoint.checkpoint_sequential
+     * [Documentation available in English]
      */
     inline std::vector<TensorPtr> checkpoint_sequential(
         const std::vector<DeepSpeedForwardFunction>& functions,
@@ -351,7 +352,7 @@ namespace checkpoint_utils {
     }
     
     /**
-     * @brief Mobile-optimized checkpoint convenience function
+     * [Documentation available in English]
      */
     inline std::vector<TensorPtr> mobile_checkpoint(
         DeepSpeedForwardFunction forward_fn,

@@ -219,11 +219,11 @@ TensorPtr AdamAMP::ensure_fp32(const TensorPtr& param) {
 }
 
 void AdamAMPState::to_file(const std::string& path) const {
-    // Implementation similar to save_state
+    // Implementation similar to to save_state
 }
 
 void AdamAMPState::from_file(const std::string& path) {
-    // Implementation similar to load_state
+    // Implementation similar to to load_state
 }
 
 } // namespace ops

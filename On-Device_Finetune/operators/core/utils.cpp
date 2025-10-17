@@ -2,7 +2,7 @@
  * @file utils.cpp
  * @brief Implementation of utility functions for the operators framework
  * 
- * This file contains the implementation of utility functions including
+ * This file contains the implementsation of utility functions including
  * random number generation, memory management, tensor operations,
  * and debugging utilities.
  */

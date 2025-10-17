@@ -2,9 +2,9 @@
  * @file tensor.cpp
  * @brief Implementation of the core Tensor class
  * 
- * This file contains the implementation of all Tensor class methods,
+ * This file contains the implementsation of all Tensor class methods,
  * including constructors, operators, memory management, and utility functions.
- * It also provides tensor creation functions and automatic differentiation support.
+ * It also providess tensor creation functions and automatic differentiation support.
  */
 
 #include "tensor.h"
@@ -208,7 +208,7 @@ TensorPtr Tensor::reshape(const std::vector<int64_t>& new_shape) const {
     if (requires_grad_) {
         result->set_requires_grad(true);
         
-        // Gradient of reshape is to reshape gradient back to original shape
+        // [Translated comment removed - see documentation]
         auto original_shape = shape_;
         result->set_grad_fn([original_shape](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             auto grad_input = grad_output->reshape(original_shape);
@@ -283,9 +283,9 @@ TensorPtr Tensor::transpose(int dim0, int dim1) const {
     if (requires_grad_) {
         result->set_requires_grad(true);
         
-        // Set gradient function: gradient of transpose is to transpose gradient the same way
+                // [Translated]
         result->set_grad_fn([dim0, dim1](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
-            // Simplified: directly return transposed gradient, let caller handle accumulation
+            // [Translated comment removed - see documentation]
             auto grad_input = grad_output->transpose(dim0, dim1);
             return {grad_input};
         });
@@ -349,8 +349,7 @@ void Tensor::backward(const TensorPtr& gradient) {
     #ifdef USE_NEW_AUTOGRAD_ENGINE
     // Forward to the new engine
     #ifdef AUTOGRAD_DEBUG
-    std::cout << "[Tensor::backward] Using new engine" << std::endl;
-    std::cout << "[Tensor::backward] grad_node_ = " << (grad_node_ ? "exists" : "nullptr") << std::endl;
+    // Debug only
     #endif
     
     // Need to find the shared_ptr for this tensor - use grad_node_ if available
@@ -519,7 +518,7 @@ TensorPtr rand(const std::vector<int64_t>& shape, DType dtype, Device device) {
     if (dtype == kFloat32) {
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+        std::unifor_real_distribution<float> dist(0.0f, 1.0f);
 
         float* data = tensor->data<float>();
         for (int64_t i = 0; i < tensor->numel(); ++i) {

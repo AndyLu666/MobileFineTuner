@@ -2,7 +2,7 @@
  * @file activation_checkpointer.h
  * @brief Mobile-optimized activation checkpointing system
  * 
- * This component implements gradient checkpointing specifically optimized for mobile
+ * This component implementss gradient checkpointing specifically optimized for mobile
  * training scenarios. Unlike DeepSpeed's checkpointing which targets data center GPUs,
  * this system considers mobile constraints like limited memory, battery life, and
  * thermal management.
@@ -66,12 +66,12 @@ struct CheckpointMetadata {
     CheckpointImportance importance;
     RecomputationCost recomputation_cost;
     
-    // Timing information
+    // Timing inforation
     std::chrono::steady_clock::time_point creation_time;
     std::chrono::steady_clock::time_point last_access_time;
     std::chrono::steady_clock::time_point expected_use_time;
     
-    // Memory information
+    // Memory inforation
     size_t memory_footprint;
     size_t recomputation_memory_needed;
     
@@ -81,7 +81,7 @@ struct CheckpointMetadata {
     bool is_thermal_sensitive;        // Generates heat when recomputed
     float power_consumption_estimate; // Estimated power for recomputation (mW)
     
-    // Graph topology information
+    // Graph topology inforation
     std::vector<size_t> dependent_checkpoints;   // Checkpoints this depends on
     std::vector<size_t> dependent_activations;   // Activations that depend on this
     int depth_from_input;                        // Distance from model input
@@ -120,7 +120,7 @@ struct CheckpointEntry {
 struct CheckpointConfig {
     // Basic checkpointing parameters
     CheckpointStrategy strategy = CheckpointStrategy::MOBILE_SMART;
-    int uniform_checkpoint_interval = 4;        // Uniform checkpointing interval
+    int unifor_checkpoint_interval = 4;        // Unifor checkpointing interval
     float memory_pressure_threshold = 0.8f;     // Start aggressive checkpointing at 80%
     
     // Mobile-specific configuration
@@ -150,7 +150,7 @@ struct CheckpointConfig {
     bool enable_checkpoint_compression = true;  // Compress checkpoints when needed
     bool enable_multi_level_checkpointing = true; // Multiple checkpoint importance levels
     
-    // Performance monitoring and profiling
+    // Perforance monitoring and profiling
     bool enable_checkpoint_profiling = false;   // Enable detailed profiling
     bool log_checkpoint_events = false;         // Log checkpointing events
     std::string profiling_output_path = "./checkpoint_profile.json";
@@ -299,7 +299,7 @@ public:
 
 private:
     // Checkpoint selection algorithms
-    std::vector<size_t> select_checkpoints_uniform(size_t layer_count);
+    std::vector<size_t> select_checkpoints_unifor(size_t layer_count);
     std::vector<size_t> select_checkpoints_adaptive(size_t layer_count);
     std::vector<size_t> select_checkpoints_mobile_smart(size_t layer_count);
     std::vector<size_t> select_checkpoints_importance_based(size_t layer_count);

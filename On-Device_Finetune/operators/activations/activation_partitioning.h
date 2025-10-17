@@ -1,15 +1,15 @@
 /**
  * @file activation_partitioning.h
- * @brief DeepSpeed-style activation partitioning system
+ * [Documentation in English - see separate docs]
  * 
- * This component implements DeepSpeed's Activation Partitioning technique, optimized for mobile:
- * 1. Smart activation partitioning algorithm
- * 2. Cross-device memory tier partition storage
- * 3. Efficient partition gather and distribution mechanism
- * 4. Mobile-aware partitioning strategy
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
  * 
- * Core idea: Store large activations partitioned across different memory tiers, and dynamically
- * gather them when needed, thus breaking through single memory tier capacity limitations.
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
  */
 
 #pragma once
@@ -33,7 +33,7 @@ using ops::Tensor;
 using ops::Device;
 using ops::kCPU;
 
-// CRITICAL FIX: Add missing enum definitions to fix header dependency issues
+// [Translated comment removed - see documentation]
 /**
  * @brief Activation compression modes optimized for mobile
  */
@@ -51,64 +51,64 @@ enum class ActivationCompressionMode {
 #endif
 
 /**
- * @brief Partition storage location enum
+ * [Documentation available in English]
  */
 enum class PartitionLocation {
-    GPU_PRIMARY = 0,     // Primary GPU memory
-    GPU_SECONDARY = 1,   // Secondary GPU memory (if multiple GPUs)
-    CPU_MEMORY = 2,      // CPU memory
-    COMPRESSED = 3,      // Compressed memory
-    PERSISTENT = 4       // Persistent storage
+    GPU_PRIMARY = 0,         // [Translated]
+    GPU_SECONDARY = 1,   // secondaryGPUmemory（ifhavemultipleGPU）
+    CPU_MEMORY = 2,      // CPUmemory
+    COMPRESSED = 3,      // compressionmemory
+    PERSISTENT = 4           // [Translated]
 };
 
 /**
- * @brief Partition strategy enum
+ * [Documentation available in English]
  */
 enum class PartitionStrategy {
-    UNIFORM = 0,         // Uniform partitioning
-    ADAPTIVE = 1,        // Adaptive partitioning (based on access pattern)
-    IMPORTANCE_BASED = 2, // Importance-based partitioning
-    MOBILE_OPTIMIZED = 3  // Mobile-optimized partitioning
+    UNIFORM = 0,             // [Translated]
+    ADAPTIVE = 1,            // [Translated]
+    IMPORTANCE_BASED = 2,     // [Translated]
+    MOBILE_OPTIMIZED = 3      // [Translated]
 };
 
 /**
- * @brief Gather strategy enum
+ * [Documentation available in English]
  */
 enum class GatherStrategy {
-    EAGER = 0,           // Eagerly gather all partitions
-    LAZY = 1,            // Lazy gather on demand
-    STREAMING = 2,       // Streaming gather (gather and use simultaneously)
-    MOBILE_AWARE = 3     // Mobile-aware gather
+    EAGER = 0,               // [Translated]
+    LAZY = 1,                // [Translated]
+    STREAMING = 2,           // [Translated]
+    MOBILE_AWARE = 3         // [Translated]
 };
 
 /**
- * @brief Activation partition metadata
+ * [Documentation available in English]
  */
 struct ActivationPartition {
-    size_t partition_id;                    // Partition ID
-    size_t activation_id;                   // Original activation ID
-    std::vector<int64_t> partition_shape;   // Partition shape
-    std::vector<int64_t> offset;            // Offset in original tensor
-    PartitionLocation location;             // Storage location
+    size_t partition_id;                        // [Translated]
+    size_t activation_id;                       // [Translated]
+    std::vector<int64_t> partition_shape;       // [Translated]
+    std::vector<int64_t> offset;                // [Translated]
+    PartitionLocation location;             // storageposition
     
-    // Memory information
-    size_t size_bytes;                      // Partition size
-    bool is_compressed;                     // Whether compressed
-    float compression_ratio;                // Compression ratio
+    // memoryinfo
+    size_t size_bytes;                          // [Translated]
+    bool is_compressed;                     // is notcompression
+    float compression_ratio;                    // [Translated]
     
-    // Access pattern information
+        // [Translated]
     std::chrono::steady_clock::time_point last_access_time;
-    size_t access_count;                    // Access count
-    float access_frequency;                 // Access frequency
+    size_t access_count;                        // [Translated]
+    float access_frequency;                     // [Translated]
     
-    // Mobile optimization information
-    bool is_ui_critical;                    // Critical for UI responsiveness
-    float power_cost_analysis;              // PRODUCTION: Power consumption analysis metric
-    int priority_level;                     // Priority level (0-10)
+    // mobileoptimizationinfo
+    bool is_ui_critical;                        // [Translated]
+    float power_cost_analysis;              // 🚀 PRODUCTION: poweranalyzemetrics
+    int priority_level;                     // priority（0-10）
     
-    // Partition dependencies
-    std::vector<size_t> dependent_partitions; // Dependent partitions
-    bool can_be_prefetched;                 // Whether can be prefetched
+    // [Translated comment removed - see documentation]
+    std::vector<size_t> dependent_partitions;     // [Translated]
+    bool can_be_prefetched;                     // [Translated]
     
     ActivationPartition(size_t part_id, size_t act_id, const std::vector<int64_t>& shape)
         : partition_id(part_id), activation_id(act_id), partition_shape(shape),
@@ -121,7 +121,7 @@ struct ActivationPartition {
 };
 
 /**
- * @brief Activation gather context
+ * [Documentation available in English]
  */
 struct GatherContext {
     size_t activation_id;
@@ -131,7 +131,7 @@ struct GatherContext {
     Device target_device;
     std::function<void(const TensorPtr&)> completion_callback;
     
-    // Performance monitoring
+    // perforancemonitor
     std::chrono::steady_clock::time_point start_time;
     std::atomic<size_t> gathered_partitions;
     std::atomic<bool> is_complete;
@@ -144,72 +144,72 @@ struct GatherContext {
 };
 
 /**
- * @brief Partition configuration
+ * [Documentation available in English]
  */
 struct PartitionConfig {
-    // Basic partition parameters
+        // [Translated]
     PartitionStrategy partition_strategy = PartitionStrategy::MOBILE_OPTIMIZED;
-    size_t max_partition_size_mb = 64;      // Max partition size (MB)
-    size_t min_partition_size_mb = 4;       // Min partition size (MB)
-    int max_partitions_per_activation = 16; // Max partitions per activation
+    size_t max_partition_size_mb = 64;          // [Translated]
+    size_t min_partition_size_mb = 4;           // [Translated]
+    int max_partitions_per_activation = 16;     // [Translated]
     
-    // Storage tier configuration
-    size_t gpu_partition_quota_mb = 256;    // GPU partition quota
-    size_t cpu_partition_quota_mb = 512;    // CPU partition quota
-    size_t compressed_partition_quota_mb = 1024; // Compressed partition quota
+    // storagelayerlevelconfiguration
+    size_t gpu_partition_quota_mb = 256;        // [Translated]
+    size_t cpu_partition_quota_mb = 512;        // [Translated]
+    size_t compressed_partition_quota_mb = 1024;     // [Translated]
     
-    // Gather strategy configuration
+        // [Translated]
     GatherStrategy default_gather_strategy = GatherStrategy::MOBILE_AWARE;
-    bool enable_async_gather = true;        // Enable async gather
-    bool enable_prefetch_gather = true;     // Enable prefetch gather
-    int max_concurrent_gathers = 3;         // Max concurrent gathers
+    bool enable_async_gather = true;            // [Translated]
+    bool enable_prefetch_gather = true;         // [Translated]
+    int max_concurrent_gathers = 3;             // [Translated]
     
-    // Mobile optimization configuration
-    bool enable_mobile_optimizations = true; // Enable mobile optimizations
-    bool prioritize_ui_responsiveness = true; // Prioritize UI responsiveness
-    bool enable_battery_aware_partitioning = true; // Battery-aware partitioning
-    bool enable_thermal_aware_partitioning = true; // Thermal-aware partitioning
+    // mobileoptimizationconfiguration
+    bool enable_mobile_optimizations = true; // enablemobileoptimization
+    bool prioritize_ui_responsiveness = true;     // [Translated]
+    bool enable_battery_aware_partitioning = true;     // [Translated]
+    bool enable_thermal_aware_partitioning = true;     // [Translated]
     
-    // Compression configuration
-    bool enable_partition_compression = true; // Enable partition compression
-    float compression_threshold = 0.8f;     // Compression threshold (memory usage)
+    // compressionconfiguration
+    bool enable_partition_compression = true;     // [Translated]
+    float compression_threshold = 0.8f;         // [Translated]
     ActivationCompressionMode default_compression = ActivationCompressionMode::QUANTIZE_INT8;
     
-    // Performance tuning parameters
-    float partition_vs_gather_tradeoff = 0.6f; // Partition vs gather tradeoff (0=max partition, 1=min gather)
-    bool enable_intelligent_prefetch = true;   // Intelligent prefetch
-    bool enable_adaptive_partition_sizing = true; // Adaptive partition sizing
+        // [Translated]
+    float partition_vs_gather_tradeoff = 0.6f;     // [Translated]
+    bool enable_intelligent_prefetch = true;       // [Translated]
+    bool enable_adaptive_partition_sizing = true;     // [Translated]
     
-    // Performance analysis and monitoring
-    bool enable_partition_profiling = false; // Enable partition profiling
-    bool log_partition_events = false;       // Log partition events
+    // Perforance analysis and monitoring
+    bool enable_partition_profiling = false;     // [Translated]
+    bool log_partition_events = false;           // [Translated]
     std::string profiling_output_path = "./partition_profile.json";
 };
 
 /**
- * @brief Partition statistics
+ * [Documentation available in English]
  */
 struct PartitionStats {
-    // Basic statistics
+    // basicstatistics
     size_t total_activations_partitioned;
     size_t total_partitions_created;
     size_t total_partitions_active;
     size_t total_gather_operations;
     
-    // Memory statistics
+    // memorystatistics
     size_t gpu_memory_used_by_partitions;
     size_t cpu_memory_used_by_partitions;
     size_t compressed_memory_used_by_partitions;
     size_t total_memory_saved_by_partitioning;
     
-    // Performance statistics
+    // perforancestatistics
     double average_partition_time_ms;
     double average_gather_time_ms;
     double average_compression_ratio;
     size_t cache_hits;
     size_t cache_misses;
     
-    // Mobile statistics
+    // mobilestatistics
     size_t battery_optimized_partitions;
     size_t thermal_optimized_partitions;
     size_t ui_responsive_gathers;
@@ -218,35 +218,35 @@ struct PartitionStats {
 };
 
 /**
- * @brief Mobile activation partitioner
+ * [Documentation available in English]
  */
 class MobileActivationPartitioner {
 private:
     PartitionConfig config_;
     
-    // Partition storage management
+        // [Translated]
     std::unordered_map<size_t, std::vector<std::shared_ptr<ActivationPartition>>> activation_partitions_;
     std::unordered_map<size_t, TensorPtr> partition_tensors_;  // partition_id -> tensor
     std::unordered_map<PartitionLocation, size_t> location_memory_usage_;
     
-    // Gather management
+        // [Translated]
     std::unordered_map<size_t, std::shared_ptr<GatherContext>> active_gathers_;
     std::queue<std::shared_ptr<GatherContext>> pending_gathers_;
     
-    // Async processing
+    // asyncprocess
     std::vector<std::thread> worker_threads_;
     std::mutex partition_mutex_;
     std::mutex gather_mutex_;
     std::condition_variable gather_cv_;
     std::atomic<bool> shutdown_flag_;
     
-    // Mobile state monitoring
+    // mobilestatemonitor
     std::atomic<float> current_memory_pressure_;
     std::atomic<int> current_battery_level_;
     std::atomic<float> current_temperature_;
     std::atomic<bool> is_app_foreground_;
     
-    // Prefetch system
+        // [Translated]
     struct PrefetchCandidate {
         size_t activation_id;
         float probability;
@@ -261,7 +261,7 @@ private:
     std::priority_queue<PrefetchCandidate, std::vector<PrefetchCandidate>,
                        std::function<bool(const PrefetchCandidate&, const PrefetchCandidate&)>> prefetch_queue_;
     
-    // Statistics
+    // statisticsinfo
     PartitionStats stats_;
     mutable std::mutex stats_mutex_;
     
@@ -272,11 +272,11 @@ public:
     ~MobileActivationPartitioner();
     
     /**
-     * @brief Partition activation
-     * @param activation_id Activation ID
-     * @param activation Activation tensor to partition
-     * @param strategy Partitioning strategy
-     * @return List of partition IDs
+     * [Documentation available in English]
+     * @param activation_id activationvalueID
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     std::vector<size_t> partition_activation(
         size_t activation_id,
@@ -285,11 +285,11 @@ public:
     );
     
     /**
-     * @brief Gather activation partitions
-     * @param activation_id Activation ID
-     * @param strategy Gather strategy
-     * @param target_device Target device
-     * @return Gathered activation tensor
+     * [Documentation available in English]
+     * @param activation_id activationvalueID
+     * [Documentation available in English]
+     * @param target_device targetdevice
+     * [Documentation available in English]
      */
     TensorPtr gather_activation(
         size_t activation_id,
@@ -298,11 +298,11 @@ public:
     );
     
     /**
-     * @brief Async gather activation partitions
-     * @param activation_id Activation ID
-     * @param strategy Gather strategy
-     * @param target_device Target device
-     * @return Future-wrapped activation tensor
+     * [Documentation available in English]
+     * @param activation_id activationvalueID
+     * [Documentation available in English]
+     * @param target_device targetdevice
+     * [Documentation available in English]
      */
     std::future<TensorPtr> gather_activation_async(
         size_t activation_id,
@@ -311,9 +311,9 @@ public:
     );
     
     /**
-     * @brief Prefetch activations (based on predicted access patterns)
-     * @param activation_ids List of activation IDs to prefetch
-     * @param target_device Target device to prefetch to
+     * [Documentation in English - see separate docs]
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     void prefetch_activations(
         const std::vector<size_t>& activation_ids,
@@ -321,44 +321,44 @@ public:
     );
     
     /**
-     * @brief Release activation partitions
-     * @param activation_id Activation ID
-     * @param force_release Whether to force release (ignore access frequency)
+     * [Documentation available in English]
+     * @param activation_id activationvalueID
+     * [Documentation in English - see separate docs]
      */
     void release_activation_partitions(size_t activation_id, bool force_release = false);
     
     /**
-     * @brief Optimize partition layout (redistribute to optimal storage locations)
+     * [Documentation in English - see separate docs]
      */
     void optimize_partition_layout();
     
     /**
-     * @brief Update mobile system state
-     * @param memory_pressure Memory pressure (0.0-1.0)
-     * @param battery_level Battery level (0-100)
-     * @param temperature Device temperature (Celsius)
-     * @param is_foreground Whether running in foreground
+     * @brief updatemobilesystemstate
+     * [Documentation available in English]
+     * @param battery_level batterybattery level (0-100)
+     * [Documentation available in English]
+     * @param is_foreground is notforegroundrunning
      */
     void update_mobile_state(float memory_pressure, int battery_level, 
                             float temperature, bool is_foreground);
     
     /**
-     * @brief Configure partitioning parameters
-     * @param config New partition configuration
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     void configure_partitioning(const PartitionConfig& config);
     
     /**
-     * @brief Get partition statistics
-     * @return Current partition statistics
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     PartitionStats get_partition_stats() const;
     
     /**
-     * @brief PRODUCTION: Calculate optimal partitioning strategy for activation
-     * @param activation Activation tensor
-     * @param current_memory_usage Current memory usage
-     * @return Precisely calculated partitioning strategy and parameters
+     * [Documentation available in English]
+     * @param activation activationvaluetensor
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     struct OptimalPartitionPlan {
         PartitionStrategy strategy;
@@ -373,58 +373,58 @@ public:
     );
     
     /**
-     * @brief Export partition profiling report
-     * @param report_path Report save path
+     * [Documentation available in English]
+     * @param report_path reportsavepath
      */
     void export_profiling_report(const std::string& report_path) const;
 
 private:
-    // Partition algorithm implementation
-    std::vector<std::shared_ptr<ActivationPartition>> partition_uniform(
+        // [Translated]
+    std::vector<std::shared_ptr<ActivationPartition>> partition_unifor(
         size_t activation_id, const TensorPtr& activation);
     std::vector<std::shared_ptr<ActivationPartition>> partition_adaptive(
         size_t activation_id, const TensorPtr& activation);
     std::vector<std::shared_ptr<ActivationPartition>> partition_mobile_optimized(
         size_t activation_id, const TensorPtr& activation);
     
-    // Gather algorithm implementation
+        // [Translated]
     TensorPtr gather_eager(const std::shared_ptr<GatherContext>& context);
     TensorPtr gather_lazy(const std::shared_ptr<GatherContext>& context);
     TensorPtr gather_streaming(const std::shared_ptr<GatherContext>& context);
     TensorPtr gather_mobile_aware(const std::shared_ptr<GatherContext>& context);
     
-    // Storage location selection
+    // storagepositionselect
     PartitionLocation select_optimal_location(
         const std::shared_ptr<ActivationPartition>& partition);
     bool can_store_in_location(PartitionLocation location, size_t size_bytes);
     void migrate_partition_to_location(
         std::shared_ptr<ActivationPartition> partition, PartitionLocation new_location);
     
-    // Mobile optimization methods
+    // mobileoptimizationmethod
     void apply_mobile_optimizations_to_partition(
         std::shared_ptr<ActivationPartition> partition);
     void adapt_partitioning_for_battery_state();
     void adapt_partitioning_for_thermal_state();
     void adapt_partitioning_for_memory_pressure();
     
-    // Prefetch and prediction
+    // [Translated comment removed - see documentation]
     void update_access_patterns(size_t activation_id);
     std::vector<size_t> predict_next_accesses(size_t current_activation_id);
     void schedule_intelligent_prefetch();
     
-    // Worker thread methods
+        // [Translated]
     void gather_worker_loop();
     void prefetch_worker_loop();
     void optimization_worker_loop();
     
-    // Utility methods
+    // toolmethod
     std::vector<int64_t> calculate_partition_shape(
         const std::vector<int64_t>& original_shape, int partition_index, int total_partitions);
     size_t calculate_tensor_size_bytes(const std::vector<int64_t>& shape);
     bool is_partition_hot(const std::shared_ptr<ActivationPartition>& partition);
     void update_partition_statistics(const std::shared_ptr<ActivationPartition>& partition);
     
-    // Memory management utilities
+    // memorymanagetool
     void cleanup_expired_partitions();
     void handle_memory_pressure();
     void compress_cold_partitions();
@@ -432,20 +432,20 @@ private:
     // Logging and analytics
     void log_partition_event(const std::string& event, size_t activation_id, 
                             const std::string& details = "");
-    void update_performance_metrics();
+    void update_perforance_metrics();
 };
 
 /**
- * @brief Partition utility functions namespace
+ * [Documentation available in English]
  */
 namespace partition_utils {
     
     /**
-     * @brief Calculate optimal partition count
-     * @param tensor_size Tensor size (bytes)
-     * @param available_memory Available memory (bytes)
-     * @param target_partition_size Target partition size (bytes)
-     * @return Recommended partition count
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     int calculate_optimal_partition_count(
         size_t tensor_size, 
@@ -454,18 +454,18 @@ namespace partition_utils {
     );
     
     /**
-     * @brief Analyze tensor partition friendliness
-     * @param shape Tensor shape
-     * @return Partition difficulty score (0.0=very hard to partition, 1.0=very easy to partition)
+     * [Documentation available in English]
+     * @param shape tensorshape
+     * [Documentation in English - see separate docs]
      */
     float analyze_partition_friendliness(const std::vector<int64_t>& shape);
     
     /**
-     * @brief PRODUCTION: Precisely calculate partition overhead
-     * @param original_size Original size
-     * @param partition_count Partition count
-     * @param gather_frequency Gather frequency
-     * @return Precise overhead analysis (time ms, extra memory bytes)
+     * [Documentation available in English]
+     * @param original_size originalsize
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     std::pair<double, size_t> estimate_partition_overhead(
         size_t original_size, 
@@ -474,10 +474,10 @@ namespace partition_utils {
     );
     
     /**
-     * @brief Optimize partition shapes for mobile
-     * @param original_shape Original tensor shape
-     * @param target_partition_count Target partition count
-     * @return Optimized list of partition shapes
+     * [Documentation available in English]
+     * @param original_shape originaltensorshape
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     std::vector<std::vector<int64_t>> optimize_partition_shapes_for_mobile(
         const std::vector<int64_t>& original_shape,

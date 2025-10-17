@@ -2,7 +2,7 @@
  * @file activation_compressor.h
  * @brief Mobile-optimized activation compression system
  * 
- * This component implements advanced compression techniques specifically designed
+ * This component implementss advanced compression techniques specifically designed
  * for mobile activation memory optimization. It supports multiple compression modes
  * with mobile-specific considerations like power efficiency and decompression speed.
  * 
@@ -21,7 +21,7 @@
 
 namespace ops {
 namespace memory {
-    enum class ActivationCompressionMode;  // Forward declaration
+    enum class ActivationCompressionMode;      // [Translated]
 }
 }
 
@@ -278,7 +278,7 @@ namespace mobile_quantization {
     std::pair<float, int> calculate_quantization_params(const TensorPtr& tensor, int target_bits = 8);
     
     /**
-     * @brief Quantize tensor with mobile-optimized implementation
+     * @brief Quantize tensor with mobile-optimized implementsation
      * @param tensor Input tensor
      * @param scale Quantization scale
      * @param zero_point Quantization zero point
@@ -288,7 +288,7 @@ namespace mobile_quantization {
     std::vector<uint8_t> quantize_tensor_mobile(const TensorPtr& tensor, float scale, int zero_point, int target_bits);
     
     /**
-     * @brief Dequantize tensor with mobile-optimized implementation
+     * @brief Dequantize tensor with mobile-optimized implementsation
      * @param quantized_data Quantized data buffer
      * @param scale Quantization scale
      * @param zero_point Quantization zero point

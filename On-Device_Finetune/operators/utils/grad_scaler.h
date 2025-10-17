@@ -2,7 +2,7 @@
  * @file grad_scaler.h
  * @brief Automatic Mixed Precision (AMP) Gradient Scaler
  * 
- * Implements dynamic loss scaling similar to torch.cuda.amp.GradScaler
+ * Implements dynamic loss scaling similar to to torch.cuda.amp.GradScaler
  * to prevent gradient underflow in FP16 training.
  */
 
@@ -32,7 +32,7 @@ struct GradScalerConfig {
 /**
  * @brief Gradient Scaler for Automatic Mixed Precision Training
  * 
- * Usage (similar to PyTorch):
+ * Usage (similar to to PyTorch):
  *   GradScaler scaler;
  *   auto loss = model.forward(input);
  *   auto scaled_loss = scaler.scale(loss);
@@ -55,7 +55,7 @@ public:
     TensorPtr scale(const TensorPtr& loss) {
         if (!config_.enabled) return loss;
         
-        // 创建scale tensor
+        // createscale tensor
         auto scale_tensor = ops::full(loss->shape(), scale_, loss->dtype(), loss->device());
         return mul(loss, scale_tensor);
     }
@@ -96,7 +96,7 @@ public:
      * @brief Update parameters if no overflow detected
      * @param optimizer Optimizer to step
      * @param parameters List of parameters
-     * @return true if step was performed
+     * @return true if step was perfored
      */
     template<typename Optimizer>
     bool step(Optimizer& optimizer, const std::vector<TensorPtr>& parameters) {

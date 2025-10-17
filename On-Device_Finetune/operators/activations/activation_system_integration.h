@@ -1,31 +1,31 @@
 /**
  * @file mobile_system_api_integration.h
- * @brief CRITICAL: Mobile system API deep integration - Last critical missing pieces
+ * [Documentation in English - see separate docs]
  * 
- * This file implements deep integration with mobile operating systems, which is completely
- * missing from data center frameworks like DeepSpeed but critical for mobile training:
+ * [Documentation in English - see separate docs]
+ * [Documentation in English - see separate docs]
  * 
- * Android System Integration:
- * 1. OnTrimMemory API - Respond to system memory warnings
- * 2. Low Memory Killer listener - Avoid process termination
- * 3. ActivityLifecycleCallbacks - Application lifecycle management
- * 4. JobScheduler integration - Background task scheduling
- * 5. Battery Manager API - Battery state monitoring
- * 6. Thermal Service API - Thermal management integration
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * 3. ActivityLifecycleCallbacks - applylifetimemanage
+ * [Documentation available in English]
+ * 5. Battery Manager API - batterystatemonitor
+ * [Documentation available in English]
  * 
- * iOS System Integration:
- * 1. Memory Warning Notifications - Memory warning notifications
- * 2. Background App Refresh - Background app refresh
- * 3. Thermal State Notifications - Thermal state notifications
- * 4. Battery State Monitoring - Battery state monitoring
- * 5. App Lifecycle Notifications - App lifecycle notifications
- * 6. Background Task API - Background task management
+ * [Documentation available in English]
+ * 1. Memory Warning Notifications - memorywarningnotification
+ * 2. Background App Refresh - backgroundapplyrefresh
+ * [Documentation available in English]
+ * 4. Battery State Monitoring - batterystatemonitor
+ * 5. App Lifecycle Notifications - applylifetimenotification
+ * 6. Background Task API - backgroundtaskmanage
  * 
- * Cross-platform System Monitoring:
- * 1. Real-time system memory pressure monitoring
- * 2. CPU/GPU frequency monitoring
- * 3. Network state monitoring
- * 4. Device orientation and sensor integration
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * 3. networkstatemonitor
+ * [Documentation in English - see separate docs]
  */
 
 #pragma once
@@ -66,23 +66,25 @@
 namespace ops {
 namespace memory {
 
-// ANDROID System API Integration
+// ===============================
+// [Translated]
+// ===============================
 
 #ifdef __ANDROID__
 
 /**
- * @brief Android OnTrimMemory API integration
+ * [Documentation available in English]
  */
 class AndroidMemoryPressureManager {
 public:
     enum class TrimLevel {
-        TRIM_MEMORY_COMPLETE = 80,          // Complete memory cleanup
-        TRIM_MEMORY_MODERATE = 60,          // Moderate memory cleanup
-        TRIM_MEMORY_BACKGROUND = 40,        // Background memory cleanup
-        TRIM_MEMORY_UI_HIDDEN = 20,         // Cleanup when UI hidden
-        TRIM_MEMORY_RUNNING_CRITICAL = 15,  // Critical memory shortage at runtime
-        TRIM_MEMORY_RUNNING_LOW = 10,       // Low memory at runtime
-        TRIM_MEMORY_RUNNING_MODERATE = 5    // Moderate memory shortage at runtime
+        TRIM_MEMORY_COMPLETE = 80,          // fullcleanupmemory
+        TRIM_MEMORY_MODERATE = 60,                  // [Translated]
+        TRIM_MEMORY_BACKGROUND = 40,        // backgroundmemorycleanup
+        TRIM_MEMORY_UI_HIDDEN = 20,                 // [Translated]
+        TRIM_MEMORY_RUNNING_CRITICAL = 15,          // [Translated]
+        TRIM_MEMORY_RUNNING_LOW = 10,               // [Translated]
+        TRIM_MEMORY_RUNNING_MODERATE = 5            // [Translated]
     };
     
     using MemoryPressureCallback = std::function<void(TrimLevel)>;
@@ -96,11 +98,11 @@ private:
     std::vector<MemoryPressureCallback> callbacks_;
     std::mutex callback_mutex_;
     
-    // Memory monitoring thread
+    // memorymonitorthread
     std::thread memory_monitor_thread_;
     std::atomic<bool> monitor_active_{false};
     
-    // Statistics
+    // statisticsinfo
     std::atomic<size_t> trim_events_received_{0};
     std::atomic<size_t> critical_trim_events_{0};
 
@@ -109,22 +111,22 @@ public:
     ~AndroidMemoryPressureManager();
     
     /**
-     * @brief Initialize JNI environment
+     * [Documentation available in English]
      */
     bool initialize_jni(JNIEnv* env, jobject activity);
     
     /**
-     * @brief Register memory pressure callback
+     * [Documentation available in English]
      */
     void register_memory_pressure_callback(MemoryPressureCallback callback);
     
     /**
-     * @brief Manually trigger memory cleanup
+     * [Documentation available in English]
      */
     void trigger_memory_cleanup(TrimLevel level);
     
     /**
-     * @brief Get current memory usage information
+     * @brief acquirecurrentmemoryuseinforation
      */
     struct AndroidMemoryInfo {
         size_t available_memory_bytes;
@@ -137,7 +139,7 @@ public:
     AndroidMemoryInfo get_memory_info();
     
     /**
-     * @brief Request Java GC
+     * [Documentation available in English]
      */
     void request_java_gc();
 
@@ -146,23 +148,23 @@ private:
     void setup_jni_callbacks();
     void handle_trim_memory_event(int level);
     
-    // JNI callback methods
+    // JNIcallbackmethod
     static void JNICALL java_onTrimMemory(JNIEnv* env, jobject thiz, jint level);
 };
 
 /**
- * @brief Android Low Memory Killer listener
+ * [Documentation available in English]
  */
 class AndroidLowMemoryKillerMonitor {
 private:
     std::thread oom_monitor_thread_;
     std::atomic<bool> monitor_active_{false};
     
-    // OOM avoidance strategy
+        // [Translated]
     std::function<void()> emergency_cleanup_callback_;
     std::atomic<size_t> oom_warnings_received_{0};
     
-    // Process memory monitoring
+    // processmemorymonitor
     std::atomic<size_t> process_memory_usage_{0};
     std::atomic<size_t> oom_score_{0};
 
@@ -171,27 +173,27 @@ public:
     ~AndroidLowMemoryKillerMonitor();
     
     /**
-     * @brief Start OOM Killer monitoring
+     * @brief startmonitorOOM Killer
      */
     void start_oom_monitoring();
     
     /**
-     * @brief Stop monitoring
+     * @brief stoppedmonitor
      */
     void stop_oom_monitoring();
     
     /**
-     * @brief Set emergency cleanup callback
+     * [Documentation available in English]
      */
     void set_emergency_cleanup_callback(std::function<void()> callback);
     
     /**
-     * @brief Get current OOM score
+     * [Documentation available in English]
      */
     int get_current_oom_score();
     
     /**
-     * @brief Adjust OOM score (requires root)
+     * [Documentation available in English]
      */
     bool adjust_oom_score(int new_score);
 
@@ -203,7 +205,7 @@ private:
 };
 
 /**
- * @brief Android Battery Manager API integration
+ * [Documentation available in English]
  */
 class AndroidBatteryManager {
 public:
@@ -230,7 +232,7 @@ private:
     jobject battery_manager_ref_;
     jclass battery_manager_class_;
     
-    // Battery monitoring
+    // batterymonitor
     std::thread battery_monitor_thread_;
     std::atomic<bool> monitor_active_{false};
     std::atomic<int> current_battery_level_{100};
@@ -243,12 +245,12 @@ public:
     ~AndroidBatteryManager();
     
     /**
-     * @brief Initialize battery manager
+     * @brief initializebatterymanager
      */
     bool initialize_battery_manager(JNIEnv* env);
     
     /**
-     * @brief Get battery information
+     * @brief acquirebatteryinforation
      */
     struct AndroidBatteryInfo {
         int level_percent;
@@ -264,7 +266,7 @@ public:
     AndroidBatteryInfo get_battery_info();
     
     /**
-     * @brief Set battery status callback
+     * @brief settingsbatterystatecallback
      */
     void set_battery_callback(std::function<void(int, BatteryStatus, BatteryHealth)> callback);
 
@@ -274,7 +276,7 @@ private:
 };
 
 /**
- * @brief Android Thermal Service API integration
+ * [Documentation available in English]
  */
 class AndroidThermalManager {
 public:
@@ -304,22 +306,22 @@ public:
     ~AndroidThermalManager();
     
     /**
-     * @brief Initialize thermal management service
+     * [Documentation available in English]
      */
     bool initialize_thermal_service(JNIEnv* env);
     
     /**
-     * @brief Get current thermal status
+     * [Documentation available in English]
      */
     ThermalStatus get_thermal_status();
     
     /**
-     * @brief Get CPU temperature
+     * @brief acquireCPUtemperature
      */
     float get_cpu_temperature();
     
     /**
-     * @brief Set thermal status callback
+     * [Documentation available in English]
      */
     void set_thermal_callback(std::function<void(ThermalStatus, float)> callback);
 
@@ -331,13 +333,15 @@ private:
 
 #endif // __ANDROID__
 
-// iOS System API Integration
+// ===============================
+// [Translated]
+// ===============================
 
 #ifdef __APPLE__
 #if TARGET_OS_IPHONE
 
 /**
- * @brief iOS Memory Warning integration
+ * [Documentation available in English]
  */
 class iOSMemoryWarningManager {
 private:
@@ -357,27 +361,27 @@ public:
     ~iOSMemoryWarningManager();
     
     /**
-     * @brief Register memory warning observer
+     * @brief registermemorywarningobserver
      */
     void register_memory_warning_observer();
     
     /**
-     * @brief Register app lifecycle observers
+     * @brief registerapplylifetimeobserver
      */
     void register_lifecycle_observers();
     
     /**
-     * @brief Set memory warning callback
+     * @brief settingsmemorywarningcallback
      */
     void set_memory_warning_callback(std::function<void()> callback);
     
     /**
-     * @brief Set lifecycle callbacks
+     * @brief settingslifetimecallback
      */
     void set_lifecycle_callbacks(std::function<void()> background_cb, std::function<void()> foreground_cb);
     
     /**
-     * @brief Get iOS memory information
+     * @brief acquireiOSmemoryinforation
      */
     struct iOSMemoryInfo {
         size_t physical_memory_bytes;
@@ -395,7 +399,7 @@ private:
 };
 
 /**
- * @brief iOS Background App Refresh management
+ * @brief iOS Background App Refreshmanage
  */
 class iOSBackgroundAppManager {
 private:
@@ -410,27 +414,27 @@ public:
     ~iOSBackgroundAppManager();
     
     /**
-     * @brief Begin background task
+     * @brief startbackgroundtask
      */
     bool begin_background_task(const std::string& task_name);
     
     /**
-     * @brief End background task
+     * @brief endbackgroundtask
      */
     void end_background_task();
     
     /**
-     * @brief Get remaining background time
+     * [Documentation available in English]
      */
     size_t get_background_time_remaining();
     
     /**
-     * @brief Set background expiration callback
+     * @brief settingsbackgroundexpiredcallback
      */
     void set_background_expiration_callback(std::function<void()> callback);
     
     /**
-     * @brief Check background app refresh availability
+     * [Documentation available in English]
      */
     bool is_background_app_refresh_available();
 
@@ -439,7 +443,7 @@ private:
 };
 
 /**
- * @brief iOS Thermal State monitoring
+ * @brief iOS Thermal Statemonitor
  */
 class iOSThermalStateMonitor {
 public:
@@ -461,17 +465,17 @@ public:
     ~iOSThermalStateMonitor();
     
     /**
-     * @brief Register thermal state observer
+     * [Documentation available in English]
      */
     void register_thermal_state_observer();
     
     /**
-     * @brief Get current thermal state
+     * [Documentation available in English]
      */
     ThermalState get_current_thermal_state();
     
     /**
-     * @brief Set thermal state callback
+     * [Documentation available in English]
      */
     void set_thermal_callback(std::function<void(ThermalState)> callback);
 
@@ -480,7 +484,7 @@ private:
 };
 
 /**
- * @brief iOS Battery State monitoring
+ * @brief iOS Battery Statemonitor
  */
 class iOSBatteryMonitor {
 public:
@@ -505,12 +509,12 @@ public:
     ~iOSBatteryMonitor();
     
     /**
-     * @brief Register battery monitoring
+     * @brief registerbatterymonitor
      */
     void register_battery_monitoring();
     
     /**
-     * @brief Get battery information
+     * @brief acquirebatteryinforation
      */
     struct iOSBatteryInfo {
         float level_percent;
@@ -521,12 +525,12 @@ public:
     iOSBatteryInfo get_battery_info();
     
     /**
-     * @brief Set battery callback
+     * @brief settingsbatterycallback
      */
     void set_battery_callback(std::function<void(float, BatteryState)> callback);
     
     /**
-     * @brief Check if low power mode is enabled
+     * @brief checkis notenabledlowpowermode
      */
     bool is_low_power_mode_enabled();
 
@@ -538,40 +542,42 @@ private:
 #endif // TARGET_OS_IPHONE
 #endif // __APPLE__
 
-// Cross-platform System Monitoring Integration
+// ===============================
+// [Translated]
+// ===============================
 
 /**
- * @brief Cross-platform system resource monitor
+ * [Documentation available in English]
  */
-class CrossPlatformSystemMonitor {
+class CrossPlatforSystemMonitor {
 public:
     struct SystemMetrics {
-        // Memory information
+        // memoryinfo
         size_t total_memory_bytes;
         size_t available_memory_bytes;
         size_t used_memory_bytes;
         float memory_pressure_ratio;
         
-        // CPU information
+        // CPUinfo
         float cpu_usage_percent;
         float cpu_frequency_ghz;
         int cpu_temperature_celsius;
         
-        // GPU information  
+        // GPUinfo  
         float gpu_usage_percent;
         float gpu_frequency_ghz;
         int gpu_temperature_celsius;
         
-        // Power information
+                // [Translated]
         int battery_level_percent;
         bool is_charging;
         bool is_low_power_mode;
         
-        // Thermal information
+                // [Translated]
         bool is_thermal_throttling;
         int device_temperature_celsius;
         
-        // Network information
+        // networkinfo
         bool is_wifi_connected;
         bool is_cellular_connected;
         bool is_metered_connection;
@@ -583,7 +589,7 @@ public:
     std::thread monitor_thread_;
     std::atomic<bool> monitor_active_{false};
     
-    // Platform-specific monitors
+        // [Translated]
 #ifdef __ANDROID__
     std::unique_ptr<AndroidMemoryPressureManager> android_memory_manager_;
     std::unique_ptr<AndroidBatteryManager> android_battery_manager_;
@@ -598,38 +604,38 @@ public:
 #endif
 #endif
     
-    // Callback functions
+    // callbackfunction
     std::function<void(const SystemMetrics&)> metrics_callback_;
     std::mutex callback_mutex_;
 
 public:
-    CrossPlatformSystemMonitor();
-    ~CrossPlatformSystemMonitor();
+    CrossPlatforSystemMonitor();
+    ~CrossPlatforSystemMonitor();
     
     /**
-     * @brief Start system monitoring
+     * @brief startsystemmonitor
      */
     void start_monitoring();
     
     /**
-     * @brief Stop system monitoring
+     * @brief stoppedsystemmonitor
      */
     void stop_monitoring();
     
     /**
-     * @brief Get current system metrics
+     * @brief acquirecurrentsystemmetrics
      */
     SystemMetrics get_current_metrics() const;
     
     /**
-     * @brief Set metrics callback
+     * @brief settingsmetricscallback
      */
     void set_metrics_callback(std::function<void(const SystemMetrics&)> callback);
     
     /**
-     * @brief Initialize platform-specific monitoring
+     * [Documentation available in English]
      */
-    bool initialize_platform_monitoring();
+    bool initialize_platfor_monitoring();
 
 private:
     void monitor_loop();
@@ -640,31 +646,31 @@ private:
     void update_thermal_metrics();
     void update_network_metrics();
     
-    // Platform-specific initialization
+        // [Translated]
     void initialize_android_monitoring();
     void initialize_ios_monitoring();
     void initialize_generic_monitoring();
 };
 
 /**
- * @brief Mobile system integration manager - Unified interface
+ * [Documentation available in English]
  */
 class MobileSystemIntegrationManager {
 private:
-    std::unique_ptr<CrossPlatformSystemMonitor> system_monitor_;
+    std::unique_ptr<CrossPlatforSystemMonitor> system_monitor_;
     
-    // System event callbacks
+    // systemeventcallback
     std::function<void()> memory_pressure_callback_;
     std::function<void(int, bool)> battery_state_callback_;        // (level, charging)
     std::function<void(bool)> thermal_state_callback_;            // (is_throttling)
     std::function<void(bool)> app_lifecycle_callback_;           // (is_foreground)
     std::function<void(bool, bool)> network_state_callback_;     // (wifi, cellular)
     
-    // Integration state
+        // [Translated]
     std::atomic<bool> integration_active_{false};
-    std::string detected_platform_;
+    std::string detected_platfor_;
     
-    // Statistics
+    // statisticsinfo
     std::atomic<size_t> memory_pressure_events_{0};
     std::atomic<size_t> battery_optimization_events_{0};
     std::atomic<size_t> thermal_optimization_events_{0};
@@ -675,12 +681,12 @@ public:
     ~MobileSystemIntegrationManager();
     
     /**
-     * @brief Initialize mobile system integration
+     * [Documentation available in English]
      */
     bool initialize_mobile_integration();
     
     /**
-     * @brief Set all system event callbacks
+     * @brief settingsallsystemeventcallback
      */
     void set_system_callbacks(
         std::function<void()> memory_pressure_cb,
@@ -691,21 +697,21 @@ public:
     );
     
     /**
-     * @brief Get detected platform information
+     * @brief acquiredetectiontoplatforinforation
      */
-    struct PlatformInfo {
-        std::string platform_name;        // "Android", "iOS", "macOS"
-        std::string platform_version;     // "13.0", "16.4", etc.
+    struct PlatforInfo {
+        std::string platfor_name;        // "Android", "iOS", "macOS"
+        std::string platfor_version;     // "13.0", "16.4", etc.
         std::string device_model;         // "iPhone14,2", "SM-G991B", etc.
         bool has_unified_memory;          // UMA support
         bool has_neural_engine;          // Neural processing unit
         std::string gpu_vendor;           // "Adreno", "Mali", "Apple"
         std::string cpu_architecture;     // "ARM64", "x86_64"
     };
-    PlatformInfo get_platform_info() const;
+    PlatforInfo get_platfor_info() const;
     
     /**
-     * @brief Get system integration statistics
+     * [Documentation available in English]
      */
     struct IntegrationStats {
         size_t memory_pressure_events;
@@ -713,22 +719,22 @@ public:
         size_t thermal_optimization_events;
         size_t lifecycle_optimization_events;
         bool is_integration_active;
-        std::string platform_name;
+        std::string platfor_name;
     };
     IntegrationStats get_integration_stats() const;
     
     /**
-     * @brief Trigger system optimization
+     * @brief triggersystemoptimization
      */
     void trigger_system_optimization();
 
 private:
-    void handle_system_metrics_update(const CrossPlatformSystemMonitor::SystemMetrics& metrics);
-    PlatformInfo detect_platform_info();
+    void handle_system_metrics_update(const CrossPlatforSystemMonitor::SystemMetrics& metrics);
+    PlatforInfo detect_platfor_info();
     
-    // Platform detection methods
-    std::string detect_platform_name();
-    std::string detect_platform_version();
+    // platfordetectionmethod
+    std::string detect_platfor_name();
+    std::string detect_platfor_version();
     std::string detect_device_model();
     std::string detect_gpu_vendor();
 };

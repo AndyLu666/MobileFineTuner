@@ -1,6 +1,6 @@
 /**
  * @file mobile_optimizer_extensions.cpp
- * @brief Mobile optimizer extension features implementation
+ * [Documentation available in English]
  */
 
 #include "mobile_optimizer_extensions.h"
@@ -16,7 +16,9 @@
 namespace ops {
 namespace optim {
 
-// MobileGradientClipper implementation - Gradient clipping
+// ===============================================================================
+// MobileGradientClipper implements - gradient clipping
+// ===============================================================================
 
 MobileGradientClipper::MobileGradientClipper(const GradientClippingConfig& config,
                                              OptimizerExtensionStats* stats)
@@ -29,7 +31,7 @@ float MobileGradientClipper::clip_gradients(std::vector<TensorPtr>& gradients) {
         return 0.0f;
     }
     
-    // 1. Calculate global gradient norm
+    // 1. compute global gradient norm
     float grad_norm = compute_global_grad_norm(gradients);
     
     if (stats_) {
@@ -38,18 +40,18 @@ float MobileGradientClipper::clip_gradients(std::vector<TensorPtr>& gradients) {
         stats_->max_grad_norm = std::max(stats_->max_grad_norm, grad_norm);
     }
     
-    // 2. Determine clipping threshold
+    // 2. determine clipping threshold
     float clip_threshold = config_.max_grad_norm;
     if (config_.adaptive_clipping) {
         clip_threshold = compute_adaptive_clip_value(grad_norm);
     }
     
-    // 3. Execute clipping
+    // 3. execute clipping
     if (grad_norm > clip_threshold) {
         float scale_factor = clip_threshold / grad_norm;
         
         for (auto& gradient : gradients) {
-            // Scale gradient in-place
+                        // [Translated]
             gradient = ops::mul(gradient, scale_factor);
         }
         
@@ -57,11 +59,13 @@ float MobileGradientClipper::clip_gradients(std::vector<TensorPtr>& gradients) {
             stats_->gradient_clips_applied++;
         }
         
+        #ifdef AUTOGRAD_DEBUG
         std::cout << "[GradientClipper] Clipped gradients: norm=" << grad_norm 
                   << " -> " << clip_threshold << " (scale=" << scale_factor << ")" << std::endl;
+        #endif
     }
     
-    // 4. Update adaptive history
+    // 4. update adaptive history
     update_gradient_history(grad_norm);
     
     return grad_norm;
@@ -73,7 +77,7 @@ float MobileGradientClipper::compute_global_grad_norm(const std::vector<TensorPt
     for (const auto& gradient : gradients) {
         if (!gradient) continue;
         
-        // Check for NaN and Inf
+        // checkNaNandInf
         const float* data = gradient->data<float>();
         size_t numel = gradient->numel();
         
@@ -94,7 +98,7 @@ float MobileGradientClipper::compute_global_grad_norm(const std::vector<TensorPt
             return std::numeric_limits<float>::infinity();
         }
         
-        // Calculate norm squared
+                // [Translated]
         for (size_t i = 0; i < numel; ++i) {
             total_norm_sq += data[i] * data[i];
         }
@@ -104,13 +108,13 @@ float MobileGradientClipper::compute_global_grad_norm(const std::vector<TensorPt
 }
 
 float MobileGradientClipper::compute_adaptive_clip_value(float current_norm) {
-    (void)current_norm;  // Can be used for adaptive adjustment in future
-    // Adaptive clipping based on historical gradient norms
+    (void)current_norm;      // [Translated]
+        // [Translated]
     if (!history_filled_ && history_index_ < 10) {
-        return config_.max_grad_norm; // Don't have enough historical data yet
+        return config_.max_grad_norm;         // [Translated]
     }
     
-    // Calculate historical mean and standard deviation
+    // [Translated comment removed - see documentation]
     float mean = 0.0f;
     int count = history_filled_ ? 10 : history_index_;
     
@@ -127,10 +131,10 @@ float MobileGradientClipper::compute_adaptive_clip_value(float current_norm) {
     variance /= count;
     float std_dev = std::sqrt(variance);
     
-    // Adaptive threshold = mean + adaptive_factor * std_dev
+    // adaptivethreshold = mean + adaptive_factor * std_dev
     float adaptive_threshold = mean + config_.adaptive_factor * std_dev;
     
-    // Limit to reasonable range
+        // [Translated]
     return std::max(config_.max_grad_norm * 0.1f, 
                    std::min(config_.max_grad_norm * 2.0f, adaptive_threshold));
 }
@@ -143,7 +147,9 @@ void MobileGradientClipper::update_gradient_history(float grad_norm) {
     }
 }
 
-// MobileLRScheduler implementation - Learning rate scheduling
+// ===============================================================================
+// MobileLRScheduler implements - learning rateschedule
+// ===============================================================================
 
 MobileLRScheduler::MobileLRScheduler(const LRSchedulerConfig& config,
                                     OptimizerExtensionStats* stats)
@@ -185,10 +191,10 @@ float MobileLRScheduler::get_learning_rate(int step) {
             break;
     }
     
-    // Mobile scaling
+    // mobilescale
     lr *= config_.mobile_lr_factor;
     
-    // Ensure not below minimum
+    // [Translated comment removed - see documentation]
     lr = std::max(lr, config_.min_lr);
     
     return lr;
@@ -210,12 +216,12 @@ void MobileLRScheduler::adjust_for_mobile_state(bool is_thermal_throttle, bool i
     float adjustment = 1.0f;
     
     if (is_thermal_throttle && config_.thermal_scaling) {
-        adjustment *= 0.8f; // Reduce learning rate to reduce computation
+        adjustment *= 0.8f;         // [Translated]
         if (stats_) stats_->thermal_lr_reductions++;
     }
     
     if (is_low_battery && config_.battery_aware) {
-        adjustment *= 0.9f; // Slightly reduce learning rate
+        adjustment *= 0.9f;         // [Translated]
         if (stats_) stats_->battery_optimizations++;
     }
     
@@ -223,13 +229,13 @@ void MobileLRScheduler::adjust_for_mobile_state(bool is_thermal_throttle, bool i
 }
 
 float MobileLRScheduler::compute_warmup_lr(int step) {
-    // 线性预热：从warmup_start_lr到base_lr
+        // [Translated]
     float progress = static_cast<float>(step) / config_.warmup_steps;
     return config_.warmup_start_lr + (config_.base_lr - config_.warmup_start_lr) * progress;
 }
 
 float MobileLRScheduler::compute_cosine_decay_lr(int step) {
-    // 余弦衰减
+    // [Translated comment removed - see documentation]
     float progress = static_cast<float>(step) / config_.decay_steps;
     progress = std::min(progress, 1.0f);
     
@@ -238,7 +244,7 @@ float MobileLRScheduler::compute_cosine_decay_lr(int step) {
 }
 
 float MobileLRScheduler::compute_linear_decay_lr(int step) {
-    // 线性衰减
+    // [Translated comment removed - see documentation]
     float progress = static_cast<float>(step) / config_.decay_steps;
     progress = std::min(progress, 1.0f);
     
@@ -246,19 +252,19 @@ float MobileLRScheduler::compute_linear_decay_lr(int step) {
 }
 
 float MobileLRScheduler::compute_exponential_decay_lr(int step) {
-    // 指数衰减
+    // exponential decay
     int decay_epochs = step / config_.step_size;
     return config_.base_lr * std::pow(config_.decay_rate, decay_epochs);
 }
 
 float MobileLRScheduler::compute_step_decay_lr(int step) {
-    // 阶梯衰减
+    // [Translated comment removed - see documentation]
     int decay_epochs = step / config_.step_size;
     return config_.base_lr * std::pow(0.1f, decay_epochs);
 }
 
 // ===============================================================================
-// MobileOptimizer 实现 - 多种优化器算法
+// [Translated]
 // ===============================================================================
 
 MobileOptimizer::MobileOptimizer(const OptimizerHyperParams& hyperparams,
@@ -267,13 +273,13 @@ MobileOptimizer::MobileOptimizer(const OptimizerHyperParams& hyperparams,
                                 MobileOptimizerStateManager* state_manager)
     : hyperparams_(hyperparams), state_manager_(state_manager) {
     
-    // 创建梯度裁剪器
+        // [Translated]
     gradient_clipper_ = std::make_unique<MobileGradientClipper>(clip_config, &extension_stats_);
     
-    // 创建学习率调度器
+    // createlearning ratescheduler
     lr_scheduler_ = std::make_unique<MobileLRScheduler>(lr_config, &extension_stats_);
     
-    // 稀疏梯度设置
+    // sparsegradientsettings
     enable_sparse_gradients_ = hyperparams_.sparse_gradients;
     
     std::cout << "[MobileOptimizer] Initialized with optimizer type: " 
@@ -285,10 +291,10 @@ bool MobileOptimizer::step(const std::unordered_map<size_t, TensorPtr>& param_gr
         return false;
     }
     
-    // 复制梯度（因为裁剪会修改）
+        // [Translated]
     std::unordered_map<size_t, TensorPtr> gradients_copy = param_gradients;
     
-    // 1. 检查梯度有效性
+    // 1. check gradient validity
     for (const auto& [param_id, gradient] : gradients_copy) {
         if (!check_gradient_validity(gradient)) {
             handle_gradient_overflow();
@@ -296,12 +302,12 @@ bool MobileOptimizer::step(const std::unordered_map<size_t, TensorPtr>& param_gr
         }
     }
     
-    // 2. 稀疏梯度优化
+    // 2. sparse gradient optimization
     if (enable_sparse_gradients_) {
         apply_gradient_sparsification(gradients_copy);
     }
     
-    // 3. 梯度裁剪
+    // 3. gradient clipping
     std::vector<TensorPtr> gradient_list;
     for (const auto& [param_id, gradient] : gradients_copy) {
         gradient_list.push_back(gradient);
@@ -313,10 +319,10 @@ bool MobileOptimizer::step(const std::unordered_map<size_t, TensorPtr>& param_gr
         return false;
     }
     
-    // 4. 更新学习率
+    // 4. update learning rate
     float current_lr = lr_scheduler_->step();
     
-    // 5. 执行优化步骤
+    // 5. execute optimization steps
     bool success = false;
     switch (hyperparams_.type) {
         case MobileOptimizerType::ADAM:
@@ -350,10 +356,10 @@ bool MobileOptimizer::adam_step(const std::unordered_map<size_t, TensorPtr>& par
     float lr = lr_scheduler_->get_learning_rate();
     
     for (const auto& [param_id, gradient] : param_gradients) {
-        // 获取参数（这里简化，实际需要从参数管理器获取）
+        // [Translated comment removed - see documentation]
         // TensorPtr param = get_parameter(param_id);
         
-        // 暂时跳过参数更新，只更新optimizer状态
+                // [Translated]
         adam_update_single_param(param_id, nullptr, gradient, lr, false);
     }
     
@@ -364,7 +370,7 @@ bool MobileOptimizer::adamw_step(const std::unordered_map<size_t, TensorPtr>& pa
     float lr = lr_scheduler_->get_learning_rate();
     
     for (const auto& [param_id, gradient] : param_gradients) {
-        // AdamW: 分离权重衰减
+                // [Translated]
         adam_update_single_param(param_id, nullptr, gradient, lr, true);
     }
     
@@ -373,13 +379,13 @@ bool MobileOptimizer::adamw_step(const std::unordered_map<size_t, TensorPtr>& pa
 
 bool MobileOptimizer::sgd_step(const std::unordered_map<size_t, TensorPtr>& param_gradients) {
     float lr = lr_scheduler_->get_learning_rate();
-    (void)lr;  // TODO: 实现实际的参数更新
+    (void)lr;  // TODO: implementsactualparameterupdate
     
     for (const auto& [param_id, gradient] : param_gradients) {
-        (void)param_id;  // TODO: 实现
+        (void)param_id;  // TODO: implements
         (void)gradient;
-        // 简单SGD：param = param - lr * gradient
-        // 这里需要实际的参数更新逻辑
+        // simpleSGD：param = param - lr * gradient
+        // [Translated comment removed - see documentation]
         // param = ops::sub(param, ops::mul(gradient, lr));
     }
     
@@ -388,7 +394,7 @@ bool MobileOptimizer::sgd_step(const std::unordered_map<size_t, TensorPtr>& para
 
 bool MobileOptimizer::sgd_momentum_step(const std::unordered_map<size_t, TensorPtr>& param_gradients) {
     float lr = lr_scheduler_->get_learning_rate();
-    (void)lr;  // TODO: 实现
+    (void)lr;  // TODO: implements
     float momentum = hyperparams_.momentum_sgd;
     
     for (const auto& [param_id, gradient] : param_gradients) {
@@ -404,7 +410,7 @@ bool MobileOptimizer::sgd_momentum_step(const std::unordered_map<size_t, TensorP
         
         state_manager_->update_momentum_state(param_id, new_momentum);
         
-        // 参数更新需要实际参数
+        // parameterupdaterequireactualparameter
         // param = ops::sub(param, ops::mul(new_momentum, lr));
     }
     
@@ -413,17 +419,17 @@ bool MobileOptimizer::sgd_momentum_step(const std::unordered_map<size_t, TensorP
 
 void MobileOptimizer::adam_update_single_param(size_t param_id, const TensorPtr& param,
                                               const TensorPtr& gradient, float lr, bool adamw_mode) {
-    // Adam算法实现
+    // Adamalgorithmimplements
     float beta1 = hyperparams_.beta1;
     float beta2 = hyperparams_.beta2;
     float eps = hyperparams_.eps;
     float weight_decay = hyperparams_.weight_decay;
     
-    // 获取optimizer状态
+    // acquireoptimizerstate
     auto momentum = state_manager_->get_momentum_state(param_id);
     auto variance = state_manager_->get_variance_state(param_id);
     
-    // 更新momentum和variance
+    // updatemomentumandvariance
     // m_t = beta1 * m_{t-1} + (1-beta1) * g_t
     auto new_momentum = ops::add(
         ops::mul(momentum, beta1),
@@ -437,7 +443,7 @@ void MobileOptimizer::adam_update_single_param(size_t param_id, const TensorPtr&
         ops::mul(grad_sq, 1.0f - beta2)
     );
     
-    // Bias correction (如果启用)
+    // Bias correction (ifenable)
     TensorPtr corrected_momentum = new_momentum;
     TensorPtr corrected_variance = new_variance;
     
@@ -449,13 +455,13 @@ void MobileOptimizer::adam_update_single_param(size_t param_id, const TensorPtr&
         corrected_variance = ops::div(new_variance, bias_correction2);
     }
     
-    // 参数更新（如果有参数的话）
+        // [Translated]
     if (param) {
         auto sqrt_v = ops::sqrt(corrected_variance);
         auto denom = ops::add(sqrt_v, eps);
         auto update = ops::mul(ops::div(corrected_momentum, denom), lr);
         
-        // AdamW: 分离权重衰减
+                // [Translated]
         TensorPtr new_param;
         if (adamw_mode && weight_decay > 0) {
             // AdamW: param = param - lr * weight_decay * param - lr * m / (sqrt(v) + eps)
@@ -466,11 +472,11 @@ void MobileOptimizer::adam_update_single_param(size_t param_id, const TensorPtr&
             new_param = ops::sub(param, update);
         }
         
-        // 这里需要将new_param更新到参数管理器
+                // [Translated]
         // param_manager_->update_parameter(param_id, new_param);
     }
     
-    // 更新optimizer状态
+    // updateoptimizerstate
     state_manager_->update_momentum_state(param_id, new_momentum);
     state_manager_->update_variance_state(param_id, new_variance);
 }
@@ -516,7 +522,7 @@ void MobileOptimizer::apply_gradient_sparsification(std::unordered_map<size_t, T
 }
 
 bool MobileOptimizer::is_gradient_sparse(const TensorPtr& gradient) {
-    // 简单的稀疏检测：统计接近零的元素比例
+    // [Translated comment removed - see documentation]
     const float* data = gradient->data<float>();
     size_t numel = gradient->numel();
     size_t zero_count = 0;
@@ -529,11 +535,11 @@ bool MobileOptimizer::is_gradient_sparse(const TensorPtr& gradient) {
         }
     }
     
-    return (static_cast<float>(zero_count) / numel) > 0.5f; // 超过50%为稀疏
+    return (static_cast<float>(zero_count) / numel) > 0.5f;     // [Translated]
 }
 
 TensorPtr MobileOptimizer::sparsify_gradient(const TensorPtr& gradient) {
-    // 创建稀疏化的梯度（设小值为零）
+        // [Translated]
     auto sparse_grad = gradient->clone();
     float* data = sparse_grad->data<float>();
     size_t numel = sparse_grad->numel();
@@ -553,12 +559,12 @@ TensorPtr MobileOptimizer::sparsify_gradient(const TensorPtr& gradient) {
 }
 
 void MobileOptimizer::zero_grad() {
-    // 清空梯度累积状态（如果有的话）
+        // [Translated]
     std::cout << "[MobileOptimizer] Zeroed gradients" << std::endl;
 }
 
 // ===============================================================================
-// CompleteMobileTrainingOptimizer 实现 - 完整训练优化器
+// CompleteMobileTrainingOptimizer implements - completetrainingoptimizer
 // ===============================================================================
 
 CompleteMobileTrainingOptimizer::CompleteMobileTrainingOptimizer(
@@ -572,7 +578,7 @@ CompleteMobileTrainingOptimizer::CompleteMobileTrainingOptimizer(
       accumulation_steps_(1),
       current_accumulation_step_(0) {
     
-    // 创建状态管理器
+    // createstatemanager
     MobileOptimizerStateConfig state_config;
     state_config.max_active_memory_mb = available_memory_mb / 2;
     state_config.max_standby_memory_mb = available_memory_mb;
@@ -584,7 +590,7 @@ CompleteMobileTrainingOptimizer::CompleteMobileTrainingOptimizer(
     
     state_manager_ = std::make_unique<MobileOptimizerStateManager>(state_config);
     
-    // 创建优化器
+    // createoptimizer
     optimizer_ = std::make_unique<MobileOptimizer>(opt_params, clip_config, lr_config, state_manager_.get());
     
     std::cout << "[CompleteMobileTrainingOptimizer] Initialized complete training system" << std::endl;
@@ -596,17 +602,17 @@ bool CompleteMobileTrainingOptimizer::training_step(
     if (accumulate && enable_gradient_accumulation_) {
         current_accumulation_step_++;
         
-        // TODO: 累积梯度逻辑
+                // [Translated]
         
         if (current_accumulation_step_ < accumulation_steps_) {
-            return false; // 还没到更新时机
+            return false;             // [Translated]
         }
         
-        // 重置累积步数
+        // resetaccumulatestep
         current_accumulation_step_ = 0;
     }
     
-    // 执行优化步骤
+    // execute optimization steps
     bool success = optimizer_->step(param_gradients);
     
     if (success) {
@@ -615,7 +621,7 @@ bool CompleteMobileTrainingOptimizer::training_step(
         total_stats_.failed_steps++;
     }
     
-    // 定期内存优化
+        // [Translated]
     if (total_stats_.successful_steps % 10 == 0) {
         state_manager_->optimize_memory_usage();
     }
@@ -637,7 +643,7 @@ void CompleteMobileTrainingOptimizer::update_mobile_system_state(
     
     state_manager_->update_mobile_state(cpu_util, thermal, low_battery);
     
-    // 同时更新学习率调度器（通过优化器）
+    // meanwhileupdate learning ratescheduler（viaoptimizer）
     // optimizer_->adjust_lr_for_mobile_state(thermal, low_battery);
 }
 
@@ -651,9 +657,9 @@ CompleteMobileTrainingOptimizer::get_complete_stats() const {
     stats.successful_steps = total_stats_.successful_steps;
     stats.failed_steps = total_stats_.failed_steps;
     
-    // 计算平均更新时间
+        // [Translated]
     if (stats.successful_steps > 0) {
-        stats.average_update_time_ms = 50.0f; // TODO: 实际测量
+        stats.average_update_time_ms = 50.0f;         // [Translated]
     }
     
     return stats;
@@ -662,14 +668,14 @@ CompleteMobileTrainingOptimizer::get_complete_stats() const {
 void CompleteMobileTrainingOptimizer::save_training_checkpoint(const std::string& path) {
     state_manager_->save_checkpoint(path + "/optimizer_states.bin");
     
-    // TODO: 保存优化器超参数和统计信息
+        // [Translated]
     std::cout << "[CompleteMobileTrainingOptimizer] Training checkpoint saved to " << path << std::endl;
 }
 
 void CompleteMobileTrainingOptimizer::load_training_checkpoint(const std::string& path) {
     state_manager_->load_checkpoint(path + "/optimizer_states.bin");
     
-    // TODO: 加载优化器超参数和统计信息
+        // [Translated]
     std::cout << "[CompleteMobileTrainingOptimizer] Training checkpoint loaded from " << path << std::endl;
 }
 

@@ -1,13 +1,13 @@
 /**
  * @file chunked_softmax_ce.h
- * @brief Precise chunked Softmax + CrossEntropy (with backward propagation)
+ * @brief accuratechunked Softmax + CrossEntropy（containbackwardpropagate）
  * 
- * Core idea:
- * - Forward: Chunk lm_head along vocabulary dimension, use streaming logsumexp to accumulate normalization term
- * - Backward: Recompute softmax block by block, accumulate gradients to W.grad and X.grad
- * - Fully equivalent to standard implementation, but peak memory reduced from O(B*L*V) to O(B*L*C)
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
  * 
- * Use case: Language model output layer with very large vocabulary (V=262K)
+ * [Documentation in English - see separate docs]
  */
 
 #pragma once
@@ -28,19 +28,19 @@ struct StreamingLogSumExpState {
     float sum_exp = 0.0f;
     
     void update(const float* logits, int64_t size) {
-        // First pass: Find maximum value
+                // [Translated]
         float local_max = max_logit;
         for (int64_t i = 0; i < size; ++i) {
             local_max = std::max(local_max, logits[i]);
         }
         
-        // If new max is larger, need to rescale previous sum_exp
+                // [Translated]
         if (local_max > max_logit) {
             sum_exp *= std::exp(max_logit - local_max);
             max_logit = local_max;
         }
         
-        // Second pass: Accumulate exp
+                // [Translated]
         for (int64_t i = 0; i < size; ++i) {
             sum_exp += std::exp(logits[i] - max_logit);
         }
@@ -52,20 +52,20 @@ struct StreamingLogSumExpState {
 };
 
 /**
- * @brief Precise chunked cross-entropy forward (without generating full logits)
+ * [Documentation available in English]
  * 
- * @param X Input features [B, L, D]
- * @param W lm_head weights [V, D] (transposed) or [D, V]
- * @param targets Target classes [B, L] (int32)
- * @param chunk_size Chunk size (e.g., 2048/4096)
- * @param W_is_transposed Whether W is already transposed to [D, V]
+ * @param X inputfeature [B, L, D]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
  * @return loss scalar
  * 
- * Algorithm:
- * 1. For each (b, l), compute logits_chunk = X[b,l] @ W_chunk in chunks
- * 2. Use streaming logsumexp to accumulate normalization term
- * 3. Record logit for target class (only one scalar needed)
- * 4. Final loss = -mean(target_logit - logsumexp)
+ * algorithm：
+ * 1. foreach (b, l)，chunkedCompute logits_chunk = X[b,l] @ W_chunk
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * 4. final loss = -mean(target_logit - logsumexp)
  */
 TensorPtr chunked_cross_entropy_forward(
     const TensorPtr& X,           // [B, L, D]
@@ -76,21 +76,21 @@ TensorPtr chunked_cross_entropy_forward(
 );
 
 /**
- * @brief Precise chunked cross-entropy backward (accumulate gradients block by block)
+ * [Documentation available in English]
  * 
- * @param X Input features [B, L, D]
- * @param W lm_head weights [V, D] or [D, V]
- * @param targets Target classes [B, L]
- * @param grad_output Upstream gradient (scalar, usually 1/N)
- * @param chunk_size Chunk size
- * @param W_is_transposed Whether W is transposed
- * @return (grad_X, grad_W) gradient tensor pair
+ * @param X inputfeature [B, L, D]
+ * @param W lm_head weight [V, D] or [D, V]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * @param chunk_size chunkedsize
+ * [Documentation available in English]
+ * @return (grad_X, grad_W) gradienttensorfor
  * 
- * Algorithm:
- * 1. Recompute logits_chunk and softmax_chunk in blocks
- * 2. Calculate (p_chunk - y_one_hot_chunk) * grad_output
- * 3. Accumulate W.grad += X^T @ (p - y)
- * 4. Accumulate X.grad += (p - y) @ W^T
+ * algorithm：
+ * [Documentation available in English]
+ * 2. Compute (p_chunk - y_one_hot_chunk) * grad_output
+ * 3. accumulate W.grad += X^T @ (p - y)
+ * 4. accumulate X.grad += (p - y) @ W^T
  */
 std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
     const TensorPtr& X,
@@ -102,13 +102,13 @@ std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
 );
 
 /**
- * @brief Wrap complete forward+backward (auto-registered to computation graph)
+ * [Documentation available in English]
  * 
- * @param X Input features [B, L, D]
- * @param W lm_head weights (supports [V,D] or [D,V])
- * @param targets Target classes [B, L]
- * @param chunk_size Chunk size
- * @return loss scalar tensor (supports backward)
+ * @param X inputfeature [B, L, D]
+ * @param W lm_head weight（support [V,D] or [D,V]）
+ * [Documentation available in English]
+ * @param chunk_size chunkedsize
+ * @return loss scalartensor（support backward）
  */
 TensorPtr chunked_cross_entropy_loss(
     const TensorPtr& X,

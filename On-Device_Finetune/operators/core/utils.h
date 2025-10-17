@@ -2,7 +2,7 @@
  * @file utils.h
  * @brief Utility functions and helper classes for the operators framework
  * 
- * This file provides utility functions for tensor operations, random number
+ * This file providess utility functions for tensor operations, random number
  * generation, memory management, and other common tasks used throughout
  * the framework.
  */

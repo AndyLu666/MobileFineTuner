@@ -1,6 +1,6 @@
 /**
  * @file mobile_optimizer_advanced.cpp
- * @brief Mobile optimizer advanced features implementation
+ * [Documentation available in English]
  */
 
 #include "mobile_optimizer_advanced.h"
@@ -17,7 +17,9 @@
 namespace ops {
 namespace optim {
 
-// AdvancedCheckpointManager implementation
+// ===============================================================================
+// AdvancedCheckpointManager implements
+// ===============================================================================
 
 AdvancedCheckpointManager::AdvancedCheckpointManager(const std::string& dir, int max_keep)
     : base_checkpoint_dir_(dir), max_checkpoints_to_keep_(max_keep) {
@@ -36,7 +38,7 @@ bool AdvancedCheckpointManager::save_training_state(const TrainingState& state,
             return false;
         }
         
-        // Save training state in JSON format
+        // saveJSONforattrainingstate
         file << "{\n";
         file << "  \"global_step\": " << state.global_step << ",\n";
         file << "  \"best_loss\": " << state.best_loss << ",\n";
@@ -44,7 +46,7 @@ bool AdvancedCheckpointManager::save_training_state(const TrainingState& state,
         file << "  \"total_thermal_events\": " << state.total_thermal_events << ",\n";
         file << "  \"total_battery_events\": " << state.total_battery_events << ",\n";
         
-        // Save loss history
+                // [Translated]
         file << "  \"loss_history\": [";
         for (size_t i = 0; i < state.loss_history.size(); ++i) {
             if (i > 0) file << ", ";
@@ -52,7 +54,7 @@ bool AdvancedCheckpointManager::save_training_state(const TrainingState& state,
         }
         file << "],\n";
         
-        // Save power history
+                // [Translated]
         file << "  \"power_history\": [";
         for (size_t i = 0; i < state.power_history.size(); ++i) {
             if (i > 0) file << ", ";
@@ -60,7 +62,7 @@ bool AdvancedCheckpointManager::save_training_state(const TrainingState& state,
         }
         file << "],\n";
         
-        // Save thermal history
+                // [Translated]
         file << "  \"thermal_history\": [";
         for (size_t i = 0; i < state.thermal_history.size(); ++i) {
             if (i > 0) file << ", ";
@@ -71,10 +73,10 @@ bool AdvancedCheckpointManager::save_training_state(const TrainingState& state,
         file << "}\n";
         file.close();
         
-        // Add to saved list
+                // [Translated]
         saved_checkpoints_.push_back(checkpoint_name);
         
-        // Cleanup old checkpoints
+        // cleanupoldcheckpoint
         if (saved_checkpoints_.size() > static_cast<size_t>(max_checkpoints_to_keep_)) {
             cleanup_old_checkpoints();
         }
@@ -100,7 +102,7 @@ bool AdvancedCheckpointManager::load_training_state(TrainingState& state,
             return false;
         }
         
-        // Simplified JSON parsing (should use a JSON library in practice)
+                // [Translated]
         std::string line;
         while (std::getline(file, line)) {
             if (line.find("\"global_step\":") != std::string::npos) {
@@ -115,7 +117,7 @@ bool AdvancedCheckpointManager::load_training_state(TrainingState& state,
                 size_t pos = line.find(':');
                 state.current_lr = std::stof(line.substr(pos + 1));
             }
-            // ... parsing other fields
+                        // [Translated]
         }
         
         file.close();
@@ -143,13 +145,13 @@ void AdvancedCheckpointManager::cleanup_old_checkpoints() {
 void AdvancedCheckpointManager::auto_checkpoint(const TrainingState& state, float current_loss) {
     static float best_loss = std::numeric_limits<float>::max();
     
-    // Auto save every 100 steps
+    // [Translated comment removed - see documentation]
     if (state.global_step % 100 == 0) {
         std::string checkpoint_name = "step_" + std::to_string(state.global_step);
         save_training_state(state, checkpoint_name);
     }
     
-    // Save best checkpoint
+        // [Translated]
     if (current_loss < best_loss) {
         best_loss = current_loss;
         save_training_state(state, "best_checkpoint");
@@ -163,7 +165,7 @@ std::string AdvancedCheckpointManager::get_best_checkpoint() const {
 }
 
 // ===============================================================================
-// AdvancedLRScheduler implementation
+// AdvancedLRScheduler implements
 // ===============================================================================
 
 AdvancedLRScheduler::AdvancedLRScheduler(const LRSchedulerConfig& config,
@@ -204,20 +206,20 @@ float AdvancedLRScheduler::compute_warm_restart_lr(int step) {
         return compute_cosine_decay_lr(step);
     }
     
-    // Calculate steps within current restart period
+        // [Translated]
     int period = restart_config_.restart_period * static_cast<int>(std::pow(restart_config_.restart_mult, restart_count_));
     int steps_in_period = step - last_restart_step_;
     
     if (steps_in_period >= period) {
-        // Need to restart
-        perform_restart();
+        // requirerestart
+        perfor_restart();
         last_restart_step_ = step;
         steps_in_period = 0;
         restart_count_++;
         period = restart_config_.restart_period * static_cast<int>(std::pow(restart_config_.restart_mult, restart_count_));
     }
     
-    // Perform cosine decay within current period
+    // [Translated comment removed - see documentation]
     float progress = static_cast<float>(steps_in_period) / period;
     float cosine_factor = 0.5f * (1.0f + std::cos(M_PI * progress));
     
@@ -225,47 +227,47 @@ float AdvancedLRScheduler::compute_warm_restart_lr(int step) {
     return min_lr + (config_.base_lr - min_lr) * cosine_factor;
 }
 
-bool AdvancedLRScheduler::should_restart(float current_performance) {
+bool AdvancedLRScheduler::should_restart(float current_perforance) {
     if (!restart_config_.adaptive_restart) {
         return false;
     }
     
-    update_performance_history(current_performance);
+    update_perforance_history(current_perforance);
     
-    // Check if performance has stagnated
-    if (performance_history_.size() < static_cast<size_t>(restart_config_.patience_steps)) {
+        // [Translated]
+    if (perforance_history_.size() < static_cast<size_t>(restart_config_.patience_steps)) {
         return false;
     }
     
-    float recent_improvement = performance_history_.back() - performance_history_[performance_history_.size() - static_cast<size_t>(restart_config_.patience_steps)];
+    float recent_improvement = perforance_history_.back() - perforance_history_[perforance_history_.size() - static_cast<size_t>(restart_config_.patience_steps)];
     
-    return recent_improvement < restart_config_.performance_threshold;
+    return recent_improvement < restart_config_.perforance_threshold;
 }
 
-void AdvancedLRScheduler::perform_restart() {
-    std::cout << "[AdvancedLRScheduler] Performing warm restart at step " 
+void AdvancedLRScheduler::perfor_restart() {
+    std::cout << "[AdvancedLRScheduler] Perforing warm restart at step " 
               << current_step_ << " (restart #" << restart_count_ + 1 << ")" << std::endl;
     
-    // Reset learning rate to initial value
+    // resetlearning ratetoinitialvalue
     current_lr_ = config_.base_lr;
     
     if (stats_) {
-        // Can record restart event here
+                // [Translated]
     }
 }
 
-void AdvancedLRScheduler::update_performance_history(float performance) {
-    performance_history_.push_back(performance);
+void AdvancedLRScheduler::update_perforance_history(float perforance) {
+    perforance_history_.push_back(perforance);
     
-    // Keep history length within reasonable range
+    // [Translated comment removed - see documentation]
     const size_t max_history = restart_config_.patience_steps * 3;
-    if (performance_history_.size() > max_history) {
-        performance_history_.erase(performance_history_.begin());
+    if (perforance_history_.size() > max_history) {
+        perforance_history_.erase(perforance_history_.begin());
     }
 }
 
 // ===============================================================================
-// NumericalStabilityManager implementation
+// NumericalStabilityManager implements
 // ===============================================================================
 
 NumericalStabilityManager::NumericalStabilityManager(const NumericalStabilityConfig& config)
@@ -286,7 +288,7 @@ bool NumericalStabilityManager::check_gradient_overflow(const std::vector<Tensor
                 return true;
             }
             
-            // Check if exceeds reasonable range
+                        // [Translated]
             if (std::abs(data[i]) > config_.max_grad_norm * current_loss_scale_) {
                 return true;
             }
@@ -299,13 +301,13 @@ bool NumericalStabilityManager::check_gradient_overflow(const std::vector<Tensor
 void NumericalStabilityManager::handle_overflow() {
     overflow_count_++;
     
-    // Record recent overflow situations
+    // [Translated comment removed - see documentation]
     recent_overflows_.push(true);
     if (recent_overflows_.size() > 10) {
         recent_overflows_.pop();
     }
     
-    // If consecutive overflows, reduce scaling more aggressively
+    // [Translated comment removed - see documentation]
     int recent_overflow_count = 0;
     std::queue<bool> temp = recent_overflows_;
     while (!temp.empty()) {
@@ -315,7 +317,7 @@ void NumericalStabilityManager::handle_overflow() {
     
     float backoff_factor = config_.scale_backoff_factor;
     if (recent_overflow_count > 5) {
-        backoff_factor = config_.scale_backoff_factor * config_.scale_backoff_factor; // More aggressive
+        backoff_factor = config_.scale_backoff_factor * config_.scale_backoff_factor;         // [Translated]
     }
     
     current_loss_scale_ = std::max(config_.min_loss_scale, current_loss_scale_ * backoff_factor);
@@ -361,7 +363,7 @@ void NumericalStabilityManager::update_loss_scale(bool overflow_detected) {
             recent_overflows_.pop();
         }
         
-        // If consecutive successes, consider increasing scaling
+        // [Translated comment removed - see documentation]
         if (successful_steps_ >= config_.scale_growth_interval && 
             current_loss_scale_ < config_.max_loss_scale) {
             
@@ -376,7 +378,7 @@ void NumericalStabilityManager::update_loss_scale(bool overflow_detected) {
 }
 
 // ===============================================================================
-// PowerOptimizationManager implementation
+// PowerOptimizationManager implements
 // ===============================================================================
 
 PowerOptimizationManager::PowerOptimizationManager(const PowerOptimizationConfig& config)
@@ -391,10 +393,10 @@ void PowerOptimizationManager::update_power_state(float battery_level, bool plug
     is_plugged_in_ = plugged_in;
     device_temperature_ = temperature;
     
-    // Simulate power measurement (should retrieve from system in practice)
+        // [Translated]
     current_power_consumption_ = 2.5f + 1.5f * (temperature - 30.0f) / 20.0f;
     if (!plugged_in) {
-        current_power_consumption_ *= 0.8f; // Slightly lower when on battery
+        current_power_consumption_ *= 0.8f;         // [Translated]
     }
     
     power_history_.push_back(current_power_consumption_);
@@ -402,7 +404,7 @@ void PowerOptimizationManager::update_power_state(float battery_level, bool plug
         power_history_.erase(power_history_.begin());
     }
     
-    // Record critical events
+    // recordcriticalevent
     if (battery_level < config_.battery_critical_threshold) {
         log_power_event("CRITICAL_BATTERY");
     } else if (battery_level < config_.battery_low_threshold) {
@@ -417,21 +419,21 @@ void PowerOptimizationManager::update_power_state(float battery_level, bool plug
 float PowerOptimizationManager::compute_power_adjustment_factor() {
     float factor = 1.0f;
     
-    // Adjust based on battery status
+    // based onbatterystateadjust
     if (!is_plugged_in_) {
         if (battery_level_ < config_.battery_critical_threshold) {
-            factor *= 0.5f; // Critical battery: significantly reduce
+            factor *= 0.5f;             // [Translated]
         } else if (battery_level_ < config_.battery_low_threshold) {
-            factor *= config_.power_reduction_factor; // Low battery: moderately reduce
+            factor *= config_.power_reduction_factor;             // [Translated]
         }
     }
     
-    // Adjust based on temperature
+    // based ontemperatureadjust
     if (device_temperature_ > 60.0f) {
-        factor *= 0.8f; // Reduce power when temperature is high
+        factor *= 0.8f;         // [Translated]
     }
     
-    // Adjust based on average power consumption
+        // [Translated]
     if (!power_history_.empty()) {
         float avg_power = std::accumulate(power_history_.begin(), power_history_.end(), 0.0f) / power_history_.size();
         if (avg_power > config_.target_power_consumption) {
@@ -440,7 +442,7 @@ float PowerOptimizationManager::compute_power_adjustment_factor() {
         }
     }
     
-    return std::max(0.1f, std::min(1.0f, factor)); // Limit to 0.1-1.0 range
+    return std::max(0.1f, std::min(1.0f, factor)); // limitat0.1-1.0rangeinner
 }
 
 void PowerOptimizationManager::apply_power_optimizations(float& learning_rate, int& batch_size) {
@@ -449,7 +451,7 @@ void PowerOptimizationManager::apply_power_optimizations(float& learning_rate, i
     if (adjustment_factor < 1.0f) {
         learning_rate *= adjustment_factor;
         
-        // If power pressure is high, also consider reducing batch size
+        // [Translated comment removed - see documentation]
         if (adjustment_factor < 0.7f) {
             batch_size = std::max(1, static_cast<int>(batch_size * adjustment_factor));
         }
@@ -460,10 +462,10 @@ void PowerOptimizationManager::apply_power_optimizations(float& learning_rate, i
 }
 
 float PowerOptimizationManager::predict_power_consumption(float lr, int batch_size) {
-    // Simplified power prediction model
+    // [Translated comment removed - see documentation]
     float base_power = 2.0f;
-    float lr_factor = 1.0f + lr * 100; // Learning rate affects computation intensity
-    float batch_factor = 1.0f + batch_size * 0.1f; // Batch size affects computation volume
+    float lr_factor = 1.0f + lr * 100;     // [Translated]
+    float batch_factor = 1.0f + batch_size * 0.1f;     // [Translated]
     
     return base_power * lr_factor * batch_factor;
 }
@@ -479,12 +481,12 @@ void PowerOptimizationManager::log_power_event(const std::string& event) {
 }
 
 float PowerOptimizationManager::get_battery_drain_rate() {
-    // Simplified battery drain rate calculation
+    // [Translated comment removed - see documentation]
     if (power_history_.size() < 10) return 0.0f;
     
     float avg_power = std::accumulate(power_history_.end() - 10, power_history_.end(), 0.0f) / 10.0f;
     
-    // Assume battery capacity is 5000mAh, 3.7V = 18.5Wh
+        // [Translated]
     float battery_capacity_wh = 18.5f;
     float drain_rate_per_hour = avg_power / battery_capacity_wh;
     
@@ -492,7 +494,7 @@ float PowerOptimizationManager::get_battery_drain_rate() {
 }
 
 // ===============================================================================
-// AsyncOptimizerUpdater implementation
+// AsyncOptimizerUpdater implements
 // ===============================================================================
 
 AsyncOptimizerUpdater::AsyncOptimizerUpdater(const AsyncOptimizerConfig& config)
@@ -521,11 +523,11 @@ void AsyncOptimizerUpdater::submit_gradient_update(size_t param_id, const Tensor
     float importance = compute_parameter_importance(param_id, gradient);
     
     if (should_sync_update(param_id, importance)) {
-        // Synchronously process important parameters
+        // syncprocessimportantparameter
         return;
     }
     
-    // Asynchronously process less important parameters
+        // [Translated]
     {
         std::lock_guard<std::mutex> lock(queue_mutex_);
         async_gradient_queue_.emplace(param_id, gradient);
@@ -536,7 +538,7 @@ void AsyncOptimizerUpdater::submit_gradient_update(size_t param_id, const Tensor
 float AsyncOptimizerUpdater::compute_parameter_importance(size_t param_id, const TensorPtr& gradient) {
     float importance = 0.0f;
     
-    // Importance based on gradient magnitude
+        // [Translated]
     if (config_.use_gradient_magnitude) {
         const float* data = gradient->data<float>();
         float grad_norm = 0.0f;
@@ -548,23 +550,23 @@ float AsyncOptimizerUpdater::compute_parameter_importance(size_t param_id, const
         importance += grad_norm;
     }
     
-    // Importance based on history
+        // [Translated]
     if (config_.use_historical_importance) {
         auto it = importance_history_.find(param_id);
         if (it != importance_history_.end() && !it->second.empty()) {
             float avg_importance = std::accumulate(it->second.begin(), it->second.end(), 0.0f) / it->second.size();
-            importance = 0.7f * importance + 0.3f * avg_importance; // Weighted average
+            importance = 0.7f * importance + 0.3f * avg_importance;             // [Translated]
         }
     }
     
-    // Update history
+        // [Translated]
     update_importance_history(param_id, importance);
     
     return importance;
 }
 
 bool AsyncOptimizerUpdater::should_sync_update(size_t param_id, float importance) {
-    (void)param_id;  // TODO: 实现基于param_id的同步策略
+    (void)param_id;  // TODO: implementsbased onparam_idsyncstrategy
     return importance > config_.importance_threshold;
 }
 
@@ -587,8 +589,8 @@ void AsyncOptimizerUpdater::process_async_updates() {
         auto [param_id, gradient] = async_gradient_queue_.front();
         async_gradient_queue_.pop();
         
-        // Should perform actual parameter update here
-        // Simplified version: only record that async updates were processed
+                // [Translated]
+                // [Translated]
         processed_count++;
     }
     
@@ -611,7 +613,7 @@ void AsyncOptimizerUpdater::update_importance_history(size_t param_id, float imp
 }
 
 // ===============================================================================
-// CompleteMobileOptimizerAdvanced implementation
+// CompleteMobileOptimizerAdvanced implements
 // ===============================================================================
 
 CompleteMobileOptimizerAdvanced::CompleteMobileOptimizerAdvanced(
@@ -631,7 +633,7 @@ CompleteMobileOptimizerAdvanced::CompleteMobileOptimizerAdvanced(
     
     std::cout << "[CompleteMobileOptimizerAdvanced] Initializing advanced mobile optimizer..." << std::endl;
     
-    // 创建基础优化器
+    // createbasicoptimizer
     base_optimizer_ = std::make_unique<CompleteMobileTrainingOptimizer>(
         available_memory_mb, storage_path, opt_params, clip_config, lr_config
     );
@@ -642,20 +644,20 @@ CompleteMobileOptimizerAdvanced::CompleteMobileOptimizerAdvanced(
 }
 
 void CompleteMobileOptimizerAdvanced::initialize_advanced_components() {
-    // Create checkpoint manager
+    // createcheckpointmanager
     checkpoint_manager_ = std::make_unique<AdvancedCheckpointManager>("./advanced_checkpoints", 5);
     
-    // Create advanced learning rate scheduler
-    LRSchedulerConfig lr_config;  // Need to get from base_optimizer
+    // createadvancedlearning ratescheduler
+    LRSchedulerConfig lr_config;  // requirefrombase_optimizeracquire
     advanced_lr_scheduler_ = std::make_unique<AdvancedLRScheduler>(lr_config, restart_config_);
     
-    // Create numerical stability manager
+        // [Translated]
     stability_manager_ = std::make_unique<NumericalStabilityManager>(stability_config_);
     
-    // Create power manager
+    // createpowermanager
     power_manager_ = std::make_unique<PowerOptimizationManager>(power_config_);
     
-    // Create async updater
+        // [Translated]
     async_updater_ = std::make_unique<AsyncOptimizerUpdater>(async_config_);
     
     std::cout << "[CompleteMobileOptimizerAdvanced] All advanced components initialized" << std::endl;
@@ -675,7 +677,7 @@ bool CompleteMobileOptimizerAdvanced::advanced_training_step(
     float training_loss,
     float validation_loss) {
     
-    // 1. Numerical stability check
+    // 1. numerical stability check
     std::vector<TensorPtr> gradients;
     for (const auto& [param_id, grad] : param_gradients) {
         gradients.push_back(grad);
@@ -685,40 +687,40 @@ bool CompleteMobileOptimizerAdvanced::advanced_training_step(
     
     if (overflow_detected) {
         stability_manager_->handle_overflow();
-        return false; // Skip this step
+        return false;         // [Translated]
     }
     
-    // 2. Gradient scaling
+    // 2. gradient scaling
     stability_manager_->scale_gradients(gradients);
     
-    // 3. Async optimizer update check
+    // 3. async optimizer update check
     std::unordered_map<size_t, TensorPtr> sync_gradients;
     for (const auto& [param_id, grad] : param_gradients) {
         async_updater_->submit_gradient_update(param_id, grad);
-        // Assume all gradients are processed synchronously (simplified)
+        // [Translated comment removed - see documentation]
         sync_gradients[param_id] = grad;
     }
     
-    // 4. Execute basic training step
+    // 4. execute basic training steps
     bool success = base_optimizer_->training_step(sync_gradients, false);
     
-    // 5. Update numerical stability state
-    stability_manager_->update_loss_scale(false); // Successfully executed
+    // 5. update numerical stability state
+    stability_manager_->update_loss_scale(false); // successfulexecute
     
-    // 6. Update training metrics
+    // 6. update training metrics
     update_training_metrics(training_loss, validation_loss);
     
-    // 7. Auto-save checkpoint
+    // 7. auto-save checkpoint
     if (success) {
         AdvancedCheckpointManager::TrainingState state;
         state.global_step = training_loss_history_.size();
         state.best_loss = best_validation_loss_;
-        state.current_lr = 1e-4f; // Should get from scheduler
+        state.current_lr = 1e-4f; // shouldfromscheduleracquire
         
         checkpoint_manager_->auto_checkpoint(state, training_loss);
     }
     
-    // 8. Auto-adjust optimization strategy
+    // 8. auto-adjust optimization strategy
     if (training_loss_history_.size() % 100 == 0) {
         auto_adjust_optimization_strategy();
     }
@@ -740,7 +742,7 @@ void CompleteMobileOptimizerAdvanced::update_training_metrics(float training_los
         }
     }
     
-    // Keep history length within reasonable range
+    // [Translated comment removed - see documentation]
     const size_t max_history = 1000;
     if (training_loss_history_.size() > max_history) {
         training_loss_history_.erase(training_loss_history_.begin());
@@ -751,17 +753,17 @@ void CompleteMobileOptimizerAdvanced::update_training_metrics(float training_los
 }
 
 void CompleteMobileOptimizerAdvanced::auto_adjust_optimization_strategy() {
-    // Auto-adjust strategy based on training history
+    // [Translated comment removed - see documentation]
     if (training_loss_history_.size() < 50) return;
     
-    // Check convergence situation
+    // [Translated comment removed - see documentation]
     float recent_improvement = training_loss_history_[training_loss_history_.size()-50] - 
                               training_loss_history_.back();
     
     if (recent_improvement < 0.001f) {
-        // Training stagnated, consider warm restart
+        // [Translated comment removed - see documentation]
         if (restart_config_.enabled && advanced_lr_scheduler_->should_restart(recent_improvement)) {
-            advanced_lr_scheduler_->perform_restart();
+            advanced_lr_scheduler_->perfor_restart();
         }
     }
     
@@ -777,20 +779,20 @@ CompleteMobileOptimizerAdvanced::AdvancedTrainingStats
 CompleteMobileOptimizerAdvanced::get_advanced_stats() const {
     AdvancedTrainingStats stats;
     
-    // Get basic statistics
+    // acquirebasicstatistics
     stats.base_stats = base_optimizer_->get_complete_stats();
     
-    // Add advanced statistics
-    stats.restart_count = advanced_lr_scheduler_ ? 0 : 0; // Need to get from scheduler
+    // addadvancedstatistics
+    stats.restart_count = advanced_lr_scheduler_ ? 0 : 0; // requirefromscheduleracquire
     stats.overflow_count = stability_manager_->get_overflow_count();
     stats.current_loss_scale = stability_manager_->get_current_loss_scale();
     
-    // Power consumption statistics
-    stats.average_power_consumption = 3.5f; // Should get from power_manager_
+    // powerstatistics
+    stats.average_power_consumption = 3.5f; // shouldfrompower_manager_acquire
     stats.total_energy_consumed = stats.average_power_consumption * 
-                                 training_loss_history_.size() * 0.1f; // Assume 0.1 seconds per step
+                                 training_loss_history_.size() * 0.1f;                                  // [Translated]
     
-    // Training efficiency
+    // trainingefficiency
     stats.loss_history = training_loss_history_;
     if (training_loss_history_.size() > 10) {
         float initial_loss = training_loss_history_[0];
@@ -805,11 +807,11 @@ CompleteMobileOptimizerAdvanced::get_advanced_stats() const {
 }
 
 void CompleteMobileOptimizerAdvanced::save_advanced_checkpoint(const std::string& name, float current_loss) {
-    (void)current_loss;  // TODO: Can be used for adaptive checkpoint strategy
+    (void)current_loss;  // TODO: availableinadaptivecheckpointstrategy
     AdvancedCheckpointManager::TrainingState state;
     state.global_step = training_loss_history_.size();
     state.best_loss = best_validation_loss_;
-    state.current_lr = 1e-4f; // Should get from scheduler
+    state.current_lr = 1e-4f; // shouldfromscheduleracquire
     state.loss_history = training_loss_history_;
     
     checkpoint_manager_->save_training_state(state, name);
@@ -857,7 +859,7 @@ void CompleteMobileOptimizerAdvanced::generate_training_analysis_report(const st
 }
 
 // ===============================================================================
-// Factory function
+// [Translated]
 // ===============================================================================
 
 std::unique_ptr<CompleteMobileOptimizerAdvanced> create_advanced_mobile_optimizer(
@@ -865,14 +867,14 @@ std::unique_ptr<CompleteMobileOptimizerAdvanced> create_advanced_mobile_optimize
     const std::string& storage_path,
     const std::string& checkpoint_dir,
     bool enable_all_advanced_features) {
-    (void)checkpoint_dir;  // TODO: Use for setting checkpoint directory
+    (void)checkpoint_dir;  // TODO: used forsettingscheckpointdirectory
     
-    // Create default configuration
+    // createdefaultconfiguration
     auto opt_params = MobileOptimizerFactory::create_mobile_adamw_config();
     auto clip_config = MobileOptimizerFactory::create_mobile_clipping_config();
     auto lr_config = MobileOptimizerFactory::create_mobile_lr_config(10000);
     
-    // Advanced feature configuration
+        // [Translated]
     WarmRestartConfig restart_config;
     restart_config.enabled = enable_all_advanced_features;
     restart_config.restart_period = 1000;

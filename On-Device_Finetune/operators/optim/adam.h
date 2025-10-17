@@ -1,8 +1,8 @@
 /**
  * @file adam.h
- * @brief Adam optimizer implementation
+ * @brief Adam optimizer implementsation
  * 
- * This file provides the Adam optimizer implementation with support
+ * This file providess the Adam optimizer implementsation with support
  * for adaptive learning rates, momentum, and optional AMSGrad variant.
  * Adam is widely used for training deep neural networks.
  */
@@ -81,7 +81,7 @@ public:
     void save_state(const std::string& path) const override;
     void load_state(const std::string& path) override;
     
-    // New: dynamically set learning rate (for learning rate scheduling)
+        // [Translated]
     void set_learning_rate(float new_lr) {
         adam_config_.learning_rate = new_lr;
     }

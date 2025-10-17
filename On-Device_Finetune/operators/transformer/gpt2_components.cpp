@@ -49,7 +49,7 @@ std::unique_ptr<Tensor> LayerNorm::forward(const Tensor& input) {
 
 void LayerNorm::print_info() const {
     std::cout << "LayerNorm Info:" << std::endl;
-    std::cout << "  嵌入維度: " << weight_->shape[0] << std::endl;
+    std::cout << "  embedding[Output]: " << weight_->shape[0] << std::endl;
     std::cout << "  Epsilon: " << epsilon_ << std::endl;
 }
 
@@ -85,9 +85,9 @@ std::unique_ptr<Tensor> FeedForward::forward(const Tensor& input) {
 
 void FeedForward::print_info() const {
     std::cout << "FeedForward Info:" << std::endl;
-    std::cout << "  輸入維度: " << fc1_weight_->shape[0] << std::endl;
-    std::cout << "  隱藏維度: " << fc1_weight_->shape[1] << std::endl;
-    std::cout << "  輸出維度: " << fc2_weight_->shape[1] << std::endl;
+    std::cout << "  [Output]: " << fc1_weight_->shape[0] << std::endl;
+    std::cout << "  [Output]: " << fc1_weight_->shape[1] << std::endl;
+    std::cout << "  [Output]: " << fc2_weight_->shape[1] << std::endl;
 }
 
 Embedding::Embedding(int vocab_size, int n_embd) : vocab_size_(vocab_size), n_embd_(n_embd) {
@@ -125,11 +125,11 @@ std::unique_ptr<Tensor> Embedding::forward(const std::vector<int>& input_ids) {
 
 void Embedding::print_info() const {
     std::cout << "Embedding Info:" << std::endl;
-    std::cout << "  詞彙表大小: " << vocab_size_ << std::endl;
-    std::cout << "  嵌入維度: " << n_embd_ << std::endl;
+    std::cout << "  [Output]size: " << vocab_size_ << std::endl;
+    std::cout << "  embedding[Output]: " << n_embd_ << std::endl;
 }
 
-TransformerBlock::TransformerBlock(const GPT2Config& config)
+TransforerBlock::TransforerBlock(const GPT2Config& config)
     : n_head_(config.n_head), n_embd_(config.n_embd) {
 
     ln1_ = std::make_unique<LayerNorm>(config.n_embd, config.layer_norm_epsilon);
@@ -152,7 +152,7 @@ TransformerBlock::TransformerBlock(const GPT2Config& config)
     for (float& val : attn_proj_bias_->data) val = 0.0f;
 }
 
-std::unique_ptr<Tensor> TransformerBlock::forward(const Tensor& hidden_states) {
+std::unique_ptr<Tensor> TransforerBlock::forward(const Tensor& hidden_states) {
 
     auto attn_output = gpt2_attention_forward(hidden_states,
                                              *attn_qkv_weight_, *attn_qkv_bias_,
@@ -172,10 +172,10 @@ std::unique_ptr<Tensor> TransformerBlock::forward(const Tensor& hidden_states) {
     return norm2;
 }
 
-void TransformerBlock::print_info() const {
-    std::cout << "TransformerBlock Info:" << std::endl;
-    std::cout << "  注意力頭數: " << n_head_ << std::endl;
-    std::cout << "  嵌入維度: " << n_embd_ << std::endl;
+void TransforerBlock::print_info() const {
+    std::cout << "TransforerBlock Info:" << std::endl;
+    std::cout << "  attention[Output]: " << n_head_ << std::endl;
+    std::cout << "  embedding[Output]: " << n_embd_ << std::endl;
     ln1_->print_info();
     ln2_->print_info();
     mlp_->print_info();

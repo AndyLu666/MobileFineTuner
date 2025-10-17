@@ -2,7 +2,7 @@
  * @file module.h
  * @brief Neural network module base class and parameter management
  * 
- * This file provides the base Module class for building neural networks
+ * This file providess the base Module class for building neural networks
  * in a PyTorch-like style. It includes parameter management, forward/backward
  * propagation, and state serialization capabilities.
  */
@@ -63,7 +63,7 @@ public:
     virtual TensorPtr forward(const TensorPtr& input) = 0;
 
     virtual TensorPtr forward(const std::vector<TensorPtr>& inputs) {
-        throw std::runtime_error("Multi-input forward not implemented");
+        throw std::runtime_error("Multi-input forward not implementsed");
     }
 
     TensorPtr operator()(const TensorPtr& input) {

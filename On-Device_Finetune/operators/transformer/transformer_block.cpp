@@ -1,13 +1,13 @@
 /**
- * @file transformer_block.cpp
- * @brief Implementation of transformer block
+ * @file transforer_block.cpp
+ * @brief Implementation of transforer block
  * 
- * This file provides the implementation of a complete transformer block
+ * This file providess the implementsation of a complete transforer block
  * consisting of multi-head attention and feed-forward networks with
  * layer normalization and residual connections.
  */
 
-#include "transformer_block.h"
+#include "transforer_block.h"
 #include "../core/ops.h"
 #include <stdexcept>
 #include <fstream>
@@ -15,15 +15,15 @@
 
 namespace ops {
 
-TransformerBlock::TransformerBlock(const TransformerBlockConfig& config)
+TransforerBlock::TransforerBlock(const TransforerBlockConfig& config)
     : config_(config) {
     
     if (config_.hidden_size <= 0 || config_.num_heads <= 0 || config_.mlp_dim <= 0) {
-        throw std::invalid_argument("TransformerBlock: Invalid configuration parameters");
+        throw std::invalid_argument("TransforerBlock: Invalid configuration parameters");
     }
     
     if (config_.hidden_size % config_.num_heads != 0) {
-        throw std::invalid_argument("TransformerBlock: hidden_size must be divisible by num_heads");
+        throw std::invalid_argument("TransforerBlock: hidden_size must be divisible by num_heads");
     }
     
     // Initialize attention layer
@@ -44,17 +44,17 @@ TransformerBlock::TransformerBlock(const TransformerBlockConfig& config)
     initialize_weights();
 }
 
-TransformerBlock::~TransformerBlock() = default;
+TransforerBlock::~TransforerBlock() = default;
 
-TensorPtr TransformerBlock::forward(const TensorPtr& input) {
+TensorPtr TransforerBlock::forward(const TensorPtr& input) {
     if (!input) {
-        throw std::invalid_argument("TransformerBlock::forward: input tensor is null");
+        throw std::invalid_argument("TransforerBlock::forward: input tensor is null");
     }
     
     // Input shape should be [batch_size, seq_len, hidden_size]
     auto input_shape = input->shape();
     if (input_shape.size() != 3 || input_shape[2] != config_.hidden_size) {
-        throw std::invalid_argument("TransformerBlock::forward: Invalid input shape");
+        throw std::invalid_argument("TransforerBlock::forward: Invalid input shape");
     }
     
     TensorPtr x = input;
@@ -85,7 +85,7 @@ TensorPtr TransformerBlock::forward(const TensorPtr& input) {
     return x;
 }
 
-std::vector<TensorPtr> TransformerBlock::get_parameters() {
+std::vector<TensorPtr> TransforerBlock::get_parameters() {
     std::vector<TensorPtr> params;
     
     // Get attention parameters
@@ -105,7 +105,7 @@ std::vector<TensorPtr> TransformerBlock::get_parameters() {
     return params;
 }
 
-void TransformerBlock::zero_grad() {
+void TransforerBlock::zero_grad() {
     // Zero gradients for attention
     self_attention_->zero_grad();
     
@@ -127,20 +127,20 @@ void TransformerBlock::zero_grad() {
     }
 }
 
-void TransformerBlock::update_parameters(const std::vector<TensorPtr>& updates) {
+void TransforerBlock::update_parameters(const std::vector<TensorPtr>& updates) {
     if (updates.empty()) {
         return;
     }
     
-    // This is a simplified implementation
+    // This is a simplified implementsation
     // In practice, you would need to match updates to specific parameters
-    std::cout << "TransformerBlock::update_parameters: Updating " << updates.size() << " parameters" << std::endl;
+    std::cout << "TransforerBlock::update_parameters: Updating " << updates.size() << " parameters" << std::endl;
 }
 
-void TransformerBlock::save_weights(const std::string& path) const {
+void TransforerBlock::save_weights(const std::string& path) const {
     std::ofstream file(path, std::ios::binary);
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file for saving TransformerBlock weights: " + path);
+        throw std::runtime_error("Failed to open file for saving TransforerBlock weights: " + path);
     }
     
     // Save configuration
@@ -169,10 +169,10 @@ void TransformerBlock::save_weights(const std::string& path) const {
     mlp_->save_weights(path + "_mlp");
 }
 
-void TransformerBlock::load_weights(const std::string& path) {
+void TransforerBlock::load_weights(const std::string& path) {
     std::ifstream file(path, std::ios::binary);
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file for loading TransformerBlock weights: " + path);
+        throw std::runtime_error("Failed to open file for loading TransforerBlock weights: " + path);
     }
     
     // Load and verify configuration
@@ -187,7 +187,7 @@ void TransformerBlock::load_weights(const std::string& path) {
     file.read(reinterpret_cast<char*>(&pre_norm), sizeof(bool));
     
     if (hidden_size != config_.hidden_size || num_heads != config_.num_heads || mlp_dim != config_.mlp_dim) {
-        throw std::runtime_error("TransformerBlock::load_weights: Configuration mismatch");
+        throw std::runtime_error("TransforerBlock::load_weights: Configuration mismatch");
     }
     
     // Load layer normalization weights
@@ -195,7 +195,7 @@ void TransformerBlock::load_weights(const std::string& path) {
         int64_t size;
         file.read(reinterpret_cast<char*>(&size), sizeof(int64_t));
         if (size != tensor->numel()) {
-            throw std::runtime_error("TransformerBlock::load_weights: Tensor size mismatch");
+            throw std::runtime_error("TransforerBlock::load_weights: Tensor size mismatch");
         }
         file.read(reinterpret_cast<char*>(tensor->data<float>()), size * sizeof(float));
     };
@@ -212,7 +212,7 @@ void TransformerBlock::load_weights(const std::string& path) {
     mlp_->load_weights(path + "_mlp");
 }
 
-size_t TransformerBlock::get_param_count() const {
+size_t TransforerBlock::get_param_count() const {
     size_t count = 0;
     
     // Count attention parameters
@@ -230,7 +230,7 @@ size_t TransformerBlock::get_param_count() const {
     return count;
 }
 
-void TransformerBlock::initialize_weights() {
+void TransforerBlock::initialize_weights() {
     // Initialize layer normalization weights to 1.0 and biases to 0.0
     auto init_ln_weights = [](const TensorPtr& weight, const TensorPtr& bias) {
         float* weight_data = weight->data<float>();

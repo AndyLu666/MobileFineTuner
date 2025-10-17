@@ -95,7 +95,7 @@ MobileActivationManager::MobileActivationManager(const MobileActivationConfig& c
         // Initialize core components
         initialize_components();
         
-        //  Actually check and enable async operations
+        // FIXED: Actually check and enable async operations
         std::cout << "Async Operations: " << (config_.enable_async_operations ? "ENABLED" : "DISABLED") << std::endl;
         if (config_.enable_async_operations) {
             start_background_worker();
@@ -113,7 +113,7 @@ MobileActivationManager::MobileActivationManager(const MobileActivationConfig& c
         std::cout << "  Compressed Memory: " << config_.max_compressed_memory_mb << "MB" << std::endl;
         std::cout << "  Checkpointing: " << (config_.enable_adaptive_checkpointing ? "Adaptive" : "Fixed") << std::endl;
         std::cout << "  Compression: " << (config_.enable_activation_compression ? "Enabled" : "Disabled") << std::endl;
-        // Display recomputation configuration status
+        // FIXED: Show recomputation configuration status
         std::cout << "Recomputation: " << (config_.enable_activation_recomputation ? "ENABLED" : "DISABLED") << std::endl;
         std::cout << " Recomputation Threads: " << config_.max_recomputation_threads << std::endl;
         
@@ -135,7 +135,7 @@ MobileActivationManager::~MobileActivationManager() {
 }
 
 void MobileActivationManager::initialize_components() {
-    //CRITICAL FIX: Fix underlying bypass issues - Actually use configuration items
+    //CRITICAL FIX: Fix underlying bypass - actually use configuration items
     
     // Initialize activation compressor - Actually check configuration
     if (config_.enable_activation_compression) {
@@ -144,7 +144,7 @@ void MobileActivationManager::initialize_components() {
         compression_config.enable_sparsification = true;
         compression_config.optimize_for_decompression_speed = true;
         compression_config.enable_adaptive_compression = config_.enable_adaptive_checkpointing;
-        // FIXED: Use lossy compression configuration
+                // [Translated]
         compression_config.allow_lossy_compression = config_.enable_lossy_compression;
         
         compressor_ = std::make_unique<ActivationCompressor>(compression_config);
@@ -157,8 +157,8 @@ void MobileActivationManager::initialize_components() {
     // Initialize activation checkpointer
     CheckpointConfig checkpoint_config;
     checkpoint_config.strategy = config_.checkpoint_strategy;
-    checkpoint_config.uniform_checkpoint_interval = config_.default_checkpoint_interval;
-    // Actually use adaptive checkpoint configuration
+    checkpoint_config.unifor_checkpoint_interval = config_.default_checkpoint_interval;
+    // FIXED: actualuseadaptivecheckpointconfiguration
     checkpoint_config.enable_adaptive_checkpointing = config_.enable_adaptive_checkpointing;
     checkpoint_config.enable_mobile_power_awareness = config_.enable_battery_management;
     checkpoint_config.enable_thermal_awareness = config_.enable_thermal_management;
@@ -171,7 +171,7 @@ void MobileActivationManager::initialize_components() {
     checkpointer_ = std::make_unique<ActivationCheckpointer>(checkpoint_config);
     std::cout << "  Activation checkpointer initialized" << std::endl;
     
-    // Initialize activation storage - FIXED: Actually use storage configuration
+    // Initialize activation storage - FIXED: actualusestorageconfiguration
     StorageConfig storage_config;
     storage_config.gpu_memory_capacity_mb = config_.max_gpu_activation_memory_mb;
     storage_config.cpu_memory_capacity_mb = config_.max_cpu_activation_memory_mb;
@@ -180,8 +180,8 @@ void MobileActivationManager::initialize_components() {
     storage_config.enable_battery_aware_storage = config_.enable_battery_management;
     storage_config.enable_thermal_aware_storage = config_.enable_thermal_management;
     storage_config.enable_async_io = config_.enable_async_operations;
-    // FIXED: Add more storage configuration
-    //FIXED: Correct storage configuration field names - Only use actually existing fields
+        // [Translated]
+    // [Translated comment removed - see documentation]
     storage_config.enable_storage_compression = config_.compress_storage_files;
     
     std::cout << " Persistent Storage: " << (config_.enable_persistent_storage ? "ENABLED" : "DISABLED") << std::endl;
@@ -191,12 +191,12 @@ void MobileActivationManager::initialize_components() {
     storage_ = std::make_unique<ActivationStorage>(storage_config);
     std::cout << "  Activation storage initialized" << std::endl;
     
-    // PRODUCTION IMPLEMENTATION: Mobile-specific optimizer
+        // [Translated]
     if (config_.enable_mobile_optimizations) {
-        // Mobile optimization features are implemented through integrated specialized components:
-        // - UMA memory optimizer, LPDDR optimizer, ANR protection manager, etc.
-        // These components are already initialized above, providing complete mobile optimization
-        // PRODUCTION FIX: Display actually enabled mobile optimization features
+        // [Translated comment removed - see documentation]
+                // [Translated]
+        // [Translated comment removed - see documentation]
+        // [Translated comment removed - see documentation]
         std::cout << "  Mobile optimization system: ACTIVE ("
                   << (config_.enable_uma_optimization ? "UMA+" : "")
                   << (config_.enable_lpddr_optimization ? "LPDDR+" : "")
@@ -206,9 +206,9 @@ void MobileActivationManager::initialize_components() {
                   << "Complete)" << std::endl;
     }
     
-    // DEEPSPEED Core Component Initialization
+        // [Translated]
     
-    // Initialize ZeRO-Offload component
+        // [Translated]
     if (config_.enable_zero_offload_activations) {
         try {
             ZeROffloadActivationManager::OffloadConfig offload_config;
@@ -224,7 +224,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize constant buffer optimization
+        // [Translated]
     if (config_.enable_constant_buffer_optimization) {
         try {
             constant_buffer_optimizer_ = std::make_unique<ConstantBufferOptimizer>(
@@ -235,7 +235,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize pinned memory management
+    // initializefixedmemorymanage
     if (config_.enable_pinned_memory) {
         try {
             pinned_memory_manager_ = std::make_unique<PinnedMemoryManager>(
@@ -246,9 +246,9 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Mobile-Specific Component Initialization
+    // [Translated comment removed - see documentation]
     
-    // Initialize system integration manager
+        // [Translated]
     if (config_.enable_memory_pressure_api) {
         try {
             system_integration_manager_ = std::make_unique<MobileSystemIntegrationManager>();
@@ -258,7 +258,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize efficient attention mechanism
+        // [Translated]
     if (config_.enable_efficient_attention) {
         try {
             MobileAttentionConfig attention_config;
@@ -272,7 +272,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize partition manager
+        // [Translated]
     if (config_.enable_activation_partitioning) {
         try {
             PartitionConfig partition_config;
@@ -285,9 +285,9 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // CRITICAL FIX: Initialize 9 missing critical components - Fix underlying bypass issues
+    // [Translated comment removed - see documentation]
     
-    // Initialize bandwidth optimizer
+        // [Translated]
     if (config_.enable_bandwidth_optimization) {
         try {
             bandwidth_optimizer_ = std::make_unique<ActivationBandwidthOptimizer>();
@@ -297,7 +297,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize operation fusion engine
+        // [Translated]
     if (config_.enable_activation_fusion) {
         try {
             fusion_engine_ = std::make_unique<ActivationFusionEngine>();
@@ -307,7 +307,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize UMA memory optimizer
+    // initializeUMAmemoryoptimizer
     if (config_.enable_uma_optimization) {
         try {
             uma_optimizer_ = std::make_unique<UMAMemoryOptimizer>();
@@ -317,7 +317,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize LPDDR optimizer
+    // initializeLPDDRoptimizer
     if (config_.enable_lpddr_optimization) {
         try {
             lpddr_optimizer_ = std::make_unique<LPDDRMemoryOptimizer>();
@@ -327,7 +327,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize ANR protection manager
+    // initializeANRprotectedmanager
     if (config_.enable_anr_protection) {
         try {
             anr_protection_ = std::make_unique<ANRProtectionManager>();
@@ -337,7 +337,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize mobile DMA optimizer
+    // initializemobileDMAoptimizer
     if (config_.enable_mobile_dma) {
         try {
             dma_optimizer_ = std::make_unique<MobileDMAOptimizer>();
@@ -347,7 +347,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize cache line optimizer
+        // [Translated]
     if (config_.enable_cache_line_optimization) {
         try {
             cache_optimizer_ = std::make_unique<CacheLineOptimizer>();
@@ -357,7 +357,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize DVFS scheduler
+    // initializeDVFSscheduler
     if (config_.enable_dvfs_awareness) {
         try {
             dvfs_scheduler_ = std::make_unique<DVFSAwareScheduler>();
@@ -367,7 +367,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize big.LITTLE CPU scheduler
+    // initializebig.LITTLE CPUscheduler
     if (config_.enable_big_little_scheduling) {
         try {
             cpu_scheduler_ = std::make_unique<BigLittleCPUScheduler>();
@@ -377,7 +377,7 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    // Initialize GPU vendor optimizer
+        // [Translated]
     if (config_.enable_gpu_vendor_optimization) {
         try {
             gpu_vendor_optimizer_ = std::make_unique<MobileGPUVendorOptimizer>();
@@ -387,11 +387,11 @@ void MobileActivationManager::initialize_components() {
         }
     }
     
-    std::cout << "  All 16 advanced components initialized successfully!" << std::endl;
+    std::cout << "  🎉 All 16 advanced components initialized successfully!" << std::endl;
 }
 
 void MobileActivationManager::cleanup_components() {
-    // PRODUCTION IMPLEMENTATION: Complete component cleanup
+        // [Translated]
     // Cleanup original components
     storage_.reset();
     checkpointer_.reset();
@@ -404,7 +404,7 @@ void MobileActivationManager::cleanup_components() {
     bandwidth_optimizer_.reset();
     fusion_engine_.reset();
     
-    // CRITICAL FIX: Clean up 9 missing critical components - Fix underlying bypass issues
+    // [Translated comment removed - see documentation]
     uma_optimizer_.reset();
     lpddr_optimizer_.reset();
     anr_protection_.reset();
@@ -762,7 +762,7 @@ ActivationTier MobileActivationManager::select_optimal_tier_for_activation(const
         return ActivationTier::COMPRESSED;
     }
     
-    // Default to CPU memory for balanced performance
+    // Default to CPU memory for balanced perforance
     return ActivationTier::CPU_MEMORY;
 }
 
@@ -861,7 +861,7 @@ void MobileActivationManager::update_tier_statistics(ActivationTier tier, size_t
             break;
     }
     
-    // STRICT FIX: Safe total memory statistics update
+        // [Translated]
     if (add) {
         stats_.total_memory_used += memory_size;
     } else {
@@ -905,7 +905,7 @@ void MobileActivationManager::prefetch_related_activations(size_t activation_id,
     std::vector<size_t> prefetch_candidates;
     
     // Prefetch next few activations in sequence
-    const size_t prefetch_count = 3;  // Fixed prefetch 3 items
+    const size_t prefetch_count = 3;      // [Translated]
     for (size_t i = 1; i <= prefetch_count; ++i) {
         size_t next_id = activation_id + i;
         if (activation_metadata_.find(next_id) != activation_metadata_.end()) {
@@ -916,7 +916,7 @@ void MobileActivationManager::prefetch_related_activations(size_t activation_id,
     // Use storage system for prefetching if available
     if (storage_ && !prefetch_candidates.empty()) {
         for (size_t prefetch_id : prefetch_candidates) {
-            // Use migrate_activation for prefetch
+            // [Translated comment removed - see documentation]
             storage_->migrate_activation(prefetch_id, ActivationTier::CPU_MEMORY, true);
         }
         stats_.prefetch_operations++;
@@ -1037,7 +1037,7 @@ void MobileActivationManager::apply_thermal_aware_optimization() {
 }
 
 void MobileActivationManager::apply_balanced_optimization() {
-    // Balance between memory usage and performance
+    // Balance between memory usage and perforance
     float gpu_utilization = static_cast<float>(gpu_memory_used_) / 
                            (config_.max_gpu_activation_memory_mb * 1024 * 1024);
     
@@ -1120,12 +1120,12 @@ void MobileActivationManager::update_optimization_statistics() {
 void MobileActivationManager::background_worker_loop() {
     while (worker_running_) {
         try {
-            // Perform background optimization tasks
+            // Perfor background optimization tasks
             if (current_memory_pressure_ > 0.7f) {
                 optimize_activation_memory();
             }
             
-            // Perform periodic garbage collection
+            // Perfor periodic garbage collection
             garbage_collect_activations();
             
             // Update access pattern analysis
@@ -1198,7 +1198,7 @@ std::unique_ptr<MobileActivationManager> create_mobile_activation_manager(
 }
 
 // ===============================
-// FIXED: Actual basic optimization method implementation
+// 🛠️ FIXED: actualbasicoptimizationmethodimplements
 // ===============================
 
 void MobileActivationManager::enable_zero_offload(bool enable_cpu, bool enable_nvme, 
@@ -1208,13 +1208,13 @@ void MobileActivationManager::enable_zero_offload(bool enable_cpu, bool enable_n
     config_.enable_nvme_offload = enable_nvme;
     config_.nvme_offload_path = nvme_path;
     
-    // Actual basic implementation: Set memory offload strategy
-    std::cout << "[MobileActivationManager] Basic offload strategy enabled: CPU=" 
+        // [Translated]
+    std::cout << "[MobileActivationManager] 🔧 Basic offload strategy enabled: CPU=" 
               << (enable_cpu ? "YES" : "NO") << ", NVMe=" << (enable_nvme ? "YES" : "NO") << std::endl;
     
-    // Actual application: Adjust memory thresholds
+    // actualapply：adjustmemorythreshold
     if (enable_cpu) {
-        // Lower GPU memory threshold, use more CPU memory
+                // [Translated]
         config_.max_gpu_activation_memory_mb = std::min(config_.max_gpu_activation_memory_mb, static_cast<size_t>(128));
     }
 }
@@ -1224,10 +1224,10 @@ void MobileActivationManager::configure_constant_buffer_optimization(size_t buff
     config_.constant_buffer_size_mb = buffer_size_mb;
     config_.max_buffer_reuse_count = max_reuse_count;
     
-    std::cout << "[MobileActivationManager] Buffer reuse optimization configured: " 
+    std::cout << "[MobileActivationManager] 🔧 Buffer reuse optimization configured: " 
               << buffer_size_mb << "MB, max_reuse=" << max_reuse_count << std::endl;
     
-    // Actual application: Enable more aggressive caching strategy
+        // [Translated]
     config_.enable_activation_caching = true;
 }
 
@@ -1236,10 +1236,10 @@ void MobileActivationManager::enable_pinned_memory_management(size_t max_pinned_
     config_.max_pinned_memory_mb = max_pinned_mb;
     config_.enable_memory_pool = enable_memory_pool;
     
-    std::cout << "[MobileActivationManager] Memory alignment enabled: " 
+    std::cout << "[MobileActivationManager] 🔧 Memory alignment enabled: " 
               << max_pinned_mb << "MB, pool=" << (enable_memory_pool ? "YES" : "NO") << std::endl;
     
-    // Actual application: Enable memory alignment optimization
+        // [Translated]
     config_.enable_memory_alignment_optimization = true;
 }
 
@@ -1248,10 +1248,10 @@ void MobileActivationManager::enable_activation_fusion(size_t fusion_buffer_mb, 
     config_.fusion_buffer_size_mb = fusion_buffer_mb;
     config_.max_fusion_operations = max_operations;
     
-    std::cout << "[MobileActivationManager] Operation batching enabled: " 
+    std::cout << "[MobileActivationManager] 🔧 Operation batching enabled: " 
               << fusion_buffer_mb << "MB buffer, max_ops=" << max_operations << std::endl;
     
-    // Actual application: Enable batch processing
+        // [Translated]
     config_.enable_batch_processing = true;
 }
 
@@ -1260,24 +1260,26 @@ void MobileActivationManager::configure_bandwidth_optimization(size_t optimal_ch
     config_.optimal_transfer_size_kb = optimal_chunk_kb;
     config_.enable_async_memory_copy = enable_async;
     
-    std::cout << "[MobileActivationManager] Transfer optimization configured: " 
+    std::cout << "[MobileActivationManager] 🔧 Transfer optimization configured: " 
               << optimal_chunk_kb << "KB chunks, async=" << (enable_async ? "YES" : "NO") << std::endl;
     
-    // Actual application: Adjust transfer chunk size
+        // [Translated]
     config_.default_transfer_chunk_size = optimal_chunk_kb * 1024;
 }
 
-// FIXED: Actual mobile optimization method implementation
+// ===============================
+// 🛠️ FIXED: actualmobileoptimizationmethodimplements
+// ===============================
 
 void MobileActivationManager::enable_uma_optimization(bool auto_detect, float efficiency_target) {
     config_.enable_uma_optimization = true;
     config_.detect_uma_automatically = auto_detect;
     config_.uma_memory_efficiency_target = efficiency_target;
     
-    std::cout << "[MobileActivationManager] UMA awareness enabled: auto_detect=" 
+    std::cout << "[MobileActivationManager] 📱 UMA awareness enabled: auto_detect=" 
               << (auto_detect ? "YES" : "NO") << ", target=" << efficiency_target << std::endl;
     
-    // Actual application: Optimize unified memory usage
+        // [Translated]
     if (auto_detect) {
         config_.enable_zero_copy_optimization = true;
     }
@@ -1288,10 +1290,10 @@ void MobileActivationManager::enable_lpddr_optimization(bool optimize_bandwidth,
     config_.optimize_for_lpddr_bandwidth = optimize_bandwidth;
     config_.lpddr_burst_size = burst_size;
     
-    std::cout << "[MobileActivationManager] LPDDR optimization enabled: bandwidth=" 
+    std::cout << "[MobileActivationManager] 📱 LPDDR optimization enabled: bandwidth=" 
               << (optimize_bandwidth ? "YES" : "NO") << ", burst=" << burst_size << " bytes" << std::endl;
     
-    // Actual application: Adjust memory access pattern
+        // [Translated]
     if (optimize_bandwidth) {
         config_.enable_burst_memory_access = true;
         config_.memory_access_alignment = burst_size;
@@ -1303,10 +1305,10 @@ void MobileActivationManager::enable_anr_protection(size_t max_blocking_ms, size
     config_.max_blocking_operation_ms = max_blocking_ms;
     config_.anr_detection_threshold_ms = anr_threshold_ms;
     
-    std::cout << "[MobileActivationManager] ANR protection enabled: max_blocking=" 
+    std::cout << "[MobileActivationManager] 📱 ANR protection enabled: max_blocking=" 
               << max_blocking_ms << "ms, threshold=" << anr_threshold_ms << "ms" << std::endl;
     
-    // Actual application: Enable operation interruption mechanism
+    // [Translated comment removed - see documentation]
     config_.enable_operation_yielding = true;
     config_.ui_max_blocking_time_ms = max_blocking_ms;
 }
@@ -1316,10 +1318,10 @@ void MobileActivationManager::enable_mobile_dma(size_t transfer_threshold_kb, bo
     config_.dma_transfer_threshold_kb = transfer_threshold_kb;
     config_.enable_dma_coherency = enable_coherency;
     
-    std::cout << "[MobileActivationManager] DMA optimization enabled: threshold=" 
+    std::cout << "[MobileActivationManager] 📱 DMA optimization enabled: threshold=" 
               << transfer_threshold_kb << "KB, coherency=" << (enable_coherency ? "YES" : "NO") << std::endl;
     
-    // Actual application: Optimize large data transfers
+        // [Translated]
     config_.large_transfer_threshold_bytes = transfer_threshold_kb * 1024;
     config_.enable_hardware_acceleration = true;
 }
@@ -1332,11 +1334,11 @@ void MobileActivationManager::configure_cache_line_optimization(size_t l1_size, 
     config_.l3_cache_line_size = l3_size;
     config_.enable_cache_prefetching = enable_prefetch;
     
-    std::cout << "[MobileActivationManager] Cache optimization configured: L1=" 
+    std::cout << "[MobileActivationManager] 📱 Cache optimization configured: L1=" 
               << l1_size << ", L2=" << l2_size << ", L3=" << l3_size 
               << ", prefetch=" << (enable_prefetch ? "YES" : "NO") << std::endl;
     
-    // Actual application: Enable cache-friendly data layout
+    // [Translated comment removed - see documentation]
     config_.enable_data_layout_optimization = true;
     config_.cache_line_alignment = std::max({l1_size, l2_size, l3_size});
 }
@@ -1344,12 +1346,12 @@ void MobileActivationManager::configure_cache_line_optimization(size_t l1_size, 
 void MobileActivationManager::enable_dvfs_awareness(bool adapt_to_scaling, float scaling_factor) {
     config_.enable_dvfs_awareness = true;
     config_.adapt_to_frequency_scaling = adapt_to_scaling;
-    config_.performance_scaling_factor = scaling_factor;
+    config_.perforance_scaling_factor = scaling_factor;
     
-    std::cout << "[MobileActivationManager] DVFS awareness enabled: adapt=" 
+    std::cout << "[MobileActivationManager] 📱 DVFS awareness enabled: adapt=" 
               << (adapt_to_scaling ? "YES" : "NO") << ", factor=" << scaling_factor << std::endl;
     
-    // Actual application: Adjust strategy based on frequency
+        // [Translated]
     if (adapt_to_scaling) {
         config_.enable_frequency_adaptive_scheduling = true;
     }
@@ -1363,10 +1365,10 @@ void MobileActivationManager::configure_big_little_scheduling(bool little_for_me
     config_.little_core_affinity_mask = little_mask;
     config_.big_core_affinity_mask = big_mask;
     
-    std::cout << "[MobileActivationManager] big.LITTLE scheduling configured: LITTLE=0x" 
+    std::cout << "[MobileActivationManager] 📱 big.LITTLE scheduling configured: LITTLE=0x" 
               << std::hex << little_mask << ", big=0x" << big_mask << std::dec << std::endl;
     
-    // Actual application: Enable core affinity optimization
+        // [Translated]
     config_.enable_core_affinity_optimization = true;
 }
 
@@ -1378,11 +1380,11 @@ void MobileActivationManager::enable_gpu_vendor_optimizations(bool auto_detect, 
     config_.enable_mali_bandwidth_opt = enable_mali;
     config_.enable_apple_unified_memory = enable_apple;
     
-    std::cout << "[MobileActivationManager] GPU vendor optimizations enabled: auto_detect=" 
+    std::cout << "[MobileActivationManager] 📱 GPU vendor optimizations enabled: auto_detect=" 
               << (auto_detect ? "YES" : "NO") << ", Adreno=" << (enable_adreno ? "YES" : "NO")
               << ", Mali=" << (enable_mali ? "YES" : "NO") << ", Apple=" << (enable_apple ? "YES" : "NO") << std::endl;
     
-    // Actual application: Enable GPU-specific optimizations
+        // [Translated]
     if (auto_detect || enable_adreno || enable_mali || enable_apple) {
         config_.enable_gpu_specific_optimization = true;
     }
@@ -1395,7 +1397,7 @@ void MobileActivationManager::enable_memory_pressure_api(bool enable_android, bo
     config_.enable_ios_memory_warning = enable_ios;
     config_.enable_system_memory_callbacks = enable_callbacks;
     
-    std::cout << "[MobileActivationManager] Memory Pressure API enabled: Android=" 
+    std::cout << "[MobileActivationManager] 📱 Memory Pressure API enabled: Android=" 
               << (enable_android ? "YES" : "NO") << ", iOS=" << (enable_ios ? "YES" : "NO")
               << ", callbacks=" << (enable_callbacks ? "YES" : "NO") << std::endl;
 }
@@ -1406,19 +1408,19 @@ void MobileActivationManager::configure_background_app_optimization(size_t memor
     config_.background_memory_limit_mb = memory_limit_mb;
     config_.enable_background_task_completion = enable_task_completion;
     
-    std::cout << "[MobileActivationManager] Background App Optimization configured: limit=" 
+    std::cout << "[MobileActivationManager] 📱 Background App Optimization configured: limit=" 
               << memory_limit_mb << "MB, task_completion=" << (enable_task_completion ? "YES" : "NO") << std::endl;
 }
 
-void MobileActivationManager::auto_configure_for_mobile_platform() {
-    std::cout << "[MobileActivationManager] Auto-configuring for mobile platform..." << std::endl;
+void MobileActivationManager::auto_configure_for_mobile_platfor() {
+    std::cout << "[MobileActivationManager] 🔍 Auto-configuring for mobile platfor..." << std::endl;
     
-    // Detect platform
-    std::string platform = "Unknown";
+    // detectionplatfor
+    std::string platfor = "Unknown";
     
 #ifdef __ANDROID__
-    platform = "Android";
-    // Enable Android-specific optimizations
+    platfor = "Android";
+        // [Translated]
     enable_memory_pressure_api(true, false, true);
     enable_anr_protection(8, 100);
     configure_big_little_scheduling(true, true, 0x0F, 0xF0);
@@ -1426,42 +1428,42 @@ void MobileActivationManager::auto_configure_for_mobile_platform() {
 
 #ifdef __APPLE__
 #if TARGET_OS_IPHONE
-    platform = "iOS";
-    // Enable iOS-specific optimizations
+    platfor = "iOS";
+        // [Translated]
     enable_memory_pressure_api(false, true, true);
     enable_uma_optimization(true, 0.95f);
     configure_background_app_optimization(200, true);
 #endif
 #endif
     
-    // General mobile optimizations
+        // [Translated]
     enable_lpddr_optimization(true, 64);
     configure_cache_line_optimization(64, 64, 64, true);
     enable_mobile_dma(16, true);
     enable_dvfs_awareness(true, 1.2f);
     enable_gpu_vendor_optimizations(true, false, false, false);
     
-    // DeepSpeed optimizations
+    // DeepSpeedoptimization
     enable_zero_offload(true, false, "/tmp/activation_offload");
     configure_constant_buffer_optimization(64, 8);
     enable_pinned_memory_management(256, true);
     enable_activation_fusion(32, 4);
     configure_bandwidth_optimization(64, true);
     
-    std::cout << "[MobileActivationManager] Auto-configuration completed for platform: " << platform << std::endl;
+    std::cout << "[MobileActivationManager] Auto-configuration completed for platfor: " << platfor << std::endl;
 }
 
 MobileActivationManager::MobileOptimizationStatus MobileActivationManager::get_mobile_optimization_status() const {
     MobileOptimizationStatus status = {};
     
-    // DeepSpeed integration status
+        // [Translated]
     status.zero_offload_enabled = config_.enable_zero_offload_activations;
     status.constant_buffer_enabled = config_.enable_constant_buffer_optimization;
     status.pinned_memory_enabled = config_.enable_pinned_memory;
     status.activation_fusion_enabled = config_.enable_activation_fusion;
     status.bandwidth_optimization_enabled = config_.enable_bandwidth_optimization;
     
-    // Mobile hardware optimization status
+        // [Translated]
     status.uma_optimization_enabled = config_.enable_uma_optimization;
     status.lpddr_optimization_enabled = config_.enable_lpddr_optimization;
     status.anr_protection_enabled = config_.enable_anr_protection;
@@ -1471,21 +1473,21 @@ MobileActivationManager::MobileOptimizationStatus MobileActivationManager::get_m
     status.big_little_scheduling_enabled = config_.enable_big_little_scheduling;
     status.gpu_vendor_optimization_enabled = config_.enable_gpu_vendor_optimization;
     
-    // System integration status
+        // [Translated]
     status.memory_pressure_api_enabled = config_.enable_memory_pressure_api;
     status.background_app_optimization_enabled = config_.enable_background_app_optimization;
     
-    // Hardware detection results
+        // [Translated]
 #ifdef __ANDROID__
-    status.detected_platform = "Android";
+    status.detected_platfor = "Android";
 #elif defined(__APPLE__)
 #if TARGET_OS_IPHONE
-    status.detected_platform = "iOS";
+    status.detected_platfor = "iOS";
 #else
-    status.detected_platform = "macOS";
+    status.detected_platfor = "macOS";
 #endif
 #else
-    status.detected_platform = "Generic";
+    status.detected_platfor = "Generic";
 #endif
     
     status.detected_gpu_vendor = "Auto-detect";
@@ -1493,39 +1495,39 @@ MobileActivationManager::MobileOptimizationStatus MobileActivationManager::get_m
     status.has_uma_support = config_.enable_uma_optimization;
     status.has_lpddr = config_.enable_lpddr_optimization;
     
-    // PRODUCTION IMPLEMENTATION: Real performance metrics calculation
+        // [Translated]
     
-    // PRODUCTION FIX: Pre-calculate total memory limit for future use
+    // [Translated comment removed - see documentation]
     size_t total_memory_limit = (config_.max_gpu_activation_memory_mb + 
                                 config_.max_cpu_activation_memory_mb + 
                                 config_.max_compressed_memory_mb) * 1024 * 1024;
     
-    // Calculate real memory efficiency
+        // [Translated]
     auto current_stats = get_activation_stats();
     if (current_stats.total_memory_used > 0) {
-        // Calculate real efficiency based on compression ratio and memory utilization
+                // [Translated]
         float compression_efficiency = 1.0f - (static_cast<float>(current_stats.total_compressed_bytes) / 
                                               static_cast<float>(current_stats.total_original_bytes));
         float memory_utilization = static_cast<float>(current_stats.total_memory_used) / 
                                    static_cast<float>(total_memory_limit);
         status.memory_efficiency_score = std::min(1.0f, compression_efficiency * 0.6f + (1.0f - memory_utilization) * 0.4f);
     } else {
-        status.memory_efficiency_score = 1.0f; // Best efficiency when no memory usage
+        status.memory_efficiency_score = 1.0f;         // [Translated]
     }
     
-    // Calculate real power efficiency
+        // [Translated]
     size_t gpu_usage = current_stats.gpu_activations;
     size_t total_activations = current_stats.gpu_activations + current_stats.cpu_activations + 
                               current_stats.compressed_activations + current_stats.storage_activations;
     if (total_activations > 0) {
-        // Lower GPU utilization, higher power efficiency
+                // [Translated]
         float gpu_ratio = static_cast<float>(gpu_usage) / static_cast<float>(total_activations);
-        status.power_efficiency_score = 1.0f - gpu_ratio * 0.7f; // GPU usage reduces power efficiency
+        status.power_efficiency_score = 1.0f - gpu_ratio * 0.7f;         // [Translated]
     } else {
         status.power_efficiency_score = 1.0f;
     }
     
-    // Calculate real UI responsiveness
+    // [Translated comment removed - see documentation]
     size_t critical_activations = 0;
     size_t ui_friendly_activations = 0;
     for (const auto& [id, metadata] : activation_metadata_) {
@@ -1541,24 +1543,24 @@ MobileActivationManager::MobileOptimizationStatus MobileActivationManager::get_m
         status.ui_responsiveness_score = static_cast<float>(ui_friendly_activations) / 
                                         static_cast<float>(critical_activations);
     } else {
-        status.ui_responsiveness_score = 1.0f; // Best responsiveness when no critical activations
+        status.ui_responsiveness_score = 1.0f;         // [Translated]
     }
     
-    // PRODUCTION IMPLEMENTATION: Real system integration metrics
-    // Calculate based on actual configuration and running state
+        // [Translated]
+    // based onactualconfigurationandrunningstatecompute
     
-    // ANR event prevention count: Based on UI response optimization configuration
+    // [Translated comment removed - see documentation]
     if (config_.enable_anr_protection && config_.enable_ui_responsiveness) {
-        // PRODUCTION: Calculate prevented ANR event count based on UI responsiveness score
+        // [Translated comment removed - see documentation]
         status.anr_events_prevented = critical_activations > 0 ? 
             static_cast<size_t>(critical_activations * status.ui_responsiveness_score) : 0;
     } else {
         status.anr_events_prevented = 0;
     }
     
-    // Memory pressure response count: Based on memory management configuration
+    // [Translated comment removed - see documentation]
     if (config_.enable_thermal_management || config_.enable_battery_management) {
-        // PRODUCTION: Calculate actual response count based on memory pressure threshold
+        // [Translated comment removed - see documentation]
         float memory_pressure = static_cast<float>(current_stats.total_memory_used) / 
                                static_cast<float>(total_memory_limit);
         if (memory_pressure > config_.memory_pressure_warning_threshold) {
@@ -1570,7 +1572,7 @@ MobileActivationManager::MobileOptimizationStatus MobileActivationManager::get_m
         status.memory_pressure_responses = 0;
     }
     
-    // Background optimization count: Based on enabled optimization features
+    // [Translated comment removed - see documentation]
     size_t enabled_optimizations = 0;
     if (config_.enable_activation_compression) enabled_optimizations++;
     if (config_.enable_activation_recomputation) enabled_optimizations++;
@@ -1581,19 +1583,21 @@ MobileActivationManager::MobileOptimizationStatus MobileActivationManager::get_m
     return status;
 }
 
-// FIXED: Actual system state check
+// ===============================
+// FIXED: actualsystemstatecheck
+// ===============================
 
-void MobileActivationManager::perform_comprehensive_missing_component_check() {
+void MobileActivationManager::perfor_comprehensive_missing_component_check() {
     std::cout << "\n ============ SYSTEM STATUS CHECK ============ " << std::endl;
     
-    // Check basic components
+        // [Translated]
     std::cout << "\nCore Components:" << std::endl;
     std::cout << "  Activation Manager: " << (checkpointer_ ? "ACTIVE" : "INACTIVE") << std::endl;
     std::cout << "  Compressor: " << (compressor_ ? "ACTIVE" : "INACTIVE") << std::endl;
     std::cout << "  Storage System: " << (storage_ ? "ACTIVE" : "INACTIVE") << std::endl;
     std::cout << "  Mobile Optimizer: " << (config_.enable_mobile_optimizations ? "ACTIVE" : "disabled") << std::endl;
     
-    // Check optimization status
+    // checkoptimizationstate
     std::cout << "\nBasic Optimizations:" << std::endl;
     std::cout << "  ZeRO-style Offload: " << (config_.enable_zero_offload_activations ? "ENABLED" : "disabled") << std::endl;
     std::cout << "  Buffer Optimization: " << (config_.enable_constant_buffer_optimization ? "ENABLED" : "disabled") << std::endl;
@@ -1611,7 +1615,7 @@ void MobileActivationManager::perform_comprehensive_missing_component_check() {
     std::cout << "  big.LITTLE Scheduling: " << (config_.enable_big_little_scheduling ? "ENABLED" : "disabled") << std::endl;
     std::cout << "  GPU Vendor Optimization: " << (config_.enable_gpu_vendor_optimization ? "ENABLED" : "disabled") << std::endl;
     
-    // Count enabled optimizations
+    // statisticsenableoptimization
     int basic_optimizations = 0;
     int mobile_optimizations = 0;
     
@@ -1641,7 +1645,7 @@ void MobileActivationManager::perform_comprehensive_missing_component_check() {
     std::cout << "\nPRODUCTION SYSTEM STATUS: FULLY OPERATIONAL" << std::endl;
     std::cout << "Advanced Memory Management: " << (basic_optimizations + mobile_optimizations) << " optimizations active" << std::endl;
     std::cout << "Mobile-Optimized Architecture: Complete integration verified" << std::endl;
-    std::cout << "Real-time Performance Monitoring: Active" << std::endl;
+    std::cout << "Real-time Perforance Monitoring: Active" << std::endl;
     std::cout << "Production-Grade Safety: All systems validated" << std::endl;
     std::cout << "================================================ \n" << std::endl;
 }
@@ -1650,7 +1654,7 @@ void MobileActivationManager::perform_comprehensive_missing_component_check() {
 void MobileActivationManager::optimize_for_low_memory_pressure() {
     std::cout << "[REAL] Emergency memory pressure optimization..." << std::endl;
     
-    // 1. Immediately release all non-critical activations
+    // 1. immediately release all non-critical activation values
     std::vector<size_t> emergency_evictions;
     for (auto& [id, metadata] : activation_metadata_) {
         if (!metadata->is_critical_for_ui && metadata->current_tier != ActivationTier::PERSISTENT) {
@@ -1662,7 +1666,7 @@ void MobileActivationManager::optimize_for_low_memory_pressure() {
         remove_activation_internal(id);
     }
     
-    // 2. Force garbage collection
+        // [Translated]
     cleanup_expired_activations();
     
     std::cout << "[REAL] Emergency evicted " << emergency_evictions.size() << " activations" << std::endl;
@@ -1671,10 +1675,10 @@ void MobileActivationManager::optimize_for_low_memory_pressure() {
 void MobileActivationManager::optimize_for_thermal_throttling() {
     std::cout << "[REAL] Thermal emergency optimization..." << std::endl;
     
-    // Pause all non-critical operations
+        // [Translated]
     worker_running_ = false;
     
-    // Move all GPU activations to CPU
+    // willallGPUactivationvaluemovetoCPU
     apply_thermal_aware_optimization();
     
     std::cout << "[REAL] Thermal throttling applied, background worker paused" << std::endl;
@@ -1683,27 +1687,27 @@ void MobileActivationManager::optimize_for_thermal_throttling() {
 void MobileActivationManager::optimize_for_battery_conservation() {
     std::cout << "[REAL] Battery emergency conservation..." << std::endl;
     
-    // Minimize all activities
+    // [Translated comment removed - see documentation]
     apply_battery_aware_optimization();
     
-    // Pause prefetch operations
+        // [Translated]
     config_.enable_predictive_prefetch = false;
     
     std::cout << "[REAL] Battery conservation mode activated" << std::endl;
 }
 
-void MobileActivationManager::perform_emergency_memory_cleanup() {
-    std::cout << "[REAL] Performing emergency memory cleanup..." << std::endl;
+void MobileActivationManager::perfor_emergency_memory_cleanup() {
+    std::cout << "[REAL] Perforing emergency memory cleanup..." << std::endl;
     
-    // 1. Immediately compress all possible activations
+    // 1. immediately compress all possible activation values
     apply_aggressive_memory_optimization();
     
-    // 2. Clean up expired activations  
+    // 2. cleanup expired activation values  
     cleanup_expired_activations();
     
-    // 3. Force storage system cleanup
+        // [Translated]
     if (storage_) {
-        // Trigger storage cleanup (if storage system supports it)
+                // [Translated]
         std::cout << "[REAL] Triggering storage cleanup" << std::endl;
     }
     

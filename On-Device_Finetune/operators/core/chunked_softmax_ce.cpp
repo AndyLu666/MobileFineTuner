@@ -1,15 +1,37 @@
 /**
  * @file chunked_softmax_ce.cpp
- * @brief Precise chunked Softmax + CrossEntropy implementation
+ * @brief Accurate chunked Softmax + CrossEntropy implementsation
  */
 
 #include "chunked_softmax_ce.h"
 #include "tensor.h"
+#include "backward_functions.h"
+#include "autograd_engine.h"
 #include <cstring>
 #include <iostream>
 
 namespace ops {
 namespace chunked_ce {
+
+// ChunkedCEbackwardfunctionclass
+class ChunkedCEBackward : public BackwardFunction {
+private:
+    TensorPtr X_, W_, targets_;
+    int64_t chunk_size_;
+    bool W_is_transposed_;
+    
+public:
+    ChunkedCEBackward(const TensorPtr& X, const TensorPtr& W, 
+                     const TensorPtr& targets, int64_t chunk_size, bool W_is_transposed)
+        : X_(X), W_(W), targets_(targets), chunk_size_(chunk_size), W_is_transposed_(W_is_transposed) {}
+    
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override {
+        float grad_val = grad_output->data<float>()[0];
+        auto [grad_X, grad_W] = chunked_cross_entropy_backward(
+            X_, W_, targets_, grad_val, chunk_size_, W_is_transposed_);
+        return {grad_X, grad_W};
+    }
+};
 
 TensorPtr chunked_cross_entropy_forward(
     const TensorPtr& X,
@@ -36,7 +58,7 @@ TensorPtr chunked_cross_entropy_forward(
     int64_t V = W_is_transposed ? W_shape[1] : W_shape[0];
     
     if (B != tgt_shape[0] || L != tgt_shape[1]) {
-        throw std::runtime_error("chunked_ce: X and targets batch/sequence dimensions mismatch");
+        throw std::runtime_error("chunked_ce: X batch/sequence dimensions mismatch with targets");
     }
     
     const float* X_data = X->data<float>();
@@ -67,7 +89,7 @@ TensorPtr chunked_cross_entropy_forward(
             StreamingLogSumExpState lse_state;
             float target_logit = 0.0f;
             
-            // Iterate vocabulary in chunks
+            // Iterate through vocabulary in chunks
             int64_t num_chunks = (V + chunk_size - 1) / chunk_size;
             for (int64_t c = 0; c < num_chunks; ++c) {
                 int64_t chunk_start = c * chunk_size;
@@ -94,7 +116,7 @@ TensorPtr chunked_cross_entropy_forward(
                     
                     logits_chunk[i] = dot;
                     
-                    // If this is target class, record its logit
+                    // If this is the target class, record its logit
                     if (vocab_idx == target_class) {
                         target_logit = dot;
                     }
@@ -150,7 +172,7 @@ std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
     int64_t total_count = B * L;
     float scale = grad_output / static_cast<float>(total_count);
     
-    // Temporary buffers
+    // Temporary buffer
     std::vector<float> logits_chunk(chunk_size);
     std::vector<float> softmax_chunk(chunk_size);
     
@@ -198,7 +220,7 @@ std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
             
             float log_sum_exp = lse_state.get_log_sum_exp();
             
-            // Second pass: Calculate gradients (block by block)
+            // Second pass: Calculate gradients (chunk by chunk)
             for (int64_t c = 0; c < num_chunks; ++c) {
                 int64_t chunk_start = c * chunk_size;
                 int64_t chunk_end = std::min(chunk_start + chunk_size, V);
@@ -227,7 +249,7 @@ std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
                     softmax_chunk[i] = std::exp(logits_chunk[i] - log_sum_exp);
                 }
                 
-                // Calculate (p - y) and accumulate gradients
+                                // [Translated]
                 for (int64_t i = 0; i < current_chunk_size; ++i) {
                     int64_t vocab_idx = chunk_start + i;
                     
@@ -238,7 +260,7 @@ std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
                     }
                     grad_logit *= scale;
                     
-                    // grad_W accumulation: W.grad[vocab_idx] += grad_logit * x
+                    // grad_W accumulate：W.grad[vocab_idx] += grad_logit * x
                     if (W_is_transposed) {
                         // W shape [D, V]
                         for (int64_t d = 0; d < D; ++d) {
@@ -252,7 +274,7 @@ std::pair<TensorPtr, TensorPtr> chunked_cross_entropy_backward(
                         }
                     }
                     
-                    // grad_X accumulation: X.grad += grad_logit * W[vocab_idx]
+                    // grad_X accumulate：X.grad += grad_logit * W[vocab_idx]
                     if (W_is_transposed) {
                         for (int64_t d = 0; d < D; ++d) {
                             grad_x_vec[d] += grad_logit * W_data[d * V + vocab_idx];
@@ -277,12 +299,12 @@ TensorPtr chunked_cross_entropy_loss(
     const TensorPtr& targets,
     int64_t chunk_size
 ) {
-    // Determine if W is transposed (by checking shape)
+    // Determine if W is transposed (by shape)
     auto W_shape = W->shape();
     auto X_shape = X->shape();
     int64_t D = X_shape[2];
     
-    bool W_is_transposed = (W_shape[0] == D);  // If first dimension is D, it's [D, V]
+    bool W_is_transposed = (W_shape[0] == D);  // If first dimension is D, shape is [D, V]
     
     // Forward computation
     auto loss = chunked_cross_entropy_forward(X, W, targets, chunk_size, W_is_transposed);
@@ -291,7 +313,12 @@ TensorPtr chunked_cross_entropy_loss(
     if (X->requires_grad() || W->requires_grad()) {
         loss->set_requires_grad(true);
         
-        // Use set_grad_fn to set backward propagation function
+        #ifdef USE_NEW_AUTOGRAD_ENGINE
+        // New engine: Create and register BackwardFunction
+        auto backward_fn = std::make_shared<ChunkedCEBackward>(X, W, targets, chunk_size, W_is_transposed);
+        autograd::Engine::instance().register_node(loss, {X, W}, backward_fn);
+        #else
+        // Old engine: Use set_grad_fn to set backward function
         loss->set_grad_fn([X, W, targets, chunk_size, W_is_transposed](const TensorPtr& grad_output) -> std::vector<TensorPtr> {
             float grad_val = grad_output->data<float>()[0];
             
@@ -300,6 +327,7 @@ TensorPtr chunked_cross_entropy_loss(
             
             return {grad_X, grad_W};
         });
+        #endif
     }
     
     return loss;

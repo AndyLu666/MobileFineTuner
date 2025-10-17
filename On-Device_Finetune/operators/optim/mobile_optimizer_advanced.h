@@ -1,16 +1,16 @@
 /**
  * @file mobile_optimizer_advanced.h
- * @brief Mobile optimizer advanced features - Supplement missing DeepSpeed advanced techniques
+ * [Documentation in English - see separate docs]
  * 
- * Key missing features supplemented:
- * 1. Parameter Groups - Different optimization strategies for different parameter groups
- * 2. Warm Restart - Learning rate restart and training recovery
- * 3. Advanced checkpoint system - Complete state save/load
- * 4. More learning rate schedulers - Polynomial, MultiStep, etc.
- * 5. Numerical stability enhancement - Overflow detection and recovery
- * 6. Mobile power optimization - Power-aware scheduling
- * 7. Async optimizer updates - ZenFlow-style importance awareness
- * 8. More fine-grained memory budget management
+ * [Documentation in English - see separate docs]
+ * [Documentation available in English]
+ * 2. Warm Restart - learning raterestartandtrainingresume
+ * 3. advancedcheckpointsystem - completestatesave/load
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
  */
 
 #pragma once
@@ -25,100 +25,100 @@ namespace ops {
 namespace optim {
 
 /**
- * @brief Parameter group configuration - Support different optimization strategies for different parameters
+ * [Documentation available in English]
  */
 struct ParameterGroupConfig {
-    std::string group_name;                    // Group name
-    std::vector<size_t> param_ids;             // Parameter ID list
+    std::string group_name;                        // [Translated]
+    std::vector<size_t> param_ids;             // parameterIDlist
     
-    // Group-specific hyperparameters
-    float group_lr_multiplier = 1.0f;         // Learning rate multiplier
-    float group_weight_decay = -1.0f;         // Weight decay (-1 means use global value)
-    float group_beta1 = -1.0f;                // Beta1 (-1 means use global value)
-    float group_beta2 = -1.0f;                // Beta2 (-1 means use global value)
+    // [Translated comment removed - see documentation]
+    float group_lr_multiplier = 1.0f;             // [Translated]
+    float group_weight_decay = -1.0f;             // [Translated]
+    float group_beta1 = -1.0f;                // Beta1 (-1representuseglobalvalue)
+    float group_beta2 = -1.0f;                // Beta2 (-1representuseglobalvalue)
     
-    // Group-specific optimization strategy
+        // [Translated]
     OptimizerStateCompression group_compression = OptimizerStateCompression::ADAPTIVE;
-    bool freeze_group = false;                 // Freeze this group's parameters
-    bool use_sparse_updates = false;          // Use sparse updates
+    bool freeze_group = false;                     // [Translated]
+    bool use_sparse_updates = false;          // usesparseupdate
     
-    // Mobile-specific
-    float mobile_priority = 1.0f;             // Mobile priority (0-10)
-    bool thermal_sensitive = true;            // Sensitive to thermal management
-    bool battery_sensitive = true;            // Sensitive to battery state
+        // [Translated]
+    float mobile_priority = 1.0f;             // mobilepriority (0-10)
+    bool thermal_sensitive = true;                // [Translated]
+    bool battery_sensitive = true;                // [Translated]
     
     ParameterGroupConfig(const std::string& name) 
         : group_name(name) {}
 };
 
 /**
- * @brief Training recovery configuration
+ * @brief trainingresumeconfiguration
  */
 struct WarmRestartConfig {
-    bool enabled = false;                     // Enable warm restart
-    int restart_period = 1000;               // Restart period
-    float restart_mult = 2.0f;               // Period multiplier
-    float min_lr_ratio = 0.1f;               // Minimum learning rate ratio
+    bool enabled = false;                     // enablewarm restart
+    int restart_period = 1000;                   // [Translated]
+    float restart_mult = 2.0f;                   // [Translated]
+    float min_lr_ratio = 0.1f;                   // [Translated]
     
-    // Mobile-specific
-    bool adaptive_restart = true;             // Adaptive restart
-    float performance_threshold = 0.001f;     // Performance threshold
-    int patience_steps = 100;                // Patience steps
+        // [Translated]
+    bool adaptive_restart = true;             // adaptiverestart
+    float perforance_threshold = 0.001f;     // perforancethreshold
+    int patience_steps = 100;                    // [Translated]
 };
 
 /**
- * @brief Numerical stability configuration
+ * [Documentation available in English]
  */
 struct NumericalStabilityConfig {
-    bool enable_overflow_detection = true;   // Overflow detection
-    bool enable_gradient_scaling = true;     // Gradient scaling
-    float initial_scale = 65536.0f;          // Initial scale factor
-    float scale_growth_factor = 2.0f;        // Scale growth factor
-    float scale_backoff_factor = 0.5f;       // Scale backoff factor
-    int scale_growth_interval = 2000;       // Scale growth interval
+    bool enable_overflow_detection = true;       // [Translated]
+    bool enable_gradient_scaling = true;     // gradient scaling
+    float initial_scale = 65536.0f;          // initialscaling factor
+    float scale_growth_factor = 2.0f;            // [Translated]
+    float scale_backoff_factor = 0.5f;           // [Translated]
+    int scale_growth_interval = 2000;           // [Translated]
     
-    // Numerical range checking
-    float max_grad_norm = 10.0f;            // Maximum gradient norm
-    float min_loss_scale = 1.0f;            // Minimum loss scale
-    float max_loss_scale = 65536.0f;        // Maximum loss scale
+        // [Translated]
+    float max_grad_norm = 10.0f;                // [Translated]
+    float min_loss_scale = 1.0f;                // [Translated]
+    float max_loss_scale = 65536.0f;            // [Translated]
 };
 
 /**
- * @brief Power optimization configuration
+ * [Documentation available in English]
  */
 struct PowerOptimizationConfig {
-    bool enable_power_aware = true;          // Enable power awareness
-    float target_power_consumption = 3.0f;   // Target power consumption (watts)
-    float max_power_consumption = 5.0f;      // Maximum power consumption
+    bool enable_power_aware = true;              // [Translated]
+    float target_power_consumption = 3.0f;       // [Translated]
+    float max_power_consumption = 5.0f;          // [Translated]
     
-    // Power scheduling strategy
-    bool enable_dynamic_voltage_scaling = true;    // Dynamic voltage scaling
-    bool enable_frequency_scaling = true;          // Frequency scaling
-    bool enable_core_migration = true;             // Core migration
+    // powerschedulestrategy
+    bool enable_dynamic_voltage_scaling = true;        // [Translated]
+    bool enable_frequency_scaling = true;              // [Translated]
+    bool enable_core_migration = true;                 // [Translated]
     
-    // Battery optimization
-    float battery_critical_threshold = 0.15f;      // Battery critical threshold (15%)
-    float battery_low_threshold = 0.30f;           // Battery low threshold (30%)
-    float power_reduction_factor = 0.7f;           // Power reduction factor
+    // batteryoptimization
+    float battery_critical_threshold = 0.15f;          // [Translated]
+    float battery_low_threshold = 0.30f;           // batterylow batterythreshold (30%)
+    float power_reduction_factor = 0.7f;               // [Translated]
 };
 
 /**
- * @brief Async optimizer configuration (ZenFlow style)
+ * [Documentation available in English]
  */
 struct AsyncOptimizerConfig {
-    bool enable_async_updates = false;       // Enable async updates
-    float importance_threshold = 0.1f;       // Importance threshold
-    int accumulation_window = 4;             // Accumulation window
-    int max_async_ops = 2;                   // Maximum async operations
+    bool enable_async_updates = false;       // enableasyncupdate
+    float importance_threshold = 0.1f;           // [Translated]
+    int accumulation_window = 4;                 // [Translated]
+    int max_async_ops = 2;                       // [Translated]
     
-    // Importance calculation
-    bool use_gradient_magnitude = true;      // Use gradient magnitude
-    bool use_parameter_magnitude = true;     // Use parameter magnitude
-    bool use_historical_importance = true;   // Use historical importance
+        // [Translated]
+    bool use_gradient_magnitude = true;      // usegradientsize
+    bool use_parameter_magnitude = true;     // useparametersize
+    bool use_historical_importance = true;       // [Translated]
 };
 
 /**
- * @brief Advanced checkpoint manager
+ * @brief advancedcheckpointmanager
  */
 class AdvancedCheckpointManager {
 private:
@@ -130,7 +130,7 @@ public:
     explicit AdvancedCheckpointManager(const std::string& dir, int max_keep = 5);
     
     /**
-     * @brief Save complete training state
+     * @brief savecompletetrainingstate
      */
     struct TrainingState {
         int global_step;
@@ -141,7 +141,7 @@ public:
         NumericalStabilityConfig stability_config;
         std::vector<float> loss_history;
         
-        // Mobile state
+        // mobilestate
         std::vector<float> power_history;
         std::vector<float> thermal_history;
         int total_thermal_events;
@@ -152,7 +152,7 @@ public:
     bool load_training_state(TrainingState& state, const std::string& checkpoint_name);
     
     /**
-     * @brief Automatic checkpoint management
+     * [Documentation available in English]
      */
     void auto_checkpoint(const TrainingState& state, float current_loss);
     void cleanup_old_checkpoints();
@@ -160,12 +160,12 @@ public:
 };
 
 /**
- * @brief Advanced learning rate scheduler (supplement more types)
+ * [Documentation available in English]
  */
 class AdvancedLRScheduler : public MobileLRScheduler {
 private:
     WarmRestartConfig restart_config_;
-    std::vector<float> performance_history_;
+    std::vector<float> perforance_history_;
     int restart_count_ = 0;
     int last_restart_step_ = 0;
     
@@ -175,12 +175,12 @@ public:
                        OptimizerExtensionStats* stats = nullptr);
     
     /**
-     * @brief Polynomial decay
+     * [Documentation available in English]
      */
     float compute_polynomial_decay_lr(int step, float power = 1.0f);
     
     /**
-     * @brief Multi-step decay  
+     * [Documentation available in English]
      */
     float compute_multistep_decay_lr(int step, const std::vector<int>& milestones, float gamma = 0.1f);
     
@@ -190,21 +190,21 @@ public:
     float compute_warm_restart_lr(int step);
     
     /**
-     * @brief Adaptive restart check
+     * @brief adaptiverestartcheck
      */
-    bool should_restart(float current_performance);
+    bool should_restart(float current_perforance);
     
     /**
-     * @brief Perform restart
+     * @brief executerestart
      */
-    void perform_restart();
+    void perfor_restart();
     
 private:
-    void update_performance_history(float performance);
+    void update_perforance_history(float perforance);
 };
 
 /**
- * @brief Numerical stability manager
+ * [Documentation available in English]
  */
 class NumericalStabilityManager {
 private:
@@ -218,27 +218,27 @@ public:
     explicit NumericalStabilityManager(const NumericalStabilityConfig& config);
     
     /**
-     * @brief Check gradient overflow
+     * [Documentation available in English]
      */
     bool check_gradient_overflow(const std::vector<TensorPtr>& gradients);
     
     /**
-     * @brief Handle overflow
+     * [Documentation available in English]
      */
     void handle_overflow();
     
     /**
-     * @brief Scale gradients
+     * @brief scalegradient
      */
     void scale_gradients(std::vector<TensorPtr>& gradients);
     
     /**
-     * @brief Unscale gradients
+     * [Documentation available in English]
      */
     void unscale_gradients(std::vector<TensorPtr>& gradients);
     
     /**
-     * @brief Update loss scale
+     * @brief updatelossscale
      */
     void update_loss_scale(bool overflow_detected);
     
@@ -247,7 +247,7 @@ public:
 };
 
 /**
- * @brief Power optimization manager
+ * @brief poweroptimizationmanager
  */
 class PowerOptimizationManager {
 private:
@@ -256,7 +256,7 @@ private:
     float current_power_consumption_ = 0.0f;
     std::chrono::steady_clock::time_point last_power_measurement_;
     
-    // Mobile system interface
+    // mobilesysteminterface
     bool is_plugged_in_ = false;
     float battery_level_ = 1.0f;
     float device_temperature_ = 30.0f;
@@ -265,22 +265,22 @@ public:
     explicit PowerOptimizationManager(const PowerOptimizationConfig& config);
     
     /**
-     * @brief Update power state
+     * @brief updatepowerstate
      */
     void update_power_state(float battery_level, bool plugged_in, float temperature);
     
     /**
-     * @brief Calculate power adjustment factor
+     * [Documentation available in English]
      */
     float compute_power_adjustment_factor();
     
     /**
-     * @brief Apply power optimizations
+     * @brief applypoweroptimization
      */
     void apply_power_optimizations(float& learning_rate, int& batch_size);
     
     /**
-     * @brief Power consumption prediction
+     * [Documentation available in English]
      */
     float predict_power_consumption(float lr, int batch_size);
     
@@ -290,7 +290,7 @@ private:
 };
 
 /**
- * @brief Async optimizer updater (ZenFlow style)
+ * [Documentation available in English]
  */
 class AsyncOptimizerUpdater {
 private:
@@ -301,7 +301,7 @@ private:
     std::condition_variable queue_cv_;
     std::atomic<bool> should_stop_{false};
     
-    // Importance evaluation
+        // [Translated]
     std::unordered_map<size_t, float> parameter_importance_;
     std::unordered_map<size_t, std::vector<float>> importance_history_;
     
@@ -310,17 +310,17 @@ public:
     ~AsyncOptimizerUpdater();
     
     /**
-     * @brief Submit gradient update
+     * [Documentation available in English]
      */
     void submit_gradient_update(size_t param_id, const TensorPtr& gradient);
     
     /**
-     * @brief Calculate parameter importance
+     * [Documentation available in English]
      */
     float compute_parameter_importance(size_t param_id, const TensorPtr& gradient);
     
     /**
-     * @brief Whether should sync update
+     * @brief is notshouldsynchronousupdate
      */
     bool should_sync_update(size_t param_id, float importance);
     
@@ -331,13 +331,13 @@ private:
 };
 
 /**
- * @brief Complete advanced mobile optimizer
+ * @brief completeadvancedmoveoptimizer
  */
 class CompleteMobileOptimizerAdvanced {
 private:
     std::unique_ptr<CompleteMobileTrainingOptimizer> base_optimizer_;
     
-    // Advanced feature managers
+        // [Translated]
     std::vector<std::unique_ptr<ParameterGroupConfig>> parameter_groups_;
     std::unique_ptr<AdvancedCheckpointManager> checkpoint_manager_;
     std::unique_ptr<AdvancedLRScheduler> advanced_lr_scheduler_;
@@ -345,13 +345,13 @@ private:
     std::unique_ptr<PowerOptimizationManager> power_manager_;
     std::unique_ptr<AsyncOptimizerUpdater> async_updater_;
     
-    // Advanced configuration
+    // advancedconfiguration
     WarmRestartConfig restart_config_;
     NumericalStabilityConfig stability_config_;
     PowerOptimizationConfig power_config_;
     AsyncOptimizerConfig async_config_;
     
-    // Advanced statistics
+    // advancedstatistics
     std::vector<float> training_loss_history_;
     std::vector<float> validation_loss_history_;
     float best_validation_loss_ = std::numeric_limits<float>::max();
@@ -371,12 +371,12 @@ public:
     );
     
     /**
-     * @brief Create parameter group
+     * [Documentation available in English]
      */
     void create_parameter_group(const ParameterGroupConfig& group_config);
     
     /**
-     * @brief Advanced training step
+     * @brief advancedtrainingsteps
      */
     bool advanced_training_step(
         const std::unordered_map<size_t, TensorPtr>& param_gradients,
@@ -385,12 +385,12 @@ public:
     );
     
     /**
-     * @brief Auto-adjust optimization strategy
+     * [Documentation available in English]
      */
     void auto_adjust_optimization_strategy();
     
     /**
-     * @brief Get complete advanced statistics
+     * @brief acquirecompleteadvancedstatistics
      */
     struct AdvancedTrainingStats {
         CompleteMobileTrainingOptimizer::CompleteTrainingStats base_stats;
@@ -407,13 +407,13 @@ public:
     AdvancedTrainingStats get_advanced_stats() const;
     
     /**
-     * @brief Advanced checkpoint
+     * @brief advancedcheckpoint
      */
     void save_advanced_checkpoint(const std::string& name, float current_loss);
     bool load_advanced_checkpoint(const std::string& name);
     
     /**
-     * @brief Training completion analysis
+     * @brief trainingcompletedbackanalyze
      */
     void generate_training_analysis_report(const std::string& report_path);
     
@@ -425,7 +425,7 @@ private:
 };
 
 /**
- * @brief Factory function - Create complete advanced mobile optimizer
+ * [Documentation available in English]
  */
 std::unique_ptr<CompleteMobileOptimizerAdvanced> create_advanced_mobile_optimizer(
     size_t available_memory_mb,

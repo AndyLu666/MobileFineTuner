@@ -22,7 +22,7 @@ void KVCache::initialize(int n_layers, int n_head, int n_embd) {
 void KVCache::update(const std::vector<std::unique_ptr<Tensor>>& new_keys,
                      const std::vector<std::unique_ptr<Tensor>>& new_values) {
     if (new_keys.size() != new_values.size()) {
-        std::cerr << "KV Cache更新錯誤：key和value數量不匹配" << std::endl;
+        std::cerr << "KV Cacheupdate[Output]：keyandvalue[Output]match" << std::endl;
         return;
     }
     for (size_t i = 0; i < new_keys.size(); i++) {
@@ -182,16 +182,16 @@ std::unique_ptr<Tensor> CachedAttention::forward(const Tensor& hidden_states,
 
     auto qkv = ops::linear(hidden_states, *qkv_weight_, *qkv_bias_);
 
-    // 正确切分：每段宽度为 n_head_ * head_dim_
+        // [Translated]
     auto qkv_reshaped = ops::reshape(*qkv, std::vector<int>{seq_len, n_head_ * head_dim_ * 3});
     auto q = slice_rows(*qkv_reshaped, 0, n_head_ * head_dim_);
     auto k = slice_rows(*qkv_reshaped, n_head_ * head_dim_, 2 * n_head_ * head_dim_);
     auto v = slice_rows(*qkv_reshaped, 2 * n_head_ * head_dim_, 3 * n_head_ * head_dim_);
 
-    // 使用按层更新接口
+    // usebylayerupdateinterface
     kv_cache.update_layer(layer_idx, *k, *v);
 
-    // 获取该层已缓存的KV（到当前长度）
+        // [Translated]
     auto cached_k = kv_cache.get_key_layer(layer_idx);
     auto cached_v = kv_cache.get_value_layer(layer_idx);
     if (cached_k) { k = std::move(cached_k); }

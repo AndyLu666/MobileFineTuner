@@ -2,7 +2,7 @@
  * @file mobile_activation_manager.h
  * @brief Mobile-optimized activation management system inspired by DeepSpeed
  * 
- * This system implements comprehensive activation memory optimization for mobile training:
+ * This system implementss comprehensive activation memory optimization for mobile training:
  * 1. Gradient Checkpointing with mobile-aware scheduling
  * 2. Activation Compression using quantization and sparsification  
  * 3. Hierarchical Storage (GPU -> CPU -> Compressed -> Storage)
@@ -44,14 +44,14 @@ class ActivationStorage;
 class ActivationRecomputer;
 class MobileActivationOptimizer;
 
-// 🚀 DeepSpeed核心技术类声明
+// [Translated comment removed - see documentation]
 class ZeROffloadActivationManager;
 class ConstantBufferOptimizer;
 class PinnedMemoryManager;
 class ActivationBandwidthOptimizer;
 class ActivationFusionEngine;
 
-// 📱 移动端特化组件声明
+// [Translated comment removed - see documentation]
 class MobileSystemIntegrationManager;
 class MobileEfficientAttention;
 class MobileActivationPartitioner;
@@ -106,7 +106,7 @@ enum class MobileActivationState {
  * @brief Activation checkpoint strategy
  */
 enum class CheckpointStrategy {
-    UNIFORM = 0,          // Uniform checkpointing interval
+    UNIFORM = 0,          // Unifor checkpointing interval
     ADAPTIVE = 1,         // Adaptive based on memory pressure
     LAYER_WISE = 2,       // Layer-wise selective checkpointing
     MOBILE_SMART = 3      // Mobile-optimized smart checkpointing
@@ -123,12 +123,12 @@ struct ActivationMetadata {
     ActivationTier current_tier;
     ActivationCompressionMode compression_mode;
     
-    // Timing information
+    // Timing inforation
     std::chrono::steady_clock::time_point creation_time;
     std::chrono::steady_clock::time_point last_access_time;
     std::chrono::steady_clock::time_point expected_release_time;
     
-    // Memory information
+    // Memory inforation
     size_t original_size_bytes;
     size_t compressed_size_bytes;
     size_t memory_footprint;
@@ -146,8 +146,8 @@ struct ActivationMetadata {
     bool battery_sensitive;     // Defer access when low battery
     int priority_level;         // 0=lowest, 10=highest
     
-    // 🚨 FIXED: 添加真实优化所需的字段
-    bool thermal_throttle_paused; // 热控制时是否暂停重计算
+        // [Translated]
+    bool thermal_throttle_paused;     // [Translated]
     
     ActivationMetadata(size_t id, const std::string& name, const std::vector<int64_t>& s, DType dt)
         : activation_id(id), layer_name(name), shape(s), dtype(dt),
@@ -193,7 +193,7 @@ struct MobileActivationConfig {
     float recomputation_memory_threshold = 0.9f; // Recompute when 90% memory used
     int max_recomputation_cost = 8;             // Max cost for recomputation (1-10 scale)
     
-    // Performance tuning
+    // Perforance tuning
     size_t activation_prefetch_count = 3;        // Number of activations to prefetch
     bool enable_async_operations = true;        // Enable async load/store operations
     size_t io_buffer_size_kb = 1024;           // I/O buffer size (1MB)
@@ -211,10 +211,10 @@ struct MobileActivationConfig {
     int battery_critical_level = 20;           // Critical battery level (%)
     
     // System resource utilization thresholds for optimization decisions
-    float gpu_utilization_aggressive_threshold = 0.9f; // GPU利用率超过90%时采用激进优化
-    float cpu_utilization_aggressive_threshold = 0.8f; // CPU利用率超过80%时采用激进优化
-    float gpu_utilization_thermal_threshold = 0.8f;    // GPU利用率超过80%时考虑热管理
-    float memory_pressure_optimization_threshold = 0.8f; // 内存压力超过80%时优化
+    float gpu_utilization_aggressive_threshold = 0.9f;     // [Translated]
+    float cpu_utilization_aggressive_threshold = 0.8f;     // [Translated]
+    float gpu_utilization_thermal_threshold = 0.8f;        // [Translated]
+    float memory_pressure_optimization_threshold = 0.8f;     // [Translated]
     
     // Advanced mobile optimizations
     bool enable_power_aware_compression = true;  // Use more compression on battery
@@ -284,7 +284,7 @@ struct MobileActivationConfig {
     // DVFS (Dynamic Voltage Frequency Scaling) Configuration
     bool enable_dvfs_awareness = true;            // Enable DVFS awareness
     bool adapt_to_frequency_scaling = true;      // Adapt to CPU frequency changes
-    float performance_scaling_factor = 1.2f;     // Performance scaling factor
+    float perforance_scaling_factor = 1.2f;     // Perforance scaling factor
     bool monitor_cpu_frequency = true;           // Monitor CPU frequency changes
     
     // big.LITTLE CPU Scheduling Configuration
@@ -324,7 +324,7 @@ struct MobileActivationConfig {
     bool enable_predictive_prefetch = false;    // Enable predictive prefetching
     size_t access_pattern_history_size = 1000;  // Access pattern history size
     
-    // 🛠️ FIXED: 添加在代码中实际使用的配置选项
+        // [Translated]
     bool enable_activation_caching = false;     // Enable activation caching
     bool enable_memory_alignment_optimization = false; // Memory alignment optimization
     bool enable_batch_processing = false;       // Enable batch processing
@@ -341,7 +341,7 @@ struct MobileActivationConfig {
     bool enable_core_affinity_optimization = false; // Core affinity optimization
     bool enable_gpu_specific_optimization = false; // GPU specific optimization
     
-    // Performance monitoring and analytics
+    // Perforance monitoring and analytics
     bool enable_activation_profiling = false;   // Enable detailed profiling
     bool log_activation_events = false;         // Log activation management events
     std::string profiling_output_path = "./activation_profile.json";
@@ -364,7 +364,7 @@ struct ActivationStats {
     size_t compressed_memory_used;
     size_t storage_memory_used;
     
-    // Performance statistics  
+    // Perforance statistics  
     size_t total_checkpoints;
     size_t total_recomputations;
     size_t cache_hits;
@@ -389,7 +389,7 @@ struct ActivationStats {
     double average_compression_time_ms;
     double average_recomputation_time_ms;
     
-    // CRITICAL: 添加缺失的统计字段
+        // [Translated]
     size_t prefetch_operations = 0;
     size_t removed_activations = 0;
     size_t total_original_bytes = 0;
@@ -402,7 +402,7 @@ struct ActivationStats {
 /**
  * @brief Main mobile activation management class
  * 
- * This class provides comprehensive activation memory management specifically
+ * This class providess comprehensive activation memory management specifically
  * optimized for mobile training scenarios. It integrates multiple optimization
  * strategies from DeepSpeed while adding mobile-specific enhancements.
  */
@@ -413,19 +413,19 @@ private:
     std::unordered_map<size_t, TensorPtr> active_activations_;
     
     // Core components
-    // PRODUCTION IMPLEMENTATION: 核心组件（完全实现）
+        // [Translated]
     std::unique_ptr<ActivationCheckpointer> checkpointer_;
     std::unique_ptr<ActivationCompressor> compressor_;
     std::unique_ptr<ActivationStorage> storage_;
     
-    // DeepSpeed核心组件 - 真实集成
+    // [Translated comment removed - see documentation]
     std::unique_ptr<ZeROffloadActivationManager> zero_offload_manager_;
     std::unique_ptr<ConstantBufferOptimizer> constant_buffer_optimizer_;
     std::unique_ptr<PinnedMemoryManager> pinned_memory_manager_;
     std::unique_ptr<ActivationBandwidthOptimizer> bandwidth_optimizer_;
     std::unique_ptr<ActivationFusionEngine> fusion_engine_;
     
-    // 移动端特化组件 - 真实集成  
+    // [Translated comment removed - see documentation]
     std::unique_ptr<MobileSystemIntegrationManager> system_integration_manager_;
     std::unique_ptr<MobileEfficientAttention> efficient_attention_;
     std::unique_ptr<MobileActivationPartitioner> partition_manager_;
@@ -438,7 +438,7 @@ private:
     std::unique_ptr<BigLittleCPUScheduler> cpu_scheduler_;
     std::unique_ptr<MobileGPUVendorOptimizer> gpu_vendor_optimizer_;
     
-    // 优化状态记录
+    // optimizationstaterecord
     bool deepspeed_optimizations_enabled_ = false;
     bool mobile_optimizations_enabled_ = false;
     
@@ -469,7 +469,7 @@ private:
     std::unordered_map<std::string, size_t> layer_checkpoint_intervals_;
     std::unordered_map<size_t, std::function<TensorPtr()>> recomputation_functions_;
     
-    // CRITICAL: 添加缺失的互斥锁
+    // [Translated comment removed - see documentation]
     std::mutex metadata_mutex_;
     
 public:
@@ -674,7 +674,7 @@ public:
     /**
      * @brief Enable DVFS (Dynamic Voltage Frequency Scaling) awareness
      * @param adapt_to_scaling Whether to adapt to frequency changes
-     * @param scaling_factor Performance scaling factor
+     * @param scaling_factor Perforance scaling factor
      */
     void enable_dvfs_awareness(bool adapt_to_scaling = true, float scaling_factor = 1.2f);
     
@@ -716,18 +716,18 @@ public:
                                              bool enable_task_completion = true);
     
     /**
-     * @brief Perform comprehensive mobile system detection and optimization
-     * This method detects the mobile platform, hardware capabilities, and
+     * @brief Perfor comprehensive mobile system detection and optimization
+     * This method detects the mobile platfor, hardware capabilities, and
      * automatically configures optimal settings
      */
-    void auto_configure_for_mobile_platform();
+    void auto_configure_for_mobile_platfor();
     
     /**
-     * @brief Perform comprehensive missing component check and display results
+     * @brief Perfor comprehensive missing component check and display results
      * This method checks all DeepSpeed and mobile-specific components and
-     * provides a detailed report of what's implemented vs missing
+     * providess a detailed report of what's implementsed vs missing
      */
-    void perform_comprehensive_missing_component_check();
+    void perfor_comprehensive_missing_component_check();
     
     /**
      * @brief Get comprehensive mobile optimization status
@@ -755,13 +755,13 @@ public:
         bool background_app_optimization_enabled;
         
         // Hardware detection results
-        std::string detected_platform;        // "Android", "iOS", "macOS", etc.
+        std::string detected_platfor;        // "Android", "iOS", "macOS", etc.
         std::string detected_gpu_vendor;      // "Adreno", "Mali", "Apple", etc.
         std::string detected_cpu_architecture; // "ARM64", "x86_64", etc.
         bool has_uma_support;                 // UMA support detected
         bool has_lpddr;                       // LPDDR memory detected
         
-        // Performance metrics
+        // Perforance metrics
         float memory_efficiency_score;        // 0.0-1.0
         float power_efficiency_score;         // 0.0-1.0
         float ui_responsiveness_score;        // 0.0-1.0
@@ -773,18 +773,18 @@ public:
     };
     MobileOptimizationStatus get_mobile_optimization_status() const;
 
-    // FIXED: 核心优化方法应该是公共API，以便外部调用和测试
+        // [Translated]
     void apply_aggressive_memory_optimization();
     void apply_battery_aware_optimization();
     void apply_thermal_aware_optimization(); 
     void apply_balanced_optimization();
     void update_optimization_statistics();
     
-    // FIXED: 紧急优化方法也应该是公共的
+        // [Translated]
     void optimize_for_low_memory_pressure();
     void optimize_for_thermal_throttling(); 
     void optimize_for_battery_conservation();
-    void perform_emergency_memory_cleanup();
+    void perfor_emergency_memory_cleanup();
 
 private:
     // Component management methods
@@ -826,7 +826,7 @@ private:
     void update_cache_statistics(bool hit);
     TensorPtr recompute_activation(size_t activation_id);
     
-    // CRITICAL MISSING: 缺失方法声明 - 底层绕过问题修复
+    // [Translated comment removed - see documentation]
     void prefetch_related_activations(size_t activation_id, const std::string& hint);
     size_t generate_layer_id(const std::string& layer_name);
     void remove_activation(size_t activation_id);
@@ -834,7 +834,7 @@ private:
     float calculate_migration_priority(const ActivationMetadata& metadata);
     void analyze_access_patterns();
     
-    // FIXED: 添加缺失的辅助方法
+        // [Translated]
     float calculate_memory_efficiency();
     
     // Statistics update methods

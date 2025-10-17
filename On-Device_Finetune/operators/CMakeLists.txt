@@ -2,58 +2,59 @@ cmake_minimum_required(VERSION 3.10)
 project(Operators VERSION 2.0.0 LANGUAGES CXX)
 
 # ============================================================================
-# Industrial-Grade Configuration Options
+# 工业级配置选项
 # ============================================================================
-option(USE_NEW_AUTOGRAD_ENGINE "Use topological sorting autograd engine" ON)
-option(AUTOGRAD_DEBUG "Enable autograd debug output" OFF)
-option(USE_MOBILE_OPTIMIZER "Enable mobile optimizer extensions" ON)
-option(ENABLE_MEMORY_MODULE "Enable Memory module (parameter management/Zero optimization)" ON)
-option(ENABLE_ACTIVATIONS_MODULE "Enable Activations module (gradient checkpointing/activation management)" ON)
-option(BUILD_TESTS "Build test programs" ON)
-option(BUILD_EXAMPLES "Build example programs" OFF)
-option(ENABLE_PROFILING "Enable performance profiling" OFF)
+option(USE_NEW_AUTOGRAD_ENGINE "使用拓扑排序自动微分引擎" ON)
+option(AUTOGRAD_DEBUG "启用自动微分调试输出" OFF)
+option(USE_MOBILE_OPTIMIZER "启用移动端优化器扩展" ON)
+option(ENABLE_MEMORY_MODULE "启用Memory模块（参数管理/Zero优化）" ON)
+option(ENABLE_ACTIVATIONS_MODULE "启用Activations模块（梯度检查点/激活管理）" ON)
+option(BUILD_TESTS "构建测试程序" ON)
+option(BUILD_EXAMPLES "构建示例程序" OFF)
+option(ENABLE_PROFILING "启用性能分析" OFF)
 
 # ============================================================================
-# C++ Standard
+# C++ 标准
 # ============================================================================
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ============================================================================
-# Compilation Options
+# 编译选项
 # ============================================================================
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2")
 
 if(AUTOGRAD_DEBUG)
     add_definitions(-DAUTOGRAD_DEBUG)
-    message(STATUS "Autograd debug output enabled")
+    message(STATUS "自动微分调试输出已启用")
 endif()
 
 if(USE_NEW_AUTOGRAD_ENGINE)
     add_definitions(-DUSE_NEW_AUTOGRAD_ENGINE)
-    message(STATUS "New autograd engine enabled (topological sorting)")
+    message(STATUS "新自动微分引擎已启用（拓扑排序）")
 endif()
 
 if(ENABLE_PROFILING)
     add_definitions(-DENABLE_PROFILING)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
-    message(STATUS "Performance profiling enabled")
+    message(STATUS "性能分析已启用")
 endif()
 
 # ============================================================================
-# Include Directories
+# 包含目录
 # ============================================================================
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # ============================================================================
-# Source File List
+# 源文件列表
 # ============================================================================
 
-# Core module (core tensor/operators/autograd)
+# Core 模块（核心张量/算子/自动微分）
 set(CORE_SOURCES
     core/tensor.cpp
     core/ops.cpp
+    core/chunked_softmax_ce.cpp
     core/utils.cpp
     core/logger.cpp
     core/memory_manager.cpp
@@ -64,8 +65,8 @@ set(CORE_SOURCES
     core/tokenizer.cpp
 )
 
-# Autograd module (automatic differentiation)
-# backward_functions is required in both modes; new engine only adds autograd_engine
+# Autograd 模块（自动微分）
+# backward_functions 在兩種模式下都需要；新引擎僅額外加入 autograd_engine
 list(APPEND CORE_SOURCES
     core/backward_functions.cpp
 )
@@ -75,7 +76,7 @@ if(USE_NEW_AUTOGRAD_ENGINE)
     )
 endif()
 
-# Optimizer module (optimizers)
+# Optimizer 模块（优化器）
 set(OPTIMIZER_SOURCES
     optim/optimizer.cpp
     optim/adam.cpp
@@ -87,10 +88,10 @@ if(USE_MOBILE_OPTIMIZER)
         optim/mobile_optimizer_state_manager.cpp
         optim/mobile_optimizer_advanced.cpp
     )
-    message(STATUS "Mobile optimizer extensions enabled")
+    message(STATUS "移动端优化器扩展已启用")
 endif()
 
-# Memory module (parameter management/ZeRO optimization)
+# Memory 模块（参数管理/ZeRO优化）
 set(MEMORY_SOURCES "")
 if(ENABLE_MEMORY_MODULE)
     list(APPEND MEMORY_SOURCES
@@ -100,22 +101,23 @@ if(ENABLE_MEMORY_MODULE)
         memory/mobile_zero.cpp
     )
     add_definitions(-DENABLE_MEMORY_MODULE)
-    message(STATUS "Memory module enabled (parameter management/ZeRO optimization)")
+    message(STATUS "✅ Memory模块已启用（参数管理/ZeRO优化）")
 endif()
 
-# Activations module (activation management/gradient checkpointing)
+# Activations 模块（激活管理/梯度检查点）
 set(ACTIVATIONS_SOURCES "")
 if(ENABLE_ACTIVATIONS_MODULE)
     list(APPEND ACTIVATIONS_SOURCES
         activations/mobile_activation_manager.cpp
         activations/deepspeed_checkpoint_integration.cpp
+        memory/activation_checkpointer.cpp
     )
     add_definitions(-DENABLE_ACTIVATIONS_MODULE)
-    message(STATUS "Activations module enabled (activation management/checkpointing)")
+    message(STATUS "✅ Activations模块已启用（激活管理/检查点）")
 endif()
 
 # ============================================================================
-# Create Static Library
+# 创建静态库
 # ============================================================================
 add_library(operators STATIC
     ${CORE_SOURCES}
@@ -125,18 +127,18 @@ add_library(operators STATIC
 )
 
 # ============================================================================
-# Link Library Detection (Accelerate/BLAS)
-# Remove all BLAS/Accelerate related logic, use pure C++ implementation uniformly
-message(STATUS "BLAS removed, using pure C++ implementation uniformly")
+# 链接库检测（Accelerate/BLAS）
+# 移除所有 BLAS/Accelerate 相关逻辑，统一使用纯 C++ 实现
+message(STATUS "🔧 BLAS 已移除，统一使用纯C++实现")
 
 # ============================================================================
-# Thread Support
+# 线程支持
 # ============================================================================
 find_package(Threads REQUIRED)
 target_link_libraries(operators PUBLIC Threads::Threads)
 
 # ============================================================================
-# Output Configuration
+# 输出配置
 # ============================================================================
 set_target_properties(operators PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
@@ -144,7 +146,7 @@ set_target_properties(operators PROPERTIES
 )
 
 # ============================================================================
-# Installation Rules
+# 安装规则
 # ============================================================================
 install(TARGETS operators
     ARCHIVE DESTINATION lib
@@ -157,12 +159,12 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 )
 
 # ============================================================================
-# Test Targets
+# 测试目标
 # ============================================================================
 if(BUILD_TESTS)
     enable_testing()
     
-    # Autograd engine tests
+    # 自动微分引擎测试
     if(USE_NEW_AUTOGRAD_ENGINE)
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../tests/test_autograd_engine.cpp)
             add_executable(test_autograd_engine
@@ -173,7 +175,7 @@ if(BUILD_TESTS)
         endif()
     endif()
     
-    # Optimizer tests
+    # 优化器测试
     if(USE_MOBILE_OPTIMIZER)
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/optim/comprehensive_optimizer_test.cpp)
             add_executable(test_optimizer
@@ -184,7 +186,7 @@ if(BUILD_TESTS)
         endif()
     endif()
     
-    # Memory module tests
+    # Memory模块测试
     if(ENABLE_MEMORY_MODULE)
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_memory_module.cpp)
             add_executable(test_memory_module
@@ -195,7 +197,7 @@ if(BUILD_TESTS)
         endif()
     endif()
     
-    # Activations module tests
+    # Activations模块测试
     if(ENABLE_ACTIVATIONS_MODULE)
         if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_activations_module.cpp)
             add_executable(test_activations_module
@@ -206,25 +208,25 @@ if(BUILD_TESTS)
         endif()
     endif()
     
-    message(STATUS "Test targets enabled")
+    message(STATUS "✅ 测试目标已启用")
 endif()
 
 # ============================================================================
-# Configuration Summary
+# 配置摘要
 # ============================================================================
 message(STATUS "")
 message(STATUS "============================================")
-message(STATUS "Operators Framework Configuration Summary v${PROJECT_VERSION}")
+message(STATUS "Operators 框架配置摘要 v${PROJECT_VERSION}")
 message(STATUS "============================================")
-message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
-message(STATUS "Core Modules:")
-message(STATUS "  - Autograd Engine: ${USE_NEW_AUTOGRAD_ENGINE}")
-message(STATUS "  - Mobile Optimizer: ${USE_MOBILE_OPTIMIZER}")
-message(STATUS "Advanced Modules:")
-message(STATUS "  - Memory Module: ${ENABLE_MEMORY_MODULE}")
-message(STATUS "  - Activations Module: ${ENABLE_ACTIVATIONS_MODULE}")
-message(STATUS "Development Tools:")
-message(STATUS "  - Build Tests: ${BUILD_TESTS}")
-message(STATUS "  - Performance Profiling: ${ENABLE_PROFILING}")
+message(STATUS "C++ 标准: ${CMAKE_CXX_STANDARD}")
+message(STATUS "核心模块:")
+message(STATUS "  - 自动微分引擎: ${USE_NEW_AUTOGRAD_ENGINE}")
+message(STATUS "  - 移动端优化器: ${USE_MOBILE_OPTIMIZER}")
+message(STATUS "高级模块:")
+message(STATUS "  - Memory模块: ${ENABLE_MEMORY_MODULE}")
+message(STATUS "  - Activations模块: ${ENABLE_ACTIVATIONS_MODULE}")
+message(STATUS "开发工具:")
+message(STATUS "  - 构建测试: ${BUILD_TESTS}")
+message(STATUS "  - 性能分析: ${ENABLE_PROFILING}")
 message(STATUS "============================================")
 message(STATUS "")

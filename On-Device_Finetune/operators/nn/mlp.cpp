@@ -40,10 +40,10 @@ std::unique_ptr<Tensor> FeedForward::forward(const Tensor& input) {
 
 void FeedForward::print_info() const {
     std::cout << "FeedForward Info:" << std::endl;
-    std::cout << "  輸入維度: " << config_.input_size << std::endl;
-    std::cout << "  中間維度: " << 4 * config_.input_size << std::endl;
-    std::cout << "  輸出維度: " << config_.input_size << std::endl;
-    std::cout << "  激活函數: GELU" << std::endl;
+    std::cout << "  [Output]: " << config_.input_size << std::endl;
+    std::cout << "  [Output]: " << 4 * config_.input_size << std::endl;
+    std::cout << "  [Output]: " << config_.input_size << std::endl;
+    std::cout << "  activation[Output]: GELU" << std::endl;
 }
 
 SimpleMLP::SimpleMLP(const MLPConfig& config) : config_(config) {
@@ -99,12 +99,12 @@ std::unique_ptr<Tensor> SimpleMLP::forward(const Tensor& input) {
 
 void SimpleMLP::print_info() const {
     std::cout << "SimpleMLP Info:" << std::endl;
-    std::cout << "  輸入維度: " << config_.input_size << std::endl;
-    std::cout << "  隱藏維度: " << config_.hidden_size << std::endl;
-    std::cout << "  輸出維度: " << config_.output_size << std::endl;
-    std::cout << "  激活函數: " << config_.activation << std::endl;
-    std::cout << "  權重1維度: " << config_.hidden_size << " x " << config_.input_size << std::endl;
-    std::cout << "  權重2維度: " << config_.output_size << " x " << config_.hidden_size << std::endl;
+    std::cout << "  [Output]: " << config_.input_size << std::endl;
+    std::cout << "  [Output]: " << config_.hidden_size << std::endl;
+    std::cout << "  [Output]: " << config_.output_size << std::endl;
+    std::cout << "  activation[Output]: " << config_.activation << std::endl;
+    std::cout << "  [Output]1[Output]: " << config_.hidden_size << " x " << config_.input_size << std::endl;
+    std::cout << "  [Output]2[Output]: " << config_.output_size << " x " << config_.hidden_size << std::endl;
 }
 
 }

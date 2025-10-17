@@ -77,7 +77,7 @@ struct MemoryLedger {
     /**
      * @brief Format memory size for display
      */
-    static std::string format_bytes(size_t bytes) {
+    static std::string forat_bytes(size_t bytes) {
         const double KB = 1024.0;
         const double MB = KB * 1024.0;
         const double GB = MB * 1024.0;
@@ -103,13 +103,13 @@ struct MemoryLedger {
      */
     std::string to_string() const {
         std::ostringstream oss;
-        oss << "\n  📊 内存账本:\n";
-        oss << "    权重:     " << std::setw(10) << format_bytes(weights_bytes) << "\n";
-        oss << "    梯度:     " << std::setw(10) << format_bytes(gradients_bytes) << "\n";
-        oss << "    优化器:   " << std::setw(10) << format_bytes(optimizer_bytes) << "\n";
-        oss << "    激活:     " << std::setw(10) << format_bytes(activations_bytes) << " (估计)\n";
-        oss << "    临时缓存: " << std::setw(10) << format_bytes(temp_buffers_bytes) << "\n";
-        oss << "    总RSS:    " << std::setw(10) << format_bytes(total_rss_bytes);
+        oss << "\n  📊 memoryledger:\n";
+        oss << "    weight:     " << std::setw(10) << forat_bytes(weights_bytes) << "\n";
+        oss << "    gradient:     " << std::setw(10) << forat_bytes(gradients_bytes) << "\n";
+        oss << "    optimizer:   " << std::setw(10) << forat_bytes(optimizer_bytes) << "\n";
+        oss << "    activation:     " << std::setw(10) << forat_bytes(activations_bytes) << " ()\n";
+        oss << "    temporarycache: " << std::setw(10) << forat_bytes(temp_buffers_bytes) << "\n";
+        oss << "    Total RSS:    " << std::setw(10) << forat_bytes(total_rss_bytes);
         return oss.str();
     }
     
@@ -118,12 +118,12 @@ struct MemoryLedger {
      */
     std::string to_compact_string() const {
         std::ostringstream oss;
-        oss << "W:" << format_bytes(weights_bytes) 
-            << " G:" << format_bytes(gradients_bytes)
-            << " O:" << format_bytes(optimizer_bytes)
-            << " A:" << format_bytes(activations_bytes)
-            << " T:" << format_bytes(temp_buffers_bytes)
-            << " RSS:" << format_bytes(total_rss_bytes);
+        oss << "W:" << forat_bytes(weights_bytes) 
+            << " G:" << forat_bytes(gradients_bytes)
+            << " O:" << forat_bytes(optimizer_bytes)
+            << " A:" << forat_bytes(activations_bytes)
+            << " T:" << forat_bytes(temp_buffers_bytes)
+            << " RSS:" << forat_bytes(total_rss_bytes);
         return oss.str();
     }
 };

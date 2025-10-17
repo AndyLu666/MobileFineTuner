@@ -1,15 +1,15 @@
 /**
  * @file mobile_safe_matmul.h
- * @brief Memory-safe matrix multiplication optimization implementation for mobile devices
+ * [Documentation available in English]
  * 
- * This file provides a series of matrix multiplication implementations optimized for mobile devices,
- * improving performance as much as possible while ensuring memory safety.
+ * [Documentation available in English]
+ * [Documentation in English - see separate docs]
  * 
- * Optimization strategies:
- * 1. Loop reordering (ikj order) - 2-3x performance boost
- * 2. Adaptive blocking optimization - 5-10x performance boost  
- * 3. Memory usage monitoring - 100% safety guarantee
- * 4. ARM NEON vectorization (optional) - 3-4x additional boost
+ * optimizationstrategy：
+ * [Documentation available in English]
+ * 2. adaptivechunkedoptimization - 5-10xperforanceboost  
+ * [Documentation available in English]
+ * [Documentation available in English]
  */
 
 #pragma once
@@ -33,7 +33,7 @@
 namespace mobile_matmul {
 
 /**
- * @brief Memory safety monitor
+ * [Documentation available in English]
  */
 class MemorySafetyMonitor {
 public:
@@ -42,10 +42,10 @@ public:
         struct task_basic_info info;
         mach_msg_type_number_t size = TASK_BASIC_INFO_COUNT;
         if (task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&info, &size) == KERN_SUCCESS) {
-            return 8ULL * 1024 * 1024 * 1024 - info.resident_size; // 8GB - used
+            return 8ULL * 1024 * 1024 * 1024 - info.resident_size;             // [Translated]
         }
         #endif
-        return 2ULL * 1024 * 1024 * 1024; // Default assume 2GB available
+        return 2ULL * 1024 * 1024 * 1024;         // [Translated]
     }
     
     static size_t get_l1_cache_size() {
@@ -56,45 +56,45 @@ public:
             return cache_size;
         }
         #endif
-        return 32 * 1024; // Default 32KB L1 cache
+        return 32 * 1024; // default32KB L1cache
     }
     
     static bool is_operation_safe(int64_t m, int64_t n, int64_t k) {
         size_t matrix_memory = (m*k + k*n + m*n) * sizeof(float);
         size_t available = get_available_memory();
         
-        // Use no more than 25% of available memory
+                // [Translated]
         return matrix_memory < (available * 0.25);
     }
 };
 
 /**
- * @brief Adaptive block size calculator
+ * [Documentation available in English]
  */
 class AdaptiveBlockSize {
 public:
     static int calculate_safe_block_size() {
         size_t l1_cache = MemorySafetyMonitor::get_l1_cache_size();
         
-        // Conservative estimate: Use 1/6 of L1 cache, leave space for 3 matrix blocks
+        // [Translated comment removed - see documentation]
         int max_block = static_cast<int>(std::sqrt(l1_cache / (6 * sizeof(float))));
         
-        // Limit to reasonable range
+                // [Translated]
         max_block = std::min(max_block, 128);
         max_block = std::max(max_block, 16);
         
-        // Ensure it's a multiple of 4 (for subsequent SIMD optimization)
+        // [Translated comment removed - see documentation]
         return (max_block / 4) * 4;
     }
     
     static int calculate_block_size_for_matrix(int64_t m, int64_t n, int64_t k) {
         int base_block = calculate_safe_block_size();
         
-        // Dynamically adjust based on matrix size
+        // according tomatrixsizedynamicadjust
         if (m < 256 && n < 256 && k < 256) {
-            return std::min(base_block, 32); // Small matrices use small blocks
+            return std::min(base_block, 32); // smallmatrixusesmallblock
         } else if (m > 1024 || n > 1024 || k > 1024) {
-            return std::min(base_block, 64); // Large matrices control block size
+            return std::min(base_block, 64); // largematrixcontrolblocksize
         }
         
         return base_block;
@@ -102,9 +102,9 @@ public:
 };
 
 /**
- * @brief Performance monitor
+ * [Documentation available in English]
  */
-class PerformanceMonitor {
+class PerforanceMonitor {
 private:
     std::chrono::high_resolution_clock::time_point start_time_;
     
@@ -120,56 +120,56 @@ public:
     
     double calculate_gflops(int64_t m, int64_t n, int64_t k, long time_ms) {
         if (time_ms == 0) return 0.0;
-        double operations = 2.0 * m * n * k; // Number of operations in matrix multiplication
+        double operations = 2.0 * m * n * k;         // [Translated]
         double time_sec = time_ms / 1000.0;
         return (operations / time_sec) / 1e9; // GFLOPS
     }
 };
 
 /**
- * @brief Basic triple-loop matrix multiplication (original implementation)
+ * [Documentation available in English]
  */
 void naive_matmul(const float* A, const float* B, float* C,
                   int64_t M, int64_t N, int64_t K);
 
 /**
- * @brief Loop reordering optimized matrix multiplication (ikj order)
+ * [Documentation available in English]
  */
 void reordered_matmul(const float* A, const float* B, float* C,
                       int64_t M, int64_t N, int64_t K);
 
 /**
- * @brief Block-optimized matrix multiplication
+ * @brief chunkedoptimizationmatrix multiplication
  */
 void blocked_matmul(const float* A, const float* B, float* C,
                     int64_t M, int64_t N, int64_t K, int block_size = 0);
 
 /**
- * @brief ARM NEON vectorized matrix multiplication (if supported)
+ * @brief ARM NEONtoquantizationmatrix multiplication（ifsupport）
  */
 void vectorized_matmul(const float* A, const float* B, float* C,
                        int64_t M, int64_t N, int64_t K);
 
 /**
- * @brief Adaptive selection of optimal matrix multiplication implementation
+ * [Documentation available in English]
  */
 void adaptive_matmul(const float* A, const float* B, float* C,
                      int64_t M, int64_t N, int64_t K);
 
 /**
- * @brief Optimization strategy enumeration
+ * [Documentation available in English]
  */
 enum class OptimizationLevel {
-    NAIVE,      // Basic triple loop
-    REORDERED,  // Loop reordering
-    BLOCKED,    // Block optimization
-    VECTORIZED, // SIMD vectorization
-    ADAPTIVE,   // Adaptive selection
-    MEMORY_FIRST // Extreme memory-saving mode: minimal blocking + disable vectorization + single-threaded
+    NAIVE,          // [Translated]
+    REORDERED,      // [Translated]
+    BLOCKED,    // chunkedoptimization
+    VECTORIZED, // SIMDtoquantization
+    ADAPTIVE,   // adaptiveselect
+    MEMORY_FIRST     // [Translated]
 };
 
 /**
- * @brief Main safe matrix multiplication interface
+ * @brief mainsafematrix multiplicationinterface
  */
 class SafeMatmul {
 public:
@@ -180,8 +180,8 @@ public:
                         OptimizationLevel level = OptimizationLevel::ADAPTIVE);
     
     /**
-     * @brief Right matrix transpose matrix multiplication (for tying, zero-copy)
-     * C[M,N] = A[M,K] @ B[N,K]^T (B accessed transposed, no B^T construction)
+     * @brief rightmatrixtransposematrix multiplication（used for tying，zero-copy）
+     * [Documentation available in English]
      */
     static void multiply_rhs_T(const float* A, const float* B, float* C,
                               int64_t M, int64_t N, int64_t K,

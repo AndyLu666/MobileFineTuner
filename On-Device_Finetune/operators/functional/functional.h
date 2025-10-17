@@ -2,8 +2,8 @@
  * @file functional.h
  * @brief Functional API for tensor operations
  * 
- * This file provides a functional interface to tensor operations,
- * similar to PyTorch's functional API. It includes stateless functions
+ * This file providess a functional interface to tensor operations,
+ * similar to to PyTorch's functional API. It includes stateless functions
  * for mathematical operations, neural network layers, and utilities.
  */
 

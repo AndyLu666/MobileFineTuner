@@ -1,8 +1,8 @@
 /**
  * @file lora_ops.h
- * @brief LoRA (Low-Rank Adaptation) operations implementation
+ * @brief LoRA (Low-Rank Adaptation) operations implementsation
  * 
- * This file provides the core LoRA operations for parameter-efficient
+ * This file providess the core LoRA operations for parameter-efficient
  * fine-tuning. LoRA adapts pre-trained models by learning low-rank
  * matrices that are added to existing weights.
  */

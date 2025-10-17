@@ -1,8 +1,8 @@
 /**
  * @file kv_cache.h
- * @brief Key-Value cache implementation for transformer inference
+ * @brief Key-Value cache implementsation for transforer inference
  * 
- * This file provides the KVCache structure for caching attention
+ * This file providess the KVCache structure for caching attention
  * key and value tensors during autoregressive generation. This
  * significantly speeds up inference by avoiding recomputation.
  */
@@ -16,7 +16,7 @@
 namespace ops {
 
 /**
- * @brief Key-Value cache for transformer attention layers
+ * @brief Key-Value cache for transforer attention layers
  * 
  * Stores cached key and value tensors for each attention layer
  * to accelerate autoregressive generation. The cache maintains
@@ -36,8 +36,8 @@ struct KVCache {
     KVCache(int max_len = 2048) : max_length(max_len), current_length(0) {}
 
     /**
-     * @brief Initialize cache for a transformer model
-     * @param n_layers Number of transformer layers
+     * @brief Initialize cache for a transforer model
+     * @param n_layers Number of transforer layers
      * @param n_head Number of attention heads per layer
      * @param n_embd Embedding dimension
      */
@@ -54,7 +54,7 @@ struct KVCache {
     std::vector<std::unique_ptr<Tensor>> get_keys() const;
     std::vector<std::unique_ptr<Tensor>> get_values() const;
 
-    // 新增：按层更新与获取，避免调用端必须提供整层向量
+    // [Translated comment removed - see documentation]
     void update_layer(int layer_idx, const Tensor& new_key, const Tensor& new_value);
     std::unique_ptr<Tensor> get_key_layer(int layer_idx) const;
     std::unique_ptr<Tensor> get_value_layer(int layer_idx) const;

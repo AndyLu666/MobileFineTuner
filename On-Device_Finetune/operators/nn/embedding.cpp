@@ -30,8 +30,8 @@ void EmbeddingLayer::init_parameters() {
         std::fill(grad_weight_->data().begin(), grad_weight_->data().end(), 0.0f);
     }
 
-    std::cout << "EmbeddingLayer: 初始化 [" << embedding_config_.vocab_size
-              << ", " << embedding_config_.embedding_dim << "] 权重" << std::endl;
+    std::cout << "EmbeddingLayer: initialize [" << embedding_config_.vocab_size
+              << ", " << embedding_config_.embedding_dim << "] weight" << std::endl;
 }
 
 TensorPtr EmbeddingLayer::forward(const Tensor& input, bool training) {
@@ -213,8 +213,8 @@ void PositionalEmbeddingLayer::init_parameters() {
                   grad_position_embeddings_->data().end(), 0.0f);
     }
 
-    std::cout << "PositionalEmbeddingLayer: 初始化 [" << max_position_
-              << ", " << embedding_dim_ << "] 位置嵌入" << std::endl;
+    std::cout << "PositionalEmbeddingLayer: initialize [" << max_position_
+              << ", " << embedding_dim_ << "] positionembedding" << std::endl;
 }
 
 TensorPtr PositionalEmbeddingLayer::forward(const Tensor& input, bool training) {

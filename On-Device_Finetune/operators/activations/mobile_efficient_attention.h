@@ -1,17 +1,16 @@
 /**
  * @file mobile_efficient_attention.h
- * @brief Mobile memory-efficient attention mechanism system
+ * [Documentation available in English]
  * 
- * This component implements FlashAttention-like memory-efficient attention computation,
- * specifically optimized for mobile:
- * 1. Blocked attention computation, avoiding storing full attention matrix
- * 2. Online softmax algorithm, reducing intermediate result storage
- * 3. Mobile hardware optimization (ARM NEON, GPU, etc.)
- * 4. Dynamic precision adjustment and compression
- * 5. Battery and thermal-aware computation scheduling
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * [Documentation available in English]
+ * 4. dynamicaccuracyadjustandcompression
+ * [Documentation available in English]
  * 
- * Core innovation: Compared to standard attention's O(N²) memory complexity,
- * achieves O(N) memory complexity while maintaining computational precision and performance.
+ * [Documentation available in English]
+ * [Documentation available in English]
  */
 
 #pragma once
@@ -32,128 +31,128 @@ using ops::TensorPtr;
 using ops::Tensor;
 
 /**
- * @brief Attention computation strategy enum
+ * [Documentation available in English]
  */
 enum class AttentionStrategy {
-    STANDARD = 0,           // Standard attention (high memory)
-    FLASH_ATTENTION = 1,    // FlashAttention style
-    MOBILE_OPTIMIZED = 2,   // Mobile-optimized version
-    MEMORY_FIRST = 3,       // Memory-first (lowest memory usage)
-    SPEED_FIRST = 4         // Speed-first (may use more memory)
+    STANDARD = 0,           // standardattention（highmemory）
+    FLASH_ATTENTION = 1,        // [Translated]
+    MOBILE_OPTIMIZED = 2,   // mobileoptimizationversion
+    MEMORY_FIRST = 3,           // [Translated]
+    SPEED_FIRST = 4             // [Translated]
 };
 
 /**
- * @brief Block computation strategy
+ * @brief chunkedcomputestrategy
  */
 enum class BlockStrategy {
-    UNIFORM_BLOCKS = 0,     // Uniform blocking
-    ADAPTIVE_BLOCKS = 1,    // Adaptive blocking
-    IMPORTANCE_BLOCKS = 2,  // Importance-based blocking
-    MOBILE_AWARE = 3        // Mobile-aware blocking
+    UNIFORM_BLOCKS = 0,         // [Translated]
+    ADAPTIVE_BLOCKS = 1,    // adaptivechunked
+    IMPORTANCE_BLOCKS = 2,      // [Translated]
+    MOBILE_AWARE = 3            // [Translated]
 };
 
 /**
- * @brief Precision mode enum
+ * [Documentation available in English]
  */
 enum class AttentionPrecision {
-    FP32 = 0,              // 32-bit floating point
-    FP16 = 1,              // 16-bit floating point
+    FP32 = 0,                  // [Translated]
+    FP16 = 1,                  // [Translated]
     BF16 = 2,              // BFloat16
-    MIXED = 3,             // Mixed precision
-    DYNAMIC = 4            // Dynamic precision adjustment
+    MIXED = 3,             // mixed precision
+    DYNAMIC = 4            // dynamicaccuracyadjust
 };
 
 /**
- * @brief Attention head grouping strategy
+ * [Documentation available in English]
  */
 enum class HeadGroupStrategy {
-    NO_GROUPING = 0,       // No grouping, each head computed independently
-    UNIFORM_GROUPING = 1,  // Uniform grouping
-    ADAPTIVE_GROUPING = 2, // Adaptive grouping (based on similarity)
-    MOBILE_GROUPING = 3    // Mobile-optimized grouping
+    NO_GROUPING = 0,           // [Translated]
+    UNIFORM_GROUPING = 1,      // [Translated]
+    ADAPTIVE_GROUPING = 2,     // [Translated]
+    MOBILE_GROUPING = 3        // [Translated]
 };
 
 /**
- * @brief Mobile attention configuration
+ * @brief mobileattentionconfiguration
  */
 struct MobileAttentionConfig {
-    // Basic parameters
+    // basicparameter
     AttentionStrategy strategy = AttentionStrategy::MOBILE_OPTIMIZED;
     BlockStrategy block_strategy = BlockStrategy::MOBILE_AWARE;
     AttentionPrecision precision = AttentionPrecision::MIXED;
     HeadGroupStrategy head_grouping = HeadGroupStrategy::MOBILE_GROUPING;
     
-    // Blocking parameters
-    size_t block_size = 64;                    // Default block size
-    size_t min_block_size = 16;                // Minimum block size
-    size_t max_block_size = 256;               // Maximum block size
-    bool enable_adaptive_block_sizing = true;  // Adaptive block sizing
+    // chunkedparameter
+    size_t block_size = 64;                    // defaultchunkedsize
+    size_t min_block_size = 16;                    // [Translated]
+    size_t max_block_size = 256;                   // [Translated]
+    bool enable_adaptive_block_sizing = true;  // adaptivechunkedsize
     
-    // Memory management parameters
-    size_t max_attention_memory_mb = 128;      // Max attention memory usage (MB)
-    float memory_pressure_threshold = 0.8f;    // Memory pressure threshold
-    bool enable_attention_caching = true;      // Enable attention caching
-    bool enable_kv_caching = true;             // Enable KV caching
+    // memorymanageparameter
+    size_t max_attention_memory_mb = 128;          // [Translated]
+    float memory_pressure_threshold = 0.8f;        // [Translated]
+    bool enable_attention_caching = true;      // enableattentioncache
+    bool enable_kv_caching = true;             // enableKVcache
     
-    // Mobile optimization parameters
-    bool enable_mobile_optimizations = true;   // Enable mobile optimizations
-    bool enable_neon_acceleration = true;      // Enable ARM NEON acceleration
-    bool enable_gpu_acceleration = true;       // Enable GPU acceleration
-    bool optimize_for_power_efficiency = true; // Optimize power efficiency
+    // mobileoptimizationparameter
+    bool enable_mobile_optimizations = true;   // enablemobileoptimization
+    bool enable_neon_acceleration = true;          // [Translated]
+    bool enable_gpu_acceleration = true;           // [Translated]
+    bool optimize_for_power_efficiency = true; // optimizationpowerefficiency
     
-    // Precision and quality parameters
-    float attention_dropout = 0.0f;           // Attention dropout rate
-    float precision_threshold = 1e-4f;        // Precision threshold
-    bool enable_numerical_stability = true;   // Enable numerical stability optimization
-    float temperature_scaling = 1.0f;         // Temperature scaling parameter
+    // accuracyandqualityparameter
+    float attention_dropout = 0.0f;               // [Translated]
+    float precision_threshold = 1e-4f;        // accuracythreshold
+    bool enable_numerical_stability = true;       // [Translated]
+    float temperature_scaling = 1.0f;         // temperaturescaleparameter
     
-    // Dynamic optimization parameters
-    bool enable_dynamic_optimization = true;  // Enable dynamic optimization
-    float battery_aware_scaling = 0.8f;       // Computation scaling when battery low
-    float thermal_aware_scaling = 0.7f;       // Computation scaling when overheating
+    // dynamicoptimizationparameter
+    bool enable_dynamic_optimization = true;  // enabledynamicoptimization
+    float battery_aware_scaling = 0.8f;           // [Translated]
+    float thermal_aware_scaling = 0.7f;           // [Translated]
     
-    // Performance analysis parameters
-    bool enable_attention_profiling = false;  // Enable attention profiling
-    bool log_attention_events = false;        // Log attention events
+    // Perforance analysis parameters
+    bool enable_attention_profiling = false;  // enableattentionperforanceanalyze
+    bool log_attention_events = false;        // recordattentionevent
     std::string profiling_output_path = "./attention_profile.json";
 };
 
 /**
- * @brief Attention computation statistics
+ * @brief attentioncomputestatisticsinforation
  */
 struct AttentionStats {
-    // Basic statistics
+    // basicstatistics
     size_t total_attention_calls;
     size_t total_blocks_processed;
     size_t cache_hits;
     size_t cache_misses;
     
-    // Memory statistics
+    // memorystatistics
     size_t peak_memory_usage_bytes;
     size_t average_memory_usage_bytes;
     size_t memory_saved_by_blocking;
     float average_memory_efficiency;
     
-    // Performance statistics
+    // perforancestatistics
     double total_attention_time_ms;
     double average_attention_time_ms;
     double total_softmax_time_ms;
     double total_matmul_time_ms;
     
-    // Mobile statistics
+    // mobilestatistics
     size_t neon_accelerated_operations;
     size_t gpu_accelerated_operations;
     size_t battery_optimized_calls;
     size_t thermal_optimized_calls;
     
-    // Precision statistics
+    // accuracystatistics
     double average_attention_entropy;
     size_t precision_downgrades;
     size_t precision_upgrades;
 };
 
 /**
- * @brief Attention block context
+ * [Documentation available in English]
  */
 struct AttentionBlock {
     size_t block_id;
@@ -162,18 +161,18 @@ struct AttentionBlock {
     size_t start_col;
     size_t end_col;
     
-    // Block data
-    TensorPtr q_block;    // Query block
-    TensorPtr k_block;    // Key block
-    TensorPtr v_block;    // Value block
-    TensorPtr scores_block; // Attention scores block
+    // chunkeddata
+    TensorPtr q_block;    // Querychunked
+    TensorPtr k_block;    // Keychunked
+    TensorPtr v_block;    // Valuechunked
+    TensorPtr scores_block;     // [Translated]
     
-    // Online softmax state
-    TensorPtr row_max;    // Row max values (for numerical stability)
-    TensorPtr row_sum;    // Row sum (for normalization)
-    TensorPtr output_block; // Output block
+        // [Translated]
+    TensorPtr row_max;        // [Translated]
+    TensorPtr row_sum;        // [Translated]
+    TensorPtr output_block; // outputchunked
     
-    // Computation state
+    // computestate
     bool is_computed;
     bool is_cached;
     std::chrono::steady_clock::time_point last_access_time;
@@ -186,7 +185,7 @@ struct AttentionBlock {
 };
 
 /**
- * @brief KV cache entry
+ * [Documentation available in English]
  */
 struct KVCacheEntry {
     TensorPtr cached_k;
@@ -207,36 +206,36 @@ struct KVCacheEntry {
 };
 
 /**
- * @brief Mobile efficient attention calculator
+ * [Documentation available in English]
  */
 class MobileEfficientAttention {
 private:
     MobileAttentionConfig config_;
     
-    // Block management
+    // chunkedmanage
     std::vector<std::unique_ptr<AttentionBlock>> current_blocks_;
     std::unordered_map<size_t, std::unique_ptr<AttentionBlock>> block_cache_;
     
-    // KV cache management
+    // KVcachemanage
     std::unordered_map<std::string, std::unique_ptr<KVCacheEntry>> kv_cache_;
     size_t max_kv_cache_size_;
     size_t current_kv_cache_size_;
     
-    // Mobile state monitoring
+    // mobilestatemonitor
     std::atomic<float> current_memory_pressure_;
     std::atomic<int> current_battery_level_;
     std::atomic<float> current_temperature_;
     std::atomic<bool> is_app_foreground_;
     
-    // Thread safety
+    // threadsafe
     mutable std::mutex attention_mutex_;
     mutable std::mutex cache_mutex_;
     mutable std::mutex stats_mutex_;
     
-    // Statistics
+    // statisticsinfo
     AttentionStats stats_;
     
-    // Dynamic optimization state
+    // dynamicoptimizationstate
     std::atomic<AttentionPrecision> current_precision_;
     std::atomic<size_t> current_block_size_;
     std::deque<double> recent_computation_times_;
@@ -246,13 +245,13 @@ public:
     ~MobileEfficientAttention();
     
     /**
-     * @brief Compute memory-efficient multi-head attention
-     * @param query Query tensor [batch, seq_len, num_heads, head_dim]
-     * @param key Key tensor [batch, seq_len, num_heads, head_dim]
-     * @param value Value tensor [batch, seq_len, num_heads, head_dim]
-     * @param mask Optional attention mask
-     * @param cache_key KV cache key (for inference optimization)
-     * @return Attention output tensor
+     * @brief computememoryefficientmulti-head attention
+     * @param query Querytensor [batch, seq_len, num_heads, head_dim]
+     * @param key Keytensor [batch, seq_len, num_heads, head_dim]
+     * @param value Valuetensor [batch, seq_len, num_heads, head_dim]
+     * [Documentation available in English]
+     * @param cache_key KVcachekey（used forinferenceoptimization）
+     * @return attentionoutputtensor
      */
     TensorPtr compute_attention(
         const TensorPtr& query,
@@ -263,12 +262,12 @@ public:
     );
     
     /**
-     * @brief Compute causal attention (for autoregressive models)
-     * @param query Query tensor
-     * @param key Key tensor  
-     * @param value Value tensor
-     * @param cache_key KV cache key
-     * @return Attention output tensor
+     * [Documentation available in English]
+     * @param query Querytensor
+     * @param key Keytensor  
+     * @param value Valuetensor
+     * @param cache_key KVcachekey
+     * @return attentionoutputtensor
      */
     TensorPtr compute_causal_attention(
         const TensorPtr& query,
@@ -278,12 +277,12 @@ public:
     );
     
     /**
-     * @brief Compute cross attention (for encoder-decoder models)
-     * @param query Query tensor (from decoder)
-     * @param key Key tensor (from encoder)
-     * @param value Value tensor (from encoder)
-     * @param mask Cross attention mask
-     * @return Attention output tensor
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * @return attentionoutputtensor
      */
     TensorPtr compute_cross_attention(
         const TensorPtr& query,
@@ -293,10 +292,10 @@ public:
     );
     
     /**
-     * @brief Update KV cache (for incremental inference)
-     * @param cache_key Cache key
-     * @param new_key New Key tensor
-     * @param new_value New Value tensor
+     * [Documentation available in English]
+     * @param cache_key cachekey
+     * @param new_key newKeytensor
+     * @param new_value newValuetensor
      */
     void update_kv_cache(
         const std::string& cache_key,
@@ -305,45 +304,45 @@ public:
     );
     
     /**
-     * @brief Clear KV cache
-     * @param cache_key Specific cache key, if empty clears all
+     * @brief cleanupKVcache
+     * [Documentation available in English]
      */
     void clear_kv_cache(const std::string& cache_key = "");
     
     /**
-     * @brief Update mobile system state
-     * @param memory_pressure Memory pressure (0.0-1.0)
-     * @param battery_level Battery level (0-100)  
-     * @param temperature Device temperature
-     * @param is_foreground Whether running in foreground
+     * @brief updatemobilesystemstate
+     * [Documentation available in English]
+     * @param battery_level batterybattery level (0-100)  
+     * @param temperature devicetemperature
+     * @param is_foreground is notforegroundrunning
      */
     void update_mobile_state(float memory_pressure, int battery_level,
                             float temperature, bool is_foreground);
     
     /**
-     * @brief Configure attention parameters
-     * @param config New attention configuration
+     * @brief configurationattentionparameter
+     * @param config newattentionconfiguration
      */
     void configure_attention(const MobileAttentionConfig& config);
     
     /**
-     * @brief Get attention statistics
-     * @return Current statistics
+     * @brief acquireattentionstatisticsinforation
+     * @return currentstatisticsinforation
      */
     AttentionStats get_attention_stats() const;
     
     /**
-     * @brief Optimize attention computation configuration
-     * Dynamically adjust configuration based on current system state and historical performance
+     * @brief optimizationattentioncomputeconfiguration
+     * [Documentation available in English]
      */
     void optimize_attention_configuration();
     
     /**
-     * @brief PRODUCTION: Precisely calculate attention computation memory requirement
-     * @param query_shape Query tensor shape
-     * @param key_shape Key tensor shape
-     * @param strategy Computation strategy
-     * @return Precisely analyzed memory requirement (bytes)
+     * [Documentation available in English]
+     * @param query_shape Querytensorshape
+     * @param key_shape Keytensorshape
+     * @param strategy computestrategy
+     * [Documentation available in English]
      */
     size_t estimate_memory_requirement(
         const std::vector<int64_t>& query_shape,
@@ -352,13 +351,13 @@ public:
     );
     
     /**
-     * @brief Export attention profiling report
-     * @param report_path Report save path
+     * @brief exportattentionperforanceanalyzereport
+     * @param report_path reportsavepath
      */
     void export_profiling_report(const std::string& report_path) const;
 
 private:
-    // Core attention algorithms
+    // coreattentionalgorithm
     TensorPtr compute_flash_attention(
         const TensorPtr& query, const TensorPtr& key, const TensorPtr& value,
         const TensorPtr& mask);
@@ -369,68 +368,68 @@ private:
         const TensorPtr& query, const TensorPtr& key, const TensorPtr& value,
         const TensorPtr& mask);
     
-    // Blocking algorithms
+    // chunkedalgorithm
     std::vector<std::unique_ptr<AttentionBlock>> create_attention_blocks(
         const std::vector<int64_t>& query_shape,
         const std::vector<int64_t>& key_shape);
     void compute_block_attention(AttentionBlock& block, const TensorPtr& mask);
     TensorPtr merge_attention_blocks(const std::vector<std::unique_ptr<AttentionBlock>>& blocks);
     
-    // Online softmax algorithm (FlashAttention core)
+        // [Translated]
     void online_softmax_forward(
         const TensorPtr& scores, TensorPtr& row_max, TensorPtr& row_sum, TensorPtr& output);
     void online_softmax_update(
         const TensorPtr& new_scores, TensorPtr& row_max, TensorPtr& row_sum, TensorPtr& output);
     
-    // Mobile hardware optimization
+        // [Translated]
     void apply_neon_acceleration(TensorPtr& tensor);
     void apply_gpu_acceleration(TensorPtr& tensor);
     bool should_use_neon_for_operation(size_t tensor_size);
     bool should_use_gpu_for_operation(size_t tensor_size);
     
-    // Dynamic precision management
+    // dynamicaccuracymanage
     AttentionPrecision determine_optimal_precision(
         const TensorPtr& query, const TensorPtr& key, const TensorPtr& value);
     TensorPtr convert_precision(const TensorPtr& tensor, AttentionPrecision target_precision);
     void adapt_precision_for_mobile_state();
     
-    // KV cache management
+    // KVcachemanage
     bool should_cache_kv(const std::string& cache_key, size_t sequence_length);
     void evict_old_kv_cache();
     void compress_kv_cache_if_needed();
     std::pair<TensorPtr, TensorPtr> get_cached_kv(const std::string& cache_key);
     
-    // Block optimization algorithms
+    // chunkedoptimizationalgorithm
     size_t calculate_optimal_block_size(
         const std::vector<int64_t>& query_shape, 
         const std::vector<int64_t>& key_shape);
     void adapt_block_size_for_mobile_state();
     bool should_use_adaptive_blocking();
     
-    // Mobile optimization strategies
+    // mobileoptimizationstrategy
     void apply_battery_aware_optimizations();
     void apply_thermal_aware_optimizations();  
     void apply_memory_pressure_optimizations();
     void apply_ui_responsiveness_optimizations();
     
-    // Numerical stability and quality control
+        // [Translated]
     TensorPtr apply_temperature_scaling(const TensorPtr& scores);
     TensorPtr apply_attention_dropout(const TensorPtr& attention_weights);
     void ensure_numerical_stability(TensorPtr& tensor);
     
-    // Performance monitoring and statistics
+    // perforancemonitorandstatistics
     void update_attention_stats(double computation_time, size_t memory_used);
     void record_mobile_optimization(const std::string& optimization_type);
     void analyze_attention_patterns();
     
-    // Utility methods
+    // toolmethod
     std::vector<int64_t> calculate_output_shape(
         const std::vector<int64_t>& query_shape,
         const std::vector<int64_t>& value_shape);
     bool is_causal_mask_needed(const std::vector<int64_t>& query_shape);
     TensorPtr create_causal_mask(size_t sequence_length);
     
-    // Memory management utilities
+    // memorymanagetool
     void cleanup_expired_blocks();
     void handle_attention_memory_pressure();
     size_t get_current_attention_memory_usage();
@@ -442,50 +441,50 @@ private:
 };
 
 /**
- * @brief Attention utility functions namespace
+ * @brief attentiontoolfunctionnamespace
  */
 namespace attention_utils {
     
     /**
-     * @brief Calculate theoretical memory complexity of attention computation
-     * @param sequence_length Sequence length
-     * @param hidden_size Hidden layer size
-     * @param num_heads Number of attention heads
-     * @return Memory requirement (standard attention vs FlashAttention)
+     * @brief computeattentioncomputetheoreticalmemorycomplexity
+     * @param sequence_length sequencelength
+     * @param hidden_size hidden layersize
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     std::pair<size_t, size_t> calculate_memory_complexity(
         size_t sequence_length, size_t hidden_size, size_t num_heads);
     
     /**
-     * @brief Analyze sparsity of attention pattern
-     * @param attention_weights Attention weight matrix
-     * @param sparsity_threshold Sparsity threshold
-     * @return Sparsity analysis result
+     * [Documentation available in English]
+     * @param attention_weights attentionweightmatrix
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     struct SparsityAnalysis {
-        float sparsity_ratio;        // Sparsity ratio
-        std::vector<int> sparse_heads; // Sparse attention heads
-        bool can_optimize;           // Whether can optimize
+        float sparsity_ratio;                // [Translated]
+        std::vector<int> sparse_heads;         // [Translated]
+        bool can_optimize;           // is notcanoptimization
     };
     SparsityAnalysis analyze_attention_sparsity(
         const TensorPtr& attention_weights, float sparsity_threshold = 0.1f);
     
     /**
-     * @brief Optimize attention head grouping for mobile
-     * @param num_heads Total number of attention heads
-     * @param available_memory Available memory
-     * @param target_groups Target number of groups
-     * @return Optimized grouping strategy
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * @param available_memory availablememory
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     std::vector<std::vector<int>> optimize_head_grouping(
         int num_heads, size_t available_memory, int target_groups = -1);
     
     /**
-     * @brief Create mobile-optimized attention mask
-     * @param sequence_length Sequence length
-     * @param mask_type Mask type ("causal", "padding", "custom")
-     * @param custom_mask Custom mask (optional)
-     * @return Optimized attention mask
+     * [Documentation available in English]
+     * @param sequence_length sequencelength
+     * [Documentation available in English]
+     * [Documentation available in English]
+     * [Documentation available in English]
      */
     TensorPtr create_mobile_optimized_mask(
         size_t sequence_length, 

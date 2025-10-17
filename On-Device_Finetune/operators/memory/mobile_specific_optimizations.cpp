@@ -2,12 +2,13 @@
  * @file mobile_specific_optimizations.cpp
  * @brief Implementation of mobile-specific optimization classes
  * 
- * This file provides stub implementations of mobile-specific optimization classes
- * to fix linking issues. These are minimal working implementations that can
+ * This file providess stub implementsations of mobile-specific optimization classes
+ * to fix linking issues. These are minimal working implementsations that can
  * be extended later with full functionality.
  */
 
 #include "mobile_specific_optimizations.h"
+#include <cstring>
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -21,7 +22,7 @@ namespace memory {
 
 AndroidMemoryManager::AndroidMemoryManager() : jni_env_(nullptr), activity_ref_(nullptr), 
     memory_info_class_(nullptr), is_initialized_(false) {
-    std::cout << "[AndroidMemoryManager] Initialized (stub implementation)" << std::endl;
+    std::cout << "[AndroidMemoryManager] Initialized (stub implementsation)" << std::endl;
 }
 
 AndroidMemoryManager::~AndroidMemoryManager() {
@@ -34,7 +35,7 @@ bool AndroidMemoryManager::initialize(JNIEnv* env, jobject activity) {
     
     // Initialize memory_info_class_ to avoid unused field warning
     if (env) {
-        // In a real implementation, this would find the actual Android memory info class
+        // In a real implementsation, this would find the actual Android memory info class
         // For now, we just mark it as used to avoid warnings
         memory_info_class_ = nullptr;
         
@@ -52,7 +53,7 @@ bool AndroidMemoryManager::initialize(JNIEnv* env, jobject activity) {
 }
 
 AndroidMemoryManager::AndroidMemoryInfo AndroidMemoryManager::get_android_memory_info() const {
-    // Stub implementation - return simulated values
+    // Stub implementsation - return simulated values
     AndroidMemoryInfo info;
     info.total_memory_mb = 8192;  // 8GB
     info.available_memory_mb = 3072;  // 3GB available
@@ -64,14 +65,14 @@ AndroidMemoryManager::AndroidMemoryInfo AndroidMemoryManager::get_android_memory
 }
 
 void AndroidMemoryManager::register_low_memory_callback(const std::function<void()>& callback) {
-    // Stub implementation - just store the callback
+    // Stub implementsation - just store the callback
     (void)callback;
     std::cout << "[AndroidMemoryManager] Low memory callback registered" << std::endl;
 }
 
 void AndroidMemoryManager::request_java_gc() {
     std::cout << "[AndroidMemoryManager] Requesting Java GC (stub)" << std::endl;
-    // In real implementation, this would call System.gc() via JNI
+    // In real implementsation, this would call System.gc() via JNI
 }
 
 size_t AndroidMemoryManager::get_app_memory_class_mb() const {
@@ -100,7 +101,7 @@ bool ZRAMOptimizer::is_zram_available() const {
 }
 
 ZRAMOptimizer::ZRAMStats ZRAMOptimizer::get_zram_stats() const {
-    // Stub implementation - return simulated stats
+    // Stub implementsation - return simulated stats
     ZRAMStats stats;
     stats.compressed_size_mb = 800;
     stats.original_size_mb = 2000;
@@ -115,13 +116,13 @@ bool ZRAMOptimizer::create_swap_file(size_t size_mb, const std::string& path) {
     swap_file_active_ = true;
     
     std::cout << "[ZRAMOptimizer] Created swap file: " << path 
-              << " (" << size_mb << "MB) - stub implementation" << std::endl;
+              << " (" << size_mb << "MB) - stub implementsation" << std::endl;
     
     return true;  // Stub: always succeed
 }
 
 std::vector<uint8_t> ZRAMOptimizer::optimize_for_zram_compression(const void* data, size_t size) {
-    // Stub implementation - just copy the data
+    // Stub implementsation - just copy the data
     const uint8_t* byte_data = static_cast<const uint8_t*>(data);
     std::vector<uint8_t> optimized_data(byte_data, byte_data + size);
     
@@ -144,12 +145,12 @@ BigLittleOptimizer::BigLittleOptimizer() : big_little_available_(true) {
 }
 
 bool BigLittleOptimizer::detect_big_little_configuration() {
-    // Stub implementation - assume configuration already detected
+    // Stub implementsation - assume configuration already detected
     return big_little_available_;
 }
 
 void BigLittleOptimizer::schedule_on_optimal_cores(const std::string& computation_type, std::thread::id thread_id) {
-    // Stub implementation - just log the scheduling decision
+    // Stub implementsation - just log the scheduling decision
     (void)thread_id;
     
     std::string core_type;
@@ -166,7 +167,7 @@ void BigLittleOptimizer::schedule_on_optimal_cores(const std::string& computatio
 }
 
 std::vector<size_t> BigLittleOptimizer::get_optimal_cores_for_param_ops() const {
-    // For parameter operations, prefer little cores (lower power, sufficient performance)
+    // For parameter operations, prefer little cores (lower power, sufficient perforance)
     return little_core_ids_;
 }
 
@@ -196,7 +197,7 @@ MobileGPUOptimizer::MobileGPUOptimizer(MobileGPUVendor vendor)
 }
 
 void MobileGPUOptimizer::optimize_transfer_pattern(void* src, void* dst, size_t size) {
-    // Stub implementation - just perform a simple copy
+    // Stub implementsation - just perfor a simple copy
     std::memcpy(dst, src, size);
     
     std::cout << "[MobileGPUOptimizer] Optimized transfer of " << size << " bytes" << std::endl;
@@ -275,7 +276,7 @@ BatteryAwareScheduler::BatteryStrategy BatteryAwareScheduler::get_optimal_strate
 }
 
 size_t BatteryAwareScheduler::estimate_operation_power_cost(size_t param_size_mb, const std::string& operation) const {
-    // Stub implementation - rough power estimation
+    // Stub implementsation - rough power estimation
     size_t base_power = 100;  // 100mW base
     size_t size_factor = param_size_mb * 10;  // 10mW per MB
     
@@ -374,8 +375,8 @@ size_t UIResponsivenessOptimizer::get_ui_safe_time_budget_ms() const {
 }
 
 void UIResponsivenessOptimizer::schedule_ui_safe_operation(const std::function<void()>& operation) {
-    // Stub implementation - just execute immediately
-    // In real implementation, this would schedule operation between frames
+    // Stub implementsation - just execute immediately
+    // In real implementsation, this would schedule operation between frames
     operation();
 }
 
@@ -418,18 +419,18 @@ MobileCacheOptimizer::MobileCacheOptimizer() {
 }
 
 bool MobileCacheOptimizer::detect_cache_configuration() {
-    // Stub implementation - assume already detected
+    // Stub implementsation - assume already detected
     return true;
 }
 
 void MobileCacheOptimizer::optimize_parameter_layout(std::vector<TensorPtr>& parameters) {
-    // Stub implementation - just log the optimization
+    // Stub implementsation - just log the optimization
     std::cout << "[MobileCacheOptimizer] Optimized layout for " << parameters.size() 
               << " parameters" << std::endl;
 }
 
 std::vector<size_t> MobileCacheOptimizer::get_cache_optimal_access_order(const std::vector<size_t>& param_ids) {
-    // Stub implementation - return same order (no optimization)
+    // Stub implementsation - return same order (no optimization)
     std::cout << "[MobileCacheOptimizer] Generated cache-optimal access order for " 
               << param_ids.size() << " parameters" << std::endl;
     return param_ids;
@@ -440,7 +441,7 @@ size_t MobileCacheOptimizer::get_cache_aligned_offset(size_t base_offset, size_t
     size_t alignment = cache_config_.cache_line_size;
     size_t aligned_offset = (base_offset + alignment - 1) & ~(alignment - 1);
     
-    (void)param_size;  // Unused in stub implementation
+    (void)param_size;  // Unused in stub implementsation
     
     return aligned_offset;
 }
@@ -448,7 +449,7 @@ size_t MobileCacheOptimizer::get_cache_aligned_offset(size_t base_offset, size_t
 void MobileCacheOptimizer::prefetch_parameter_cache_lines(const TensorPtr& param) {
     if (!param) return;
     
-    // Stub implementation - simulate cache line prefetching
+    // Stub implementsation - simulate cache line prefetching
     size_t param_size = param->numel() * 4;  // Assume float32
     size_t cache_lines = (param_size + cache_config_.cache_line_size - 1) / cache_config_.cache_line_size;
     
@@ -463,7 +464,7 @@ MobileOptimizationCoordinator::MobileOptimizationCoordinator()
     : current_state_(MobileSystemState::FOREGROUND_ACTIVE), 
       current_strategy_(MobileOptimizationStrategy::BALANCED) {
     
-    // Initialize all optimizers with stub implementations
+    // Initialize all optimizers with stub implementsations
     android_manager_ = std::make_unique<AndroidMemoryManager>();
     zram_optimizer_ = std::make_unique<ZRAMOptimizer>();
     big_little_optimizer_ = std::make_unique<BigLittleOptimizer>();
@@ -538,7 +539,7 @@ void MobileOptimizationCoordinator::adapt_to_current_conditions() {
     std::cout << "Analyzing current state: " << static_cast<int>(current_state_) << std::endl;
     std::cout << "Current strategy: " << static_cast<int>(current_strategy_) << std::endl;
     
-    // Update strategy based on current conditions (stub implementation)
+    // Update strategy based on current conditions (stub implementsation)
     switch (current_state_) {
         case MobileSystemState::LOW_MEMORY_WARNING:
             current_strategy_ = MobileOptimizationStrategy::MEMORY_FIRST;
@@ -564,7 +565,7 @@ void MobileOptimizationCoordinator::adapt_to_current_conditions() {
 MobileOptimizationCoordinator::MobileOptimizationReport MobileOptimizationCoordinator::get_optimization_report() const {
     MobileOptimizationReport report;
     
-    // Stub implementation - return sample data
+    // Stub implementsation - return sample data
     report.android_integration_active = (android_manager_ != nullptr);
     report.zram_optimization_active = (zram_optimizer_ != nullptr);
     report.memory_pressure_level = 0.6;

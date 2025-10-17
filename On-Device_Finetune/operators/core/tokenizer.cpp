@@ -150,7 +150,7 @@ std::vector<int> SimpleTokenizer::encode(const std::string& text) {
     while (iss >> word) {
 
         word.erase(std::remove_if(word.begin(), word.end(), ::ispunct), word.end());
-        std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+        std::transfor(word.begin(), word.end(), word.begin(), ::tolower);
 
         if (vocab_.find(word) != vocab_.end()) {
             tokens.push_back(vocab_[word]);

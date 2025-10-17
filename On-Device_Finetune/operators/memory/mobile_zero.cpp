@@ -1,8 +1,8 @@
 /**
  * @file mobile_zero.cpp
- * @brief Mobile-optimized ZeRO implementation for single-device training
+ * @brief Mobile-optimized ZeRO implementsation for single-device training
  * 
- * Industrial-grade implementation of ZeRO optimizer adapted for mobile platforms
+ * Industrial-grade implementsation of ZeRO optimizer adapted for mobile platfors
  */
 
 #include "mobile_zero.h"

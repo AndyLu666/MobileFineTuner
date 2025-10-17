@@ -1,9 +1,9 @@
 /**
- * @file transformer_block.h
- * @brief Transformer block implementation
+ * @file transforer_block.h
+ * @brief Transforer block implementsation
  * 
- * This file provides the TransformerBlock class which implements
- * a complete transformer block consisting of multi-head attention
+ * This file providess the TransforerBlock class which implementss
+ * a complete transforer block consisting of multi-head attention
  * and feed-forward networks with layer normalization and residual connections.
  */
 
@@ -16,13 +16,13 @@
 namespace ops {
 
 /**
- * @brief Configuration structure for transformer blocks
+ * @brief Configuration structure for transforer blocks
  * 
  * Contains all architectural parameters needed to configure
- * a transformer block including attention heads, MLP dimensions,
+ * a transforer block including attention heads, MLP dimensions,
  * and normalization settings.
  */
-struct TransformerBlockConfig {
+struct TransforerBlockConfig {
     int hidden_size;  /**< Hidden dimension size */
     int num_heads;    /**< Number of attention heads */
     int mlp_dim;      /**< MLP intermediate dimension */
@@ -30,7 +30,7 @@ struct TransformerBlockConfig {
     bool pre_norm;    /**< Whether to use pre-normalization */
 
     /**
-     * @brief Default transformer block configuration
+     * @brief Default transforer block configuration
      * 
      * Creates a configuration with default values:
      * - hidden_size: 0 (must be set)
@@ -39,18 +39,18 @@ struct TransformerBlockConfig {
      * - dropout: 0.1
      * - pre_norm: true
      */
-    TransformerBlockConfig() : hidden_size(0), num_heads(1),
+    TransforerBlockConfig() : hidden_size(0), num_heads(1),
         mlp_dim(0), dropout(0.1f), pre_norm(true) {}
 
     /**
-     * @brief Construct transformer block configuration
+     * @brief Construct transforer block configuration
      * @param hidden_size_ Hidden dimension size
      * @param num_heads_ Number of attention heads
      * @param mlp_dim_ MLP intermediate dimension
      * @param dropout_ Dropout rate (default: 0.1)
      * @param pre_norm_ Whether to use pre-normalization (default: true)
      */
-    TransformerBlockConfig(
+    TransforerBlockConfig(
         int hidden_size_,
         int num_heads_,
         int mlp_dim_,
@@ -63,9 +63,9 @@ struct TransformerBlockConfig {
         pre_norm(pre_norm_) {}
 };
 
-class TransformerBlock {
+class TransforerBlock {
 public:
-    TransformerBlock(const TransformerBlockConfig& config);
+    TransforerBlock(const TransforerBlockConfig& config);
 
     TensorPtr forward(const Tensor& input, bool training = false);
     TensorPtr forward_with_cache(const Tensor& input,
@@ -86,7 +86,7 @@ public:
     size_t get_param_count() const;
 
 private:
-    TransformerBlockConfig config_;
+    TransforerBlockConfig config_;
 
     std::unique_ptr<AttentionLayer> self_attention_;
     std::unique_ptr<MLPLayer> mlp_;

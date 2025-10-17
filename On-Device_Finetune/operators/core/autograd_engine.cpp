@@ -55,8 +55,8 @@ NodePtr Engine::register_node(const TensorPtr& output,
     
     // Create edges from inputs to output
     // Important: No longer rely on inputs[i]->requires_grad() to decide edge creation.
-    // Even if intermediate tensors don't need grad writeback, they must be connected in the graph
-    // to continue gradient flow to earlier trainable parameters (like LoRA A/B).
+    // Even if intermediate tensors don't need gradient writeback, they must be connected
+    // in the graph to propagate gradients to earlier trainable parameters (e.g., LoRA A/B).
     for (size_t i = 0; i < inputs.size(); ++i) {
         if (inputs[i]) {
             auto input_node = get_node(inputs[i]);
@@ -119,12 +119,7 @@ void Engine::accumulate_grad(const TensorPtr& tensor, const TensorPtr& grad) {
     const Tensor* raw_ptr = tensor.get();
     
     #ifdef AUTOGRAD_DEBUG
-    std::cout << "[Engine::accumulate_grad] tensor=" << raw_ptr << " grad_shape=[";
-    for (size_t i = 0; i < grad->shape().size(); ++i) {
-        if (i > 0) std::cout << ",";
-        std::cout << grad->shape()[i];
-    }
-    std::cout << "]" << std::endl;
+    // Debug only
     #endif
     
     auto it = pending_grads_.find(raw_ptr);
@@ -149,7 +144,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
     if (!enabled_) return;
     
     #ifdef AUTOGRAD_DEBUG
-    std::cout << "[AutogradEngine] run_backward called with " << outputs.size() << " outputs" << std::endl;
+    // Debug only
     #endif
     
     // Prepare root nodes and gradients
@@ -176,7 +171,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
                 if (outputs[i]->numel() == 1) {
                     initial_grad = ones(outputs[i]->shape(), outputs[i]->dtype(), outputs[i]->device());
                 } else {
-                    throw std::runtime_error("Gradient must be provided for non-scalar outputs");
+                    throw std::runtime_error("Gradient must be providesd for non-scalar outputs");
                 }
             }
             
@@ -189,7 +184,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
         return;
     }
     
-    // Dynamic traversal: Support mixed graph of new engine nodes and old grad_fn
+    // Dynamic traversal: Support mixed graph of new engine nodes and legacy grad_fn
     std::vector<NodePtr> stack;
     std::unordered_set<NodePtr> visited;  // Prevent duplicate node processing
     for (auto& r : roots) { if (r) stack.push_back(r); }
@@ -199,7 +194,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
         stack.pop_back();
         if (!node || !node->tensor) continue;
         
-        // Key: Check if this node has been processed to avoid infinite loops
+        // Critical: Check if node already processed to avoid infinite loops
         if (visited.count(node)) continue;
         visited.insert(node);
         
@@ -211,8 +206,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
         TensorPtr node_grad = grad_it->second;
         
         #ifdef AUTOGRAD_DEBUG
-        std::cout << "[Engine] Processing node=" << raw_ptr
-                  << " has_backward_fn=" << (node->backward_fn?"yes":"no") << std::endl;
+        // Debug only
         #endif
         
         std::vector<TensorPtr> input_grads;
@@ -220,7 +214,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
         if (node->backward_fn) {
             input_grads = node->backward_fn->apply(node_grad);
         } else if (node->tensor->grad_fn_) {
-            // Compatibility with legacy path: Call legacy grad_fn and proceed forward
+            // Compatible with legacy path: Call legacy grad_fn and advance
             used_legacy = true;
             input_grads = node->tensor->grad_fn_(node_grad);
         } else {
@@ -228,7 +222,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
             continue;
         }
         
-        // Distribute gradients and push input nodes to stack
+        // Distribute gradients and push inputs to stack
         if (!used_legacy) {
             for (size_t i = 0; i < node->next_edges.size(); ++i) {
                 const auto& edge = node->next_edges[i];
@@ -246,8 +240,8 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
             // Legacy has no next_edges, dynamically create nodes and push to stack based on grads
             for (auto& g : input_grads) {
                 if (!g) continue;
-                // Cannot directly know input tensor pointers, must rely on legacy grad_fn having accumulated gradients to corresponding inputs;
-                // Here use registry scan strategy: push all tensors with accumulated gradients to stack (approximation)
+                // Cannot directly obtain input tensor pointers, must rely on legacy grad_fn having accumulated gradients to corresponding inputs internally
+                // Use registry scan strategy: push all tensors with accumulated gradients to stack (approximate)
                 for (const auto& [tptr, shared] : tensor_registry_) {
                     if (!shared) continue;
                     auto it2 = pending_grads_.find(tptr);
@@ -262,7 +256,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
     
     // Final: Set gradients to tensors (write back only to leaves or tensors that explicitly retain grads)
     #ifdef AUTOGRAD_DEBUG
-    std::cout << "[AutogradEngine] Setting gradients for " << pending_grads_.size() << " tensors" << std::endl;
+    // Debug only
     #endif
     
     for (const auto& [tensor_ptr, grad] : pending_grads_) {
@@ -271,14 +265,25 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
         if (reg_it != tensor_registry_.end()) {
             TensorPtr tensor_shared = reg_it->second;
             if (!tensor_shared) continue;
-            // Only write back to leaf or retains_grad tensors, avoid memory bloat from allocating gradients for many intermediate tensors
-            if (tensor_shared->is_leaf() || tensor_shared->retains_grad()) {
+            bool should_write = false;
+            #ifdef USE_NEW_AUTOGRAD_ENGINE
+            // New engine: Writeback condition = parameter/leaf (Node has no backward_fn) or explicit retain
+            if (tensor_shared->retains_grad()) {
+                should_write = true;
+            } else if (tensor_shared->grad_node_) {
+                // Has node: If no backward_fn, treat as parameter/input leaf
+                should_write = (tensor_shared->grad_node_->backward_fn == nullptr);
+            } else {
+                // No node: Conservatively treat as leaf
+                should_write = true;
+            }
+            #else
+            should_write = tensor_shared->is_leaf() || tensor_shared->retains_grad();
+            #endif
+            if (should_write) {
                 tensor_shared->set_grad(grad);
                 #ifdef AUTOGRAD_DEBUG
-                std::cout << "[AutogradEngine]   Set gradient for tensor at " << tensor_ptr
-                          << " (leaf=" << (tensor_shared->is_leaf()?"1":"0")
-                          << ", retain=" << (tensor_shared->retains_grad()?"1":"0")
-                          << ")" << std::endl;
+                // Debug only
                 #endif
             }
         }
@@ -290,7 +295,7 @@ void Engine::run_backward(const std::vector<TensorPtr>& outputs,
 }
 
 void Engine::clear_graph() {
-    // First break bidirectional references between Tensor and Node to avoid cross-step memory retention
+    // First break bi-directional references between Tensor and Node to avoid cross-step memory retention
     for (auto &kv : tensor_registry_) {
         const Tensor* raw = kv.first;
         TensorPtr t = kv.second;

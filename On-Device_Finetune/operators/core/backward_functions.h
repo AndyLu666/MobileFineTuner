@@ -38,6 +38,17 @@ public:
     std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
 };
 
+class SubBackward : public BackwardFunction {
+private:
+    std::vector<int64_t> shape_a_, shape_b_;
+
+public:
+    SubBackward(const std::vector<int64_t>& shape_a, const std::vector<int64_t>& shape_b)
+        : shape_a_(shape_a), shape_b_(shape_b) {}
+
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
 class MatmulBackward : public BackwardFunction {
 private:
     TensorPtr a_, b_;
@@ -270,6 +281,22 @@ private:
 public:
     ApplyRoPEBackward(int seq_len, int head_dim, float rope_theta)
         : seq_len_(seq_len), head_dim_(head_dim), rope_theta_(rope_theta) {}
+    std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
+};
+
+class MemoryFirstMLPBackward : public BackwardFunction {
+private:
+    TensorPtr input_, fc_weight_, fc_bias_, proj_weight_, proj_bias_;
+    int chunk_size_;
+    int64_t batch_seq_, n_embd_, n_inner_;
+public:
+    MemoryFirstMLPBackward(const TensorPtr& input, const TensorPtr& fc_weight,
+                          const TensorPtr& fc_bias, const TensorPtr& proj_weight,
+                          const TensorPtr& proj_bias, int chunk_size,
+                          int64_t batch_seq, int64_t n_embd, int64_t n_inner)
+        : input_(input), fc_weight_(fc_weight), fc_bias_(fc_bias),
+          proj_weight_(proj_weight), proj_bias_(proj_bias), chunk_size_(chunk_size),
+          batch_seq_(batch_seq), n_embd_(n_embd), n_inner_(n_inner) {}
     std::vector<TensorPtr> apply(const TensorPtr& grad_output) override;
 };
 

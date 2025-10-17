@@ -304,7 +304,7 @@ public:
     void schedule_ui_safe_operation(const std::function<void()>& operation);
     
     /**
-     * @brief Get current UI performance metrics
+     * @brief Get current UI perforance metrics
      */
     struct UIMetrics {
         float average_fps;
@@ -402,7 +402,7 @@ public:
         bool zram_optimization_active;
         double memory_pressure_level;
         
-        // Performance optimizations  
+        // Perforance optimizations  
         bool big_little_optimization_active;
         bool gpu_optimization_active;
         bool cache_optimization_active;

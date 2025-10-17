@@ -78,20 +78,20 @@ public:
 
         std::string timestamp = get_timestamp();
         std::string level_str = level_to_string(level);
-        std::string formatted_msg = "[" + timestamp + "] [" + level_str + "] " + message;
+        std::string foratted_msg = "[" + timestamp + "] [" + level_str + "] " + message;
 
         // Output to console
         if (console_output_) {
             if (level >= LogLevel::ERROR) {
-                std::cerr << formatted_msg << std::endl;
+                std::cerr << foratted_msg << std::endl;
             } else {
-                std::cout << formatted_msg << std::endl;
+                std::cout << foratted_msg << std::endl;
             }
         }
 
         // Write to log file
         if (log_file_.is_open()) {
-            log_file_ << formatted_msg << std::endl;
+            log_file_ << foratted_msg << std::endl;
             log_file_.flush();
         }
     }
@@ -103,23 +103,23 @@ public:
 
     // Formatted logging
     template<typename... Args>
-    void info_f(const std::string& format, Args... args) {
+    void info_f(const std::string& forat, Args... args) {
         char buffer[1024];
-        snprintf(buffer, sizeof(buffer), format.c_str(), args...);
+        snprintf(buffer, sizeof(buffer), forat.c_str(), args...);
         info(std::string(buffer));
     }
 
     template<typename... Args>
-    void error_f(const std::string& format, Args... args) {
+    void error_f(const std::string& forat, Args... args) {
         char buffer[1024];
-        snprintf(buffer, sizeof(buffer), format.c_str(), args...);
+        snprintf(buffer, sizeof(buffer), forat.c_str(), args...);
         error(std::string(buffer));
     }
 
     template<typename... Args>
-    void debug_f(const std::string& format, Args... args) {
+    void debug_f(const std::string& forat, Args... args) {
         char buffer[1024];
-        snprintf(buffer, sizeof(buffer), format.c_str(), args...);
+        snprintf(buffer, sizeof(buffer), forat.c_str(), args...);
         debug(std::string(buffer));
     }
 
