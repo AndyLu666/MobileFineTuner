@@ -1,0 +1,67 @@
+# Build directories
+build/
+build_*/
+operators/build/
+operators/build_*/
+
+# Training outputs and results
+runs/
+results/
+*.log
+nohup.out
+
+# Model weights and checkpoints (too large for git)
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+gpt2_lora_finetune/pretrained/
+gemma-3-270m/
+gemma-3-1b/
+gemma3/
+
+# Data directories
+data/wikitext2/
+data/mmlu/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.pytest_cache/
+*.egg-info/
+dist/
+*.egg
+
+# Virtual environments
+.venv*/
+venv/
+env/
+pt_env/
+plot_env/
+
+# IDE and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Compressed files
+*.zip
+*.tar.gz
+*.7z
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Debug outputs
+*.npy
+debug/
+testdata/
+

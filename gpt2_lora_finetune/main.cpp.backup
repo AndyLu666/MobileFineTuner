@@ -1,0 +1,184 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <cmath>
+
+#include "finetune_ops/graph/gpt2_model.h"
+#include "finetune_ops/graph/safetensors_loader.h"
+#include "finetune_ops/graph/lora_injector.h"
+#include "finetune_ops/graph/lora_saver.h"
+#include "finetune_ops/data/wikitext2_dataset.h"
+#include "finetune_ops/core/tokenizer_bpe.h"
+#include "finetune_ops/core/lm_loss.h"
+#include "finetune_ops/optim/adam.h"
+
+using namespace std;
+using namespace ops;
+
+struct CmdArgs {
+    string data_dir;
+    string pretrained_dir;
+    string lora_out;
+    int steps = 100;
+    int batch_size = 1;
+    int seq_len = 128;
+    int rank = 8;
+    float alpha = 16.0f;
+    float lr = 1e-4f;
+    float weight_decay = 0.0f;
+};
+
+static void print_usage(const char* prog) {
+    cerr << "Usage: " << prog << " [--data_dir PATH] [--pretrained_dir PATH] [--lora_out PATH]"
+         << " [--steps N] [--batch_size N] [--seq_len N]"
+         << " [--rank R] [--alpha A] [--lr LR] [--weight_decay WD]" << endl;
+}
+
+static CmdArgs parse_args(int argc, char** argv) {
+    CmdArgs args;
+    args.data_dir = "/Users/tony/Documents/重新开始/data/wikitext2/wikitext-2-raw";
+    args.pretrained_dir = "/Users/tony/Documents/重新开始/gpt2_lora_finetune/pretrained/gpt2";
+
+    for (int i = 1; i < argc; ++i) {
+        string k = argv[i];
+        auto get_val = [&](const string& key)->string {
+            if (i + 1 >= argc) { print_usage(argv[0]); exit(1); }
+            if (k != key) { print_usage(argv[0]); exit(1); }
+            return string(argv[++i]);
+        };
+        if (k == "--data_dir") args.data_dir = get_val("--data_dir");
+        else if (k == "--pretrained_dir") args.pretrained_dir = get_val("--pretrained_dir");
+        else if (k == "--lora_out") args.lora_out = get_val("--lora_out");
+        else if (k == "--steps") args.steps = stoi(get_val("--steps"));
+        else if (k == "--batch_size") args.batch_size = stoi(get_val("--batch_size"));
+        else if (k == "--seq_len") args.seq_len = stoi(get_val("--seq_len"));
+        else if (k == "--rank") args.rank = stoi(get_val("--rank"));
+        else if (k == "--alpha") args.alpha = stof(get_val("--alpha"));
+        else if (k == "--lr") args.lr = stof(get_val("--lr"));
+        else if (k == "--weight_decay") args.weight_decay = stof(get_val("--weight_decay"));
+        else if (k == "--help" || k == "-h") { print_usage(argv[0]); exit(0); }
+        else { cerr << "Unknown arg: " << k << endl; print_usage(argv[0]); exit(1); }
+    }
+    return args;
+}
+
+int main(int argc, char** argv) {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    auto args = parse_args(argc, argv);
+
+    try {
+        cout << "========== GPT-2 LoRA Finetune ==========" << endl;
+        cout << "data_dir       : " << args.data_dir << endl;
+        cout << "pretrained_dir : " << args.pretrained_dir << endl;
+        cout << "steps          : " << args.steps << endl;
+        cout << "batch_size     : " << args.batch_size << endl;
+        cout << "seq_len        : " << args.seq_len << endl;
+        cout << "rank/alpha     : " << args.rank << "/" << args.alpha << endl;
+        cout << "lr/wd          : " << args.lr << "/" << args.weight_decay << endl;
+
+        // 1) 構建模型並載入預訓練
+        GPT2Config cfg; // 使用內建預設（gpt2 small）
+        GPT2Model model(cfg);
+        model.tie_weights();
+
+        string st_path = args.pretrained_dir + "/model.safetensors";
+        SafeTensorsReader reader(st_path);
+        reader.parse_header();
+        auto key_map = GPT2KeyMapper::generate_gpt2_mapping(cfg.n_layer);
+        for (const auto& kv : key_map) {
+            const string& internal_key = kv.first;
+            const string& hf_key = kv.second;
+            try {
+                auto info = reader.get_tensor_info(hf_key);
+                if (!info.dtype.empty()) {
+                    auto tensor = reader.load_tensor(hf_key, false);
+                    model.assign_weight(internal_key, tensor);
+                }
+            } catch (...) {
+                // 某些鍵可能不存在於 gpt2 small，忽略
+            }
+        }
+
+        // 2) 初始化 LoRA 並注入
+        model.init_lora_modules();
+        LoraSpec lora_spec;
+        lora_spec.rank = args.rank;
+        lora_spec.alpha = args.alpha;
+        lora_spec.dropout = 0.0f;
+        lora_spec.split_qkv = true;
+        LoraInjector injector;
+        injector.inject(model, lora_spec);
+        auto trainable = model.get_lora_parameters();
+        cout << "LoRA params: " << trainable.size() << endl;
+        for (auto& p : trainable) {
+            p->zero_grad();
+        }
+
+        // 3) 準備 tokenizer 與資料集
+        auto tok_cfg = BPEConfig::from_pretrained(args.pretrained_dir);
+        GPT2BPETokenizer tokenizer(tok_cfg);
+        tokenizer.load();
+
+        WT2Config data_cfg;
+        data_cfg.train_path = args.data_dir + "/wiki.train.raw";
+        data_cfg.valid_path = args.data_dir + "/wiki.valid.raw";
+        data_cfg.test_path  = args.data_dir + "/wiki.test.raw";
+        data_cfg.seq_len = args.seq_len;
+        data_cfg.stride  = -1;
+        data_cfg.eos_id  = 50256;
+        WikiText2Dataset dataset(data_cfg, &tokenizer);
+        dataset.load(Split::Train);
+
+        // 4) 優化器
+        AdamConfig opt_cfg;
+        opt_cfg.learning_rate = args.lr;
+        opt_cfg.beta1 = 0.9f;
+        opt_cfg.beta2 = 0.999f;
+        opt_cfg.epsilon = 1e-8f;
+        opt_cfg.weight_decay = args.weight_decay;
+        opt_cfg.clip_grad_norm = 1.0f;
+        Adam optimizer(opt_cfg);
+
+        // 5) 訓練循環
+        cout << "\n========== Training ==========" << endl;
+        for (int step = 0; step < args.steps; ++step) {
+            auto batch = dataset.next_batch(args.batch_size);
+            auto logits = model.forward(batch.input_ids, batch.attention_mask);
+            auto loss = lm_cross_entropy(logits, batch.labels, -100, "mean");
+            float loss_val = loss->data<float>()[0];
+
+            loss->backward();
+
+            vector<TensorPtr> grads;
+            grads.reserve(trainable.size());
+            for (const auto& p : trainable) grads.push_back(p->grad());
+            optimizer.step(trainable, grads);
+            for (auto& p : trainable) p->zero_grad();
+
+            float ppl = perplexity_from_loss(loss_val);
+            cout << "Step " << step << ": Loss=" << loss_val << ", PPL=" << ppl << endl;
+        }
+
+        // 保存LoRA（可选）
+        if (!args.lora_out.empty()) {
+            cout << "\n[Save] Saving LoRA to " << args.lora_out << endl;
+            LoraSpec save_spec;
+            save_spec.rank = args.rank;
+            save_spec.alpha = args.alpha;
+            save_spec.dropout = 0.0f;
+            save_spec.split_qkv = true;
+            LoraSaver::save_safetensors(args.lora_out, model, save_spec);
+            cout << "✅ LoRA saved" << endl;
+        }
+
+        cout << "\n✅ Finetune finished." << endl;
+        return 0;
+
+    } catch (const exception& e) {
+        cerr << "\n❌ Exception: " << e.what() << endl;
+        return 1;
+    }
+}
