@@ -1,3 +1,9 @@
+<div align="center">
+  <img src="logo.jpg" alt="Duke University & Duke Kunshan University" width="600"/>
+</div>
+
+<br>
+
 # MobileFineTuner
 
 **A Unified End-to-End Framework for Fine-Tuning LLMs on Mobile Phones**
