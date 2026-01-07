@@ -73,6 +73,35 @@ python pytorch_alignment/gemma_lora_finetune.py \
 
 ---
 
+### Qwen2.5-0.5B LoRA Fine-tuning
+**File:** `qwen_lora_finetune.py`  
+**Mirrors:** `qwen_lora_finetune/src/wikitext_main.cpp` and `src/mmlu_main.cpp`
+
+Supports WikiText-2 (default) and MMLU JSONL (ids/mask) for masked causal LM training.
+
+**Usage (WikiText-2):**
+```bash
+python pytorch_alignment/qwen_lora_finetune.py \
+  --model_dir Qwen2.5-0.5B \
+  --data_dir data/wikitext2/wikitext-2-raw \
+  --output_dir pytorch_runs/qwen_wikitext_lora \
+  --epochs 1 --batch 1 --seq_len 1024 \
+  --lora_r 8 --lora_alpha 16 --lora_dropout 0.05
+```
+
+**Usage (MMLU JSONL, ids/mask):**
+```bash
+python pytorch_alignment/qwen_lora_finetune.py \
+  --model_dir Qwen2.5-0.5B \
+  --jsonl_train runs/mmlu_jsonl_qwen/train.jsonl \
+  --jsonl_valid runs/mmlu_jsonl_qwen/valid.jsonl \
+  --seq_len 128 --batch 8 --grad_accum 1 \
+  --output_dir pytorch_runs/qwen_mmlu_lora \
+  --target_mode qv  # q,v only (matches C++ default)
+```
+
+---
+
 ## Configuration Alignment
 
 All scripts are configured to match C++ implementations:

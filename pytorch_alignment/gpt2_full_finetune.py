@@ -2,6 +2,7 @@ import argparse
 import math
 import os
 import random
+import json
 from dataclasses import dataclass
 from typing import Iterable, List
 
@@ -35,6 +36,12 @@ def detect_device() -> torch.device:
 class WikiTextExample:
     input_ids: torch.Tensor
     attention_mask: torch.Tensor
+
+
+class JsonlMaskedExample:
+    input_ids: torch.Tensor
+    attention_mask: torch.Tensor
+    labels: torch.Tensor
 
 
 class WikiTextDataset(Dataset):
@@ -118,6 +125,55 @@ def collate_batch(batch: List[WikiTextExample]) -> dict:
     return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": input_ids.clone()}
 
 
+class JsonlMaskedDataset(Dataset):
+    """
+    JSONL dataset {"ids": [...], "mask": [...]} with masked labels (no shift).
+    Labels equal token ids where mask==1, otherwise -100, matching C++ JSONL mode.
+    """
+
+    def __init__(self, path: str, seq_len: int, pad_id: int):
+        self.samples: List[JsonlMaskedExample] = []
+        self.seq_len = seq_len
+        self.pad_id = pad_id
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    rec = json.loads(line)
+                    ids = rec.get("ids", [])
+                    mask = rec.get("mask", [])
+                    if not isinstance(ids, list) or not isinstance(mask, list):
+                        continue
+                    if len(ids) != len(mask) or not ids:
+                        continue
+                    ids = ids[:seq_len]
+                    mask = mask[:seq_len]
+                    if len(ids) < seq_len:
+                        pad_n = seq_len - len(ids)
+                        ids = ids + [pad_id] * pad_n
+                        mask = mask + [0] * pad_n
+                    ids_t = torch.tensor(ids, dtype=torch.long)
+                    attn = torch.ones_like(ids_t, dtype=torch.long)
+                    labels = torch.full_like(ids_t, -100)
+                    mask_t = torch.tensor(mask, dtype=torch.long)
+                    labels = torch.where(mask_t > 0, ids_t, labels)
+                    self.samples.append(JsonlMaskedExample(ids_t, attn, labels))
+                except Exception:
+                    continue
+
+    def __len__(self) -> int:
+        return len(self.samples)
+
+    def __getitem__(self, idx: int) -> JsonlMaskedExample:
+        return self.samples[idx]
+
+
+def collate_jsonl(batch: List[JsonlMaskedExample]) -> dict:
+    input_ids = torch.stack([b.input_ids for b in batch], dim=0)
+    attention_mask = torch.stack([b.attention_mask for b in batch], dim=0)
+    labels = torch.stack([b.labels for b in batch], dim=0)
+    return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
+
+
 def lr_schedule(step: int, total_steps: int, base_lr: float, warmup_steps: int) -> float:
     if warmup_steps > 0 and step < warmup_steps:
         return base_lr * float(step + 1) / float(max(1, warmup_steps))
@@ -158,6 +214,9 @@ def main():
     parser = argparse.ArgumentParser(description="PyTorch GPT-2 full finetune (alignment)")
     parser.add_argument("--data_dir", type=str, required=True)
     parser.add_argument("--pretrained_dir", type=str, required=True)
+    parser.add_argument("--jsonl_train", type=str, default="")
+    parser.add_argument("--jsonl_valid", type=str, default="")
+    parser.add_argument("--jsonl_test", type=str, default="")
     parser.add_argument("--output_path", type=str, default="")
     parser.add_argument("--resume_from", type=str, default="")
     parser.add_argument("--eval_out", type=str, default="")
@@ -186,40 +245,51 @@ def main():
     tok.padding_side = "right"
     tok.pad_token = tok.eos_token
 
-    train_dataset = WikiTextDataset(
-        os.path.join(args.data_dir, "wiki.train.raw"),
-        tok,
-        seq_len=args.seq_len,
-        stride=-1,
-        eos_token_id=tok.eos_token_id,
-        data_fraction=args.data_fraction,
-        insert_eos_between_lines=True,
-        drop_last=True,
-    )
-    valid_dataset = WikiTextDataset(
-        os.path.join(args.data_dir, "wiki.valid.raw"),
-        tok,
-        seq_len=args.seq_len,
-        stride=-1,
-        eos_token_id=tok.eos_token_id,
-        data_fraction=args.data_fraction,
-        insert_eos_between_lines=True,
-        drop_last=False,
-    )
+    use_jsonl = bool(args.jsonl_train)
+    if use_jsonl:
+        train_dataset: Dataset = JsonlMaskedDataset(args.jsonl_train, args.seq_len, tok.pad_token_id)
+        valid_dataset: Dataset = (
+            JsonlMaskedDataset(args.jsonl_valid, args.seq_len, tok.pad_token_id)
+            if args.jsonl_valid
+            else train_dataset
+        )
+        collate_fn = collate_jsonl
+    else:
+        train_dataset = WikiTextDataset(
+            os.path.join(args.data_dir, "wiki.train.raw"),
+            tok,
+            seq_len=args.seq_len,
+            stride=-1,
+            eos_token_id=tok.eos_token_id,
+            data_fraction=args.data_fraction,
+            insert_eos_between_lines=True,
+            drop_last=True,
+        )
+        valid_dataset = WikiTextDataset(
+            os.path.join(args.data_dir, "wiki.valid.raw"),
+            tok,
+            seq_len=args.seq_len,
+            stride=-1,
+            eos_token_id=tok.eos_token_id,
+            data_fraction=args.data_fraction,
+            insert_eos_between_lines=True,
+            drop_last=False,
+        )
+        collate_fn = collate_batch
 
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
         drop_last=True,
-        collate_fn=collate_batch,
+        collate_fn=collate_fn,
     )
     eval_loader = DataLoader(
         valid_dataset,
         batch_size=args.eval_batch_size,
         shuffle=False,
         drop_last=False,
-        collate_fn=collate_batch,
+        collate_fn=collate_fn,
     )
 
     total_train_seqs = len(train_dataset)

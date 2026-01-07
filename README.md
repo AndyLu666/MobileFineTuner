@@ -96,27 +96,99 @@ mkdir -p data/wikitext2/wikitext-2-raw
 ```
 
 ### 2. Run LoRA Fine-Tuning
+#### WikiText-2 LoRA
+- **GPT-2 Small (124M):**
+  ```bash
+  ./build/gpt2_lora_finetune \
+    --data_dir data/wikitext2/wikitext-2-raw \
+    --pretrained_dir gpt2_small_lora_finetune/pretrained/gpt2 \
+    --lora_out runs/gpt2_small_wt2_lora.safetensors \
+    --epochs 1 --batch_size 4 --grad_accum_steps 2 --seq_len 128 \
+    --rank 8 --alpha 16 --lr 2e-4 --warmup_steps 100 \
+    --eval_interval 200 --clip_grad_norm 1.0
+  ```
+- **GPT-2 Medium (355M):**
+  ```bash
+  ./build/gpt2_lora_finetune \
+    --data_dir data/wikitext2/wikitext-2-raw \
+    --pretrained_dir gpt2_medium_lora_finetune/pretrained/gpt2-medium \
+    --lora_out runs/gpt2_medium_wt2_lora.safetensors \
+    --epochs 1 --batch_size 2 --grad_accum_steps 2 --seq_len 128 \
+    --rank 8 --alpha 16 --lr 2e-4 --warmup_steps 100
+  ```
+- **Gemma 270M:**
+  ```bash
+  ./build/train_lora_gemma \
+    --model_dir gemma_3_270m_lora_finetune/pretrained \
+    --data_dir data/wikitext2/wikitext-2-raw \
+    --output_dir runs/gemma_270m_wt2_lora \
+    --epochs 1 --batch 4 --grad_accum 1 --seq_len 256 \
+    --learning_rate 2e-4 --warmup_ratio 0.03 \
+    --lora_r 8 --lora_alpha 32 --targets full
+  ```
+- **Gemma 1B-PT:**
+  ```bash
+  ./build/train_lora_gemma \
+    --model_dir gemma_3_1b_pt_lora_finetune/pretrained \
+    --data_dir data/wikitext2/wikitext-2-raw \
+    --output_dir runs/gemma_1b_wt2_lora \
+    --epochs 1 --batch 2 --grad_accum 2 --seq_len 256 \
+    --learning_rate 2e-4 --warmup_ratio 0.03 \
+    --lora_r 8 --lora_alpha 32 --targets full
+  ```
+- **Qwen2.5-0.5B:**
+  ```bash
+  ./build/qwen_lora_finetune \
+    --data_dir data/wikitext2/wikitext-2-raw \
+    --pretrained_dir qwen_lora_finetune/pretrained \
+    --lora_out runs/qwen_wt2_lora.safetensors \
+    --seq_len 1024 --batch_size 1 --grad_accum_steps 1 \
+    --rank 8 --alpha 16 --lr 2e-4
+  ```
 
-**GPT-2 Small (124M parameters):**
+#### MMLU LoRA (masked JSONL)
+Data prep: in each model directory run `run_prepare_data.sh` (requires `transformers`) to generate `runs/mmlu_jsonl_*/{train,valid}.jsonl` with fields `ids` and `mask`.
+
+- **GPT-2 Small / Medium:**
+  ```bash
+  ./build/gpt2_lora_finetune \
+    --jsonl_train runs/mmlu_jsonl_gpt2_s128/train.jsonl \
+    --jsonl_valid runs/mmlu_jsonl_gpt2_s128/valid.jsonl \
+    --pretrained_dir gpt2_small_lora_finetune/pretrained/gpt2 \   # or medium directory
+    --lora_out runs/gpt2_mmlu_lora.safetensors \
+    --seq_len 128 --batch_size 8 --grad_accum_steps 1 \
+    --rank 8 --alpha 16 --lr 2e-4
+  ```
+- **Gemma 270M / 1B-PT:**
+  ```bash
+  ./build/train_lora_gemma \
+    --model_dir gemma_3_1b_pt_lora_finetune/pretrained \   # or 270m directory
+    --jsonl_train runs/mmlu_jsonl_gemma1b_s128/train.jsonl \
+    --jsonl_valid runs/mmlu_jsonl_gemma1b_s128/valid.jsonl \
+    --output_dir runs/gemma_mmlu_lora \
+    --seq_len 128 --batch 8 --grad_accum 1 \
+    --learning_rate 2e-4 --warmup_ratio 0.03 \
+    --lora_r 8 --lora_alpha 32
+  ```
+- **Qwen2.5-0.5B:**
+  ```bash
+  ./build/qwen_lora_finetune \
+    --jsonl_train runs/mmlu_jsonl_qwen/train.jsonl \
+    --jsonl_valid runs/mmlu_jsonl_qwen/valid.jsonl \
+    --pretrained_dir qwen_lora_finetune/pretrained \
+    --lora_out runs/qwen_mmlu_lora.safetensors \
+    --seq_len 128 --batch_size 8 --grad_accum_steps 1 \
+    --rank 8 --alpha 16 --lr 2e-4 --qv_only
+  ```
+
+#### GPT-2 Small Full Fine-Tune (WikiText-2)
 ```bash
-./build/gpt2_lora_finetune \
+./build/gpt2_full_finetune \
   --data_dir data/wikitext2/wikitext-2-raw \
-  --pretrained_dir gpt2_lora_finetune/pretrained/gpt2 \
-  --lora_out runs/gpt2_lora.safetensors \
+  --pretrained_dir gpt2_small_lora_finetune/pretrained/gpt2 \
+  --output_path runs/gpt2_small_full_ft \
   --epochs 1 --batch_size 4 --grad_accum_steps 2 --seq_len 128 \
-  --rank 8 --alpha 16 --lr 2e-4 --warmup_steps 100 \
-  --eval_interval 200 --clip_grad_norm 1.0
-```
-
-**Gemma 270M:**
-```bash
-./build/train_lora_gemma \
-  --model_dir gemma-3-270m \
-  --data_dir data/wikitext2/wikitext-2-raw \
-  --output_dir runs/gemma_270m_lora \
-  --epochs 1 --batch 4 --grad_accum 1 --seq_len 256 \
-  --learning_rate 2e-4 --warmup_ratio 0.03 \
-  --lora_r 8 --lora_alpha 32 --targets full
+  --lr 1e-4 --warmup_steps 100
 ```
 
 ### 3. Enable Memory Optimization

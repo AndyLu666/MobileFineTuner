@@ -10,7 +10,8 @@ scripts/
 ├── Finetune/                     # Training and alignment scripts
 ├── pretokenize_wikitext2_gemma.py
 ├── plot_train200_results.py
-└── train_gemma3_lora_torch.py
+├── train_gemma3_lora_torch.py
+└── (Finetune/) run_qwen_lora_pt.sh
 ```
 
 ---
@@ -118,6 +119,9 @@ Short training run for quick testing.
 #### `run_gpt2_medium_lora.sh`
 GPT-2 Medium LoRA training.
 
+#### `run_qwen_lora_pt.sh`
+PyTorch Qwen2.5-0.5B LoRA training (WikiText-2 by default; supports JSONL MMLU if paths are provided via `--jsonl_*` in the script call).
+
 #### `run_gemma_270m_grad_accum_test.sh` / `run_gemma_270m_grad_accum_test_v2.sh`
 Gradient accumulation tests for Gemma 270M.
 
@@ -126,13 +130,13 @@ Gradient accumulation tests for Gemma 270M.
 ### Alignment and Verification
 
 #### `run_all_alignment.sh`
-Run all alignment tests against PyTorch baseline.
+Run C++ (GPT-2, Gemma) plus PyTorch (GPT-2, Gemma, Qwen) alignment tests.
 
 #### `run_sequential_alignment.sh`
 Sequential alignment verification for debugging.
 
 #### `run_pytorch_alignment.sh`
-PyTorch numerical alignment baseline.
+PyTorch numerical alignment baseline (runs GPT-2, Gemma, and Qwen in parallel; override `MODEL_*`/`DATA_DIR`/`OUT_BASE` via env vars).
 
 #### `run_pytorch_after_cpp.sh`
 PyTorch verification after C++ implementation changes.
